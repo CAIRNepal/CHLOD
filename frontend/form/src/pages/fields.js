@@ -3,8 +3,28 @@ import '../App.css';
 import './fields.css';
 
 function MyComponent() {
-    const inputs = Array.from({ length: 48 }, (_, index) => (
-        <input key={index} className='inputContainer' type='text' placeholder={`Field Name ${index + 1}`} />
+    // Define your custom field names here
+    const customFieldNames = [
+        "Name",
+        "Established_date",
+        "Location",
+        "Area",
+        "IsVulnerable",
+        "dateofRecorded",
+        "associatedWith",
+        "recordedBy",
+        "isMonitored",
+        "hasShape",
+        "type",
+        "linkedWith",
+        "madeBy",
+        "madeFor",
+        "isMadeFor"
+        // Add more field names as needed
+    ];
+
+    const inputs = customFieldNames.map((fieldName, index) => (
+        <input key={index} className='inputContainer' type='text' placeholder={fieldName} />
     ));
 
     return (

@@ -1,0 +1,35 @@
+.navbar {
+    position: sticky;
+    top: 0;
+    left: 0;
+    width: 100%;
+    background-color: #fff; /* Adjust as needed */
+    z-index: 1000; /* Adjust to make sure it's above other content */
+    padding: 10px 0; /* Adjust padding as needed */
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); /* Optional: Add shadow for better visibility */
+}
+
+.container {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    max-width: 1200px; /* Adjust as needed */
+    margin: 0 auto;
+    padding: 0 20px; /* Adjust padding as needed */
+}
+
+.projectLogo {
+    /* Add any styles for your logo container */
+}
+
+.login-signup {
+    display: flex;
+    align-items: center;
+}
+
+.login,
+.signup {
+    margin-left: 15px; /* Adjust spacing between buttons */
+}
+
+/* Add any additional styling as needed */
