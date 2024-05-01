@@ -14,7 +14,7 @@ function Login() {
             </div>
 
             <div className='loginform'>
-            <form>
+            <form action="/login" method='POST'>
                 <input type="text" placeholder="Username" />
                 <input type="password" placeholder="Password" />
                 <Link to='/signup' className='signtext'>Create new account</Link>

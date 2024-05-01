@@ -12,13 +12,15 @@ function Login() {
             </div>
 
             <div className='loginform'>
-                <form>
-                    <input type="text" placeholder="Username or Email" />
-                    <input type="password" placeholder="Password" />
-                    <input type="password" placeholder="Confirm Password" />
-                    <Link to='/login' className='signtext'>Already have an account</Link>
-                    <button type="submit" className='login'>Signup</button>
-                </form>
+                <form action="/signup" method="POST">
+        <input type="text" name="name" placeholder="Username" />
+        <input type="email" name="email" placeholder="Email" />
+        <input type="password" name="password" placeholder="Password" />
+        <input type="password" name="confirmPassword" placeholder="Confirm Password" />
+        <Link to='/login' className='signtext'>Already have an account</Link>
+        <button type="submit" className='login'>Signup</button>
+    </form>
+
             </div>
         </div>
     );
