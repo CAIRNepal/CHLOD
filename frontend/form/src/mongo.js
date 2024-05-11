@@ -1,5 +1,6 @@
 const mongoose = require("mongoose");
 
+// Connect to MongoDB
 mongoose.connect("mongodb://localhost:27017/LoginForm")
     .then(() => {
         console.log('mongoose connected');
@@ -8,6 +9,7 @@ mongoose.connect("mongodb://localhost:27017/LoginForm")
         console.log('failed');
     });
 
+// Define the schema
 const logInSchema = new mongoose.Schema({
     name: {
         type: String,
@@ -24,6 +26,6 @@ const logInSchema = new mongoose.Schema({
     }
 });
 
+// Create and export the model
 const LogInCollection = mongoose.model('LogInCollection', logInSchema);
-
 module.exports = LogInCollection;

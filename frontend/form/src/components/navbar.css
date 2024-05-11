@@ -9,13 +9,20 @@
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); /* Optional: Add shadow for better visibility */
 }
 
+.projectLogo{
+    padding-left: 2%;
+}
+
+.login-signup {
+    padding-right: 2%;
+}
 .container {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    max-width: 1200px; /* Adjust as needed */
+    max-width: 1200px; 
     margin: 0 auto;
-    padding: 0 20px; /* Adjust padding as needed */
+    padding: 0 20px; 
 }
 
 
