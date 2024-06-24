@@ -1,0 +1,15 @@
+langcode: en
+status: true
+dependencies: {  }
+id: api_user
+label: 'API user'
+weight: 3
+is_admin: false
+permissions:
+  - 'post put delete datasets through the api'
+  - 'datastore_api_drop'
+  - 'datastore_api_import'
+  - 'harvest_api_index'
+  - 'harvest_api_register'
+  - 'harvest_api_run'
+  - 'harvest_api_info'

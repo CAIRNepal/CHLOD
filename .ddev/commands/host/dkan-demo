@@ -1,0 +1,25 @@
+#!/bin/bash
+#ddev-generated
+
+## Description: Build and run a demo site for DKAN.
+## Usage: dkan-demo
+
+# Fail early, fail often.
+set -eu -o pipefail
+
+ddev dkan-init --force
+ddev dkan-site-install
+
+mkdir -p sites/default/files/uploaded_resources
+mkdir -p sites/default/files/resources
+
+# install sample
+ddev dkan-sample-content
+
+# frontend
+ddev dkan-frontend-install
+ddev dkan-frontend-build
+
+ddev drush cr
+
+echo "Demo site build complete. Type 'ddev launch search' to visit the site."

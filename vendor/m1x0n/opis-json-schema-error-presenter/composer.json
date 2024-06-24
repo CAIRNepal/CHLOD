@@ -1,0 +1,35 @@
+{
+    "name": "m1x0n/opis-json-schema-error-presenter",
+    "description": "JSON schema error presenter for opis library",
+    "type": "library",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "m1x0n",
+            "email": "mmorozovm@gmail.com"
+        }
+    ],
+    "minimum-stability": "stable",
+    "require": {
+        "php": ">=7.1",
+        "ext-json": "*",
+        "opis/json-schema": "^1.0"
+    },
+    "require-dev": {
+        "opis/json-schema": "^1.0",
+        "phpunit/phpunit": ">=7.1 <10",
+        "dg/bypass-finals": "^1.1",
+        "squizlabs/php_codesniffer": "^3.4",
+        "phpstan/phpstan": "^1"
+    },
+    "autoload": {
+        "psr-4": {
+            "OpisErrorPresenter\\": "src/"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "OpisErrorPresenterTests\\": "tests/"
+        }
+    }
+}

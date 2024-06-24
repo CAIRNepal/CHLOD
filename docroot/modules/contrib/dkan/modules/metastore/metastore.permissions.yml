@@ -1,0 +1,12 @@
+'post put delete datasets through the api':
+  title: 'Metastore: post, put, patch, and delete datasets through the api'
+  description: 'post, put, patch, and delete datasets through the api'
+'administer data dictionary settings':
+  title: 'Metastore: Administer Data Dictionary Settings'
+  description: 'Administer data dictionary settings'
+
+
+
+administer resource mapping:
+  title: 'Administer resource mapping settings'
+  restrict access: true

@@ -1,0 +1,107 @@
+#!/bin/bash
+#ddev-generated
+
+## Description: Build the Drupal codebase for a DKAN site.
+## Usage: dkan-init [flags]
+## Example: dkan-init\ndkan-init --project-version 10.0.x-dev
+## Flags: [{"Name":"moduledev", "Usage":"Set up the file system for DKAN module development."},{"Name":"project-version", "Usage":"Specify a Drupal core version. Default 9.5.x-dev."},{"Name":"force", "Usage":"Force init even if there are files present which could be deleted."}]
+
+# Fail early, fail often.
+set -euo pipefail
+
+export DKAN_REPO=https://github.com/GetDKAN/dkan.git
+export DKAN_REPO_BRANCH=2.x
+export DKAN_DIRECTORY=dkan
+
+# Defaults.
+INIT_MODULEDEV=false
+INIT_FORCE=false
+INIT_PROJECT_VERSION="10.2.x-dev"
+
+# Glean flag arguments.
+while :; do
+  case ${1:-} in
+  --moduledev)
+    INIT_MODULEDEV=true
+    echo "*"
+    echo "* Setting up for local DKAN module development"
+    echo "*"
+    ;;
+  --force)
+    INIT_FORCE=true
+    echo "*"
+    echo "* Forcing initialization"
+    echo "*"
+    ;;
+  --project-version*)
+    shift
+    INIT_PROJECT_VERSION=$1
+    ;;
+  --) # End of all options.
+    break
+    ;;
+  -?*)
+    printf 'WARN: Unknown option (ignored): %s\n' "$1" >&2
+    ;;
+  *) # Default case: No more options, so break out of the loop.
+    break ;;
+  esac
+  shift
+done
+
+echo "*"
+echo "* Using project version: $INIT_PROJECT_VERSION"
+echo "*"
+
+# Determine if there's anything in the directory that we shouldn't remove.
+# - look for composer.json
+# - look for dkan/.
+# - If docroot/ exists, it shouldn't contain core/.
+
+if [ $INIT_FORCE = false ]; then
+  if [ -f composer.json ]; then
+    echo "Found composer.json. Assuming there is work in this directory you want to preserve. Aborting."
+    exit 1
+  fi
+  if [ -d docroot/core ]; then
+    echo "Found docroot/core. Assuming there is work in this directory you want to preserve. Aborting."
+    exit 1
+  fi
+  if [ -d $DKAN_DIRECTORY ]; then
+    echo "Found dkan. Assuming there is work in this directory you want to preserve. Aborting."
+    exit 1
+  fi
+fi
+
+if [ $INIT_MODULEDEV = true ]; then
+  echo " ** Checking for commands..."
+  command -v git
+fi
+
+if [ $INIT_FORCE = true ]; then
+  ddev composer create getdkan/recommended-project:$INIT_PROJECT_VERSION@dev --no-install -y
+else
+  ddev composer create getdkan/recommended-project:$INIT_PROJECT_VERSION@dev --no-install
+fi
+
+if [ $INIT_MODULEDEV = true ]; then
+  git clone -b $DKAN_REPO_BRANCH $DKAN_REPO $DDEV_APPROOT/dkan
+  ddev composer config repositories.dkan path dkan
+  ddev composer require getdkan/dkan:@dev --no-install
+fi
+
+ddev composer install
+
+# Adjust settings for our special case.
+# TODO: Change this after DDev 1.19.6 is released and we can merge hooks.
+cat .ddev/misc/settings.dkan-snippet.php.txt >> $DDEV_DOCROOT/sites/default/settings.php
+cp .ddev/misc/settings.dkan.php $DDEV_DOCROOT/sites/default/settings.dkan.php
+
+# TODO: Should this be in recommended-project as scaffold?
+#       or... in dkan module itself?
+mkdir -p $DDEV_DOCROOT/sites/default/files/uploaded_resources
+mkdir -p $DDEV_DOCROOT/sites/default/files/resources
+chmod -R 777 $DDEV_DOCROOT/sites/default/files
+chmod u+w $DDEV_DOCROOT/sites/default
+
+echo "Site codebase initialized."

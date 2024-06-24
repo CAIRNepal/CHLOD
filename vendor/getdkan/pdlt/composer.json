@@ -1,0 +1,43 @@
+{
+    "name": "getdkan/pdlt",
+    "description": "PHP Date Language Tool",
+    "license": "GPL-2.0-or-later",
+    "type": "library",
+    "authors": [
+        {
+            "name": "Clayton Liddell",
+            "email": "clayton.liddell@civicactions.com"
+        }
+    ],
+    "require": {
+        "php": ">=7.4"
+    },
+    "require-dev": {
+        "drupal/coder": "^8.3.14",
+        "phpunit/phpunit": "^9.6",
+        "rector/rector": "^0.15.17",
+        "squizlabs/php_codesniffer": "^3.7"
+    },
+    "autoload": {
+        "psr-4": {
+            "PDLT\\": "src/"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "PDLT\\Tests\\": "tests/"
+        }
+    },
+    "config": {
+        "allow-plugins": {
+            "dealerdirect/phpcodesniffer-composer-installer": true
+        }
+    },
+    "scripts": {
+        "phpcbf": "./vendor/bin/phpcbf",
+        "phpcs": "./vendor/bin/phpcs",
+        "rector": "./vendor/bin/rector process",
+        "rector-dry-run": "./vendor/bin/rector process --dry-run",
+        "test": "XDEBUG_MODE=coverage ./vendor/bin/phpunit --testsuite all --coverage-html ./coverage"
+    }
+}

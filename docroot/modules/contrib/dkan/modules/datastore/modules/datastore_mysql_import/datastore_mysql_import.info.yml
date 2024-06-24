@@ -1,0 +1,9 @@
+name: Datastore MySQL Import
+description: Provides a MySQL Importer class.
+type: module
+core_version_requirement: ^10
+package: DKAN
+dependencies:
+  - dkan:common
+  - dkan:datastore
+  - dkan:metastore

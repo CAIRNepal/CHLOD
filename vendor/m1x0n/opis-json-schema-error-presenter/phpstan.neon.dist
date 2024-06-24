@@ -1,0 +1,6 @@
+parameters:
+    level: 4
+    paths:
+        - %rootDir%/../../../src
+    excludePaths:
+        - %rootDir%/../../../src/Implementation/LocaleResolvers/HttpLocaleResolver.php

@@ -1,0 +1,45 @@
+{
+    "resources": [
+        {
+            "id": "asdf",
+            "alias": "t"
+        }
+    ],
+    "properties": [
+        {
+            "alias": "add_one",
+            "expression": {
+                "operator": "+",
+                "operands": ["field1", 1]
+            }
+        },
+        {
+            "alias": "add_two",
+            "expression": {
+                "operator": "+",
+                "operands": [
+                    {"resource": "t", "property": "field2"},
+                    2
+                ]
+            }
+        },
+        {
+          "alias": "sum",
+          "expression": {
+            "operator": "sum",
+            "operands": [
+              {
+                "resource": "t",
+                "property": "field2"
+              }
+            ]
+          }
+        }
+    ],
+    "sorts": [
+        {
+            "property": "add_one",
+            "order": "asc"
+        }
+    ]
+}
