@@ -15,8 +15,9 @@ import Dataset from './templates/dataset';
 import ApiDocsSpecific from './templates/dataset/api';
 import Publishers from './templates/publishers';
 import Form from './templates/form';
-import Community from './templates/community';
 import Curation from './templates/curation';
+import Activity from './templates/activity';
+import Queues from './templates/queues';
 
 const router = createBrowserRouter([
   {
@@ -60,8 +61,12 @@ const router = createBrowserRouter([
     element: <Curation />
   },
   {
-    path: "/community",
-    element: <Community />
+    path: "/curation/activity",
+    element: <Activity/>
+  },
+  {
+    path: "/curation/queues",
+    element: <Queues/>
   },
   {
     path: '*',
