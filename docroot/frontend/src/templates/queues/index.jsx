@@ -1,8 +1,8 @@
 import React from "react";
-import { Announcement } from "@civicactions/data-catalog-components";
 import Layout from '../../components/Layout';
 import config from "../../assets/config";
 import { version, dependencies } from '../../../package.json';
+import UUIDFetcher from "../../components/formcomponent/UUIDFetcher";
 
 const Queues = () => (
     <Layout title="Queues">
@@ -10,16 +10,7 @@ const Queues = () => (
             <h1>Queues this site</h1>
             <div className="dc-page-content row">
                 <div className="col-md-9 col-sm-12">
-                    <p>This is the default state of the DKAN data catalog.</p>
-                    <p>
-                    This tool helps create open data catalogs using React and other
-                    libraries.
-                    </p>
-                </div>
-                <div className="col-md-3 col-sm-12">
-                    <Announcement variation="info" heading="Note">
-                    <p>Update this Queues page before publishing.</p>
-                    </Announcement>
+                    <UUIDFetcher />
                 </div>
             </div>
             <h2>App version:</h2>

@@ -1,0 +1,6 @@
+{
+  "dependencies": {
+    "antd": "^5.19.0",
+    "react-highlight-words": "^0.20.0"
+  }
+}

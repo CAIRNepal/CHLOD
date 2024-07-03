@@ -1,12 +1,13 @@
 import React, { useState, useEffect } from 'react';
 
-const MyComponent = () => {
-    const [formData, setFormData] = useState(null); 
+const MyComponent = ({ uuid }) => {
+    const [formData, setFormData] = useState(null);
 
     useEffect(() => {
+        if (!uuid) return;
         const fetchData = async () => {
             try {
-                const response = await fetch('https://nchlod.ddev.site/webform_rest/heritage_graph/submission/6b64fbf9-93f1-4d80-a3f5-5b1332f614eb');
+                const response = await fetch(`https://nchlod.ddev.site/webform_rest/heritage_graph/submission/${uuid}`);
                 const responseData = await response.json();
                 setFormData(responseData.data);
             } catch (error) {
@@ -15,18 +16,29 @@ const MyComponent = () => {
         };
 
         fetchData();
-    }, []); 
+    }, [uuid]);
 
     return (
         <div>
-            {formData && (
-                <div>
-                    <h2>User Information</h2>
-                    <p>First Name: {formData.enter_your_first_name}</p>
-                    <p>Last Name: {formData.enter_your_last_name}</p>
-                    <p>Email: {formData.enter_your_email}</p>
-                  
-                </div>
+            {formData ? (
+                <table style={{ borderCollapse: 'collapse', width: '100%' }}>
+                    <thead>
+                        <tr>
+                            <th style={{ border: '1px solid #ddd', padding: '8px' }}>First Name</th>
+                            <th style={{ border: '1px solid #ddd', padding: '8px' }}>Last Name</th>
+                            <th style={{ border: '1px solid #ddd', padding: '8px' }}>Email</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td style={{ border: '1px solid #ddd', padding: '8px' }}>{formData.enter_your_first_name}</td>
+                            <td style={{ border: '1px solid #ddd', padding: '8px' }}>{formData.enter_your_last_name}</td>
+                            <td style={{ border: '1px solid #ddd', padding: '8px' }}>{formData.enter_your_email}</td>
+                        </tr>
+                    </tbody>
+                </table>
+            ) : (
+                <p>No data available</p>
             )}
         </div>
     );
