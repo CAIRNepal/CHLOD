@@ -2,5 +2,5 @@
   "container": "container",
   "site": "NCHLOD",
   "slogan": "Nepal Cultural Heritage Linked Open Data",
-  "logo": ""
+  "logo": "https://nchlod.ddev.site/frontend/src/theme/images/logo.svg"
 }

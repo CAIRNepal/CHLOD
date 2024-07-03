@@ -13,7 +13,7 @@ const Layout = ({
   return (
     <div className="App">
       <Helmet
-        title={`${title} - DKAN Demo`}
+        title={`${title} - NCHLOD`}
         description={description}
         generator="DKAN 2 (https://github.com/GetDKAN/dkan)"
         defer={false}

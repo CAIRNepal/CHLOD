@@ -1,14 +1,14 @@
 name: NCHLOD
 type: php
-docroot: ""
+docroot: docroot
 php_version: "8.2"
 webserver_type: nginx-fpm
 xdebug_enabled: false
 additional_hostnames: []
 additional_fqdns: []
 database:
-    type: mariadb
-    version: "10.11"
+    type: mysql
+    version: "5.7"
 use_dns_when_possible: true
 composer_version: "2"
 web_environment: []
@@ -278,3 +278,4 @@ corepack_enable: false
 # information on the commands that can be extended and the tasks you can define
 # for them. Example:
 #hooks:
+ngrok_args: --domain wp23.ngrok-free.app

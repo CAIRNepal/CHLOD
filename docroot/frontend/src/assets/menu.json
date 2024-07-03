@@ -11,13 +11,8 @@
       "target": "_top"
     },
     {
-      "label": "Publishers",
+      "label": "Community",
       "url": "/publishers",
-      "target": "_top"
-    },
-    {
-      "label": "About",
-      "url": "/about",
       "target": "_top"
     },
     {
@@ -26,8 +21,28 @@
       "target": "_top"
     },
     {
+      "label": "Curation",
+      "url": "/curation",
+      "target": "_top"
+    },
+    {
+      "label": "Activity",
+      "url": "/curation/activity",
+      "target": "_top"
+    },
+    {
+      "label": "Queues",
+      "url": "/curation/queues",
+      "target": "_top"
+    },
+    {
       "label": "Form",
       "url": "/form",
+      "target": "_top"
+    },
+    {
+      "label": "About",
+      "url": "/about",
       "target": "_top"
     }
   ],

@@ -15,6 +15,8 @@ import Dataset from './templates/dataset';
 import ApiDocsSpecific from './templates/dataset/api';
 import Publishers from './templates/publishers';
 import Form from './templates/form';
+import Community from './templates/community';
+import Curation from './templates/curation';
 
 const router = createBrowserRouter([
   {
@@ -52,6 +54,14 @@ const router = createBrowserRouter([
   {
     path: "/form",
     element: <Form />
+  },
+  {
+    path: "/curation",
+    element: <Curation />
+  },
+  {
+    path: "/community",
+    element: <Community />
   },
   {
     path: '*',
