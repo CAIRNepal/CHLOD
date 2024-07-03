@@ -3,6 +3,7 @@ import { Announcement } from "@civicactions/data-catalog-components";
 import Layout from '../../components/Layout';
 import config from "../../assets/config";
 import { version, dependencies } from '../../../package.json';
+import MyComponent from "../../components/formcomponent";
 
 const Activity = () => (
     <Layout title="Activity">
@@ -10,10 +11,7 @@ const Activity = () => (
             <h1>Activity</h1>
             <div className="dc-page-content row">
                 <div className="col-md-9 col-sm-12">
-                    <p>This is the Activity component.</p>
-                    <p>
-                    This component displays information about the activity on the site.
-                    </p>
+                    <MyComponent/>
                 </div>
                 <div className="col-md-3 col-sm-12">
                     <Announcement variation="info" heading="Note">
