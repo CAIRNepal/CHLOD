@@ -135,11 +135,6 @@ const Activity = () => {
                     <div className="col-md-9 col-sm-12">
                         <Table columns={columns} dataSource={data} />
                     </div>
-                    <div className="col-md-3 col-sm-12">
-                        <Announcement variation="info" heading="Note">
-                            <p>Update this activity page before publishing.</p>
-                        </Announcement>
-                    </div>
                 </div>
                 <h2>App version:</h2>
                 <div className="dc-page-content row">
