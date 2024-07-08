@@ -15,7 +15,7 @@ const Layout = ({
       <Helmet
         title={`${title} - NCHLOD`}
         description={description}
-        generator="DKAN 2 (https://github.com/GetDKAN/dkan)"
+        // generator="DKAN 2 (https://github.com/GetDKAN/dkan)"
         defer={false}
         htmlAttributes={{
           "lang": "en"

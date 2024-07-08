@@ -1,45 +1,47 @@
-const columns = [
-    {
-        title: 'First Name',
-        dataIndex: 'firstName',
-        key: 'firstName',
-        width: '30%',
-        ...getColumnSearchProps('firstName'),
-    },
-    {
-        title: 'Last Name',
-        dataIndex: 'lastName',
-        key: 'lastName',
-        width: '30%',
-        ...getColumnSearchProps('lastName'),
-    },
-    {
-        title: 'Email',
-        dataIndex: 'email',
-        key: 'email',
-        ...getColumnSearchProps('email'),
-    },
-];
+import React, { useState, useEffect } from 'react';
 
-const [apiData, setApiData] = useState([]);
+const MyComponent = ({ uuid }) => {
+    const [formData, setFormData] = useState(null);
 
-useEffect(() => {
-    const fetchData = async () => {
-        try {
-            const response = await fetch('https://api.example.com/data');
-            const responseData = await response.json();
-            setApiData(responseData);
-        } catch (error) {
-            console.error('Error fetching data:', error);
-        }
-    };
+    useEffect(() => {
+        if (!uuid) return;
+        const fetchData = async () => {
+            try {
+                const response = await fetch(`https://nchlod.ddev.site/webform_rest/heritage_graph/submission/${uuid}`);
+                const responseData = await response.json();
+                setFormData(responseData.data);
+            } catch (error) {
+                console.error('Error fetching data:', error);
+            }
+        };
 
-    fetchData();
-}, []);
+        fetchData();
+    }, [uuid]);
 
-const data = apiData.map((item, index) => ({
-    key: index.toString(),
-    firstName: item.firstName,
-    lastName: item.lastName,
-    email: item.email,
-}));
+    return (
+        <div>
+            {formData ? (
+                <table style={{ borderCollapse: 'collapse', width: '100%' }}>
+                    <thead>
+                        <tr>
+                            <th style={{ border: '1px solid #ddd', padding: '8px' }}>First Name</th>
+                            <th style={{ border: '1px solid #ddd', padding: '8px' }}>Last Name</th>
+                            <th style={{ border: '1px solid #ddd', padding: '8px' }}>Email</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td style={{ border: '1px solid #ddd', padding: '8px' }}>{formData.enter_your_first_name}</td>
+                            <td style={{ border: '1px solid #ddd', padding: '8px' }}>{formData.enter_your_last_name}</td>
+                            <td style={{ border: '1px solid #ddd', padding: '8px' }}>{formData.enter_your_email}</td>
+                        </tr>
+                    </tbody>
+                </table>
+            ) : (
+                <p>No data available</p>
+            )}
+        </div>
+    );
+};
+
+export default MyComponent;
