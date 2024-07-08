@@ -1260,3 +1260,21 @@ ul.mr-auto.nav {
 }
 
 /*# sourceMappingURL=index.css.map */
+
+
+
+/*# THis for table*/
+.ant-input,.ant-input:hover, .ant-input:active{
+  border-color: #076096;
+}
+.ant-btn{
+  background-color: #076096;
+  color: white;
+}
+
+.ant-table-wrapper{
+  margin-top: 20px;
+  width: 100%;
+}
+
+

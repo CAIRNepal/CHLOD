@@ -1,151 +1,248 @@
 import React, { useState, useRef } from "react";
 import { Announcement } from "@civicactions/data-catalog-components";
-import Layout from '../../components/Layout';
+import Layout from "../../components/Layout";
 import config from "../../assets/config";
-import { version, dependencies } from '../../../package.json';
-import { Input, Space, Button, Table } from 'antd';
-import { SearchOutlined } from '@ant-design/icons';
-import Highlighter from 'react-highlight-words';
+import { version, dependencies } from "../../../package.json";
+import { Input, Space, Button, Table } from "antd";
+import { SearchOutlined } from "@ant-design/icons";
+import Highlighter from "react-highlight-words";
 
 const Activity = () => {
-    const [searchText, setSearchText] = useState('');
-    const [searchedColumn, setSearchedColumn] = useState('');
-    const searchInput = useRef(null);
+  const [searchText, setSearchText] = useState("");
+  const [searchedColumn, setSearchedColumn] = useState("");
+  const searchInput = useRef(null);
 
-    const handleSearch = (selectedKeys, confirm, dataIndex) => {
-        confirm();
-        setSearchText(selectedKeys[0]);
-        setSearchedColumn(dataIndex);
-    };
+  const handleSearch = (selectedKeys, confirm, dataIndex) => {
+    confirm();
+    setSearchText(selectedKeys[0]);
+    setSearchedColumn(dataIndex);
+  };
 
-    const handleReset = (clearFilters) => {
-        clearFilters();
-        setSearchText('');
-    };
+  const handleReset = (clearFilters) => {
+    clearFilters();
+    setSearchText("");
+  };
 
-    const getColumnSearchProps = (dataIndex) => ({
-        filterDropdown: ({ setSelectedKeys, selectedKeys, confirm, clearFilters }) => (
-            <div style={{ padding: 8 }}>
-                <Input
-                    ref={searchInput}
-                    placeholder={`Search ${dataIndex}`}
-                    value={selectedKeys[0]}
-                    onChange={(e) => setSelectedKeys(e.target.value ? [e.target.value] : [])}
-                    onPressEnter={() => handleSearch(selectedKeys, confirm, dataIndex)}
-                    style={{ marginBottom: 8, display: 'block' }}
-                />
-                <Space>
-                    <Button
-                        type="primary"
-                        onClick={() => handleSearch(selectedKeys, confirm, dataIndex)}
-                        icon={<SearchOutlined />}
-                        size="small"
-                        style={{ width: 90 }}
-                    >
-                        Search
-                    </Button>
-                    <Button
-                        onClick={() => handleReset(clearFilters)}
-                        size="small"
-                        style={{ width: 90 }}
-                    >
-                        Reset
-                    </Button>
-                </Space>
-            </div>
-        ),
-        filterIcon: (filtered) => (
-            <SearchOutlined style={{ color: filtered ? '#1890ff' : undefined }} />
-        ),
-        onFilter: (value, record) =>
-            record[dataIndex].toString().toLowerCase().includes(value.toLowerCase()),
-        onFilterDropdownVisibleChange: (visible) => {
-            if (visible) {
-                setTimeout(() => searchInput.current.select(), 100);
-            }
-        },
-        render: (text) =>
-            searchedColumn === dataIndex ? (
-                <Highlighter
-                    highlightStyle={{ backgroundColor: '#ffc069', padding: 0 }}
-                    searchWords={[searchText]}
-                    autoEscape
-                    textToHighlight={text ? text.toString() : ''}
-                />
-            ) : (
-                text
-            ),
-    });
+  const getColumnSearchProps = (dataIndex) => ({
+    filterDropdown: ({
+      setSelectedKeys,
+      selectedKeys,
+      confirm,
+      clearFilters,
+    }) => (
+      <div style={{ padding: 8 }}>
+        <Input
+          ref={searchInput}
+          placeholder={`Search ${dataIndex}`}
+          value={selectedKeys[0]}
+          
+          onChange={(e) =>
+            setSelectedKeys(e.target.value ? [e.target.value] : [])
+          }
+          onPressEnter={() => handleSearch(selectedKeys, confirm, dataIndex)}
+          style={{ marginBottom: 8, display: "block" }}
+        />
+        <Space>
+          <Button
+            type="primary"
+            onClick={() => handleSearch(selectedKeys, confirm, dataIndex)}
+            icon={<SearchOutlined />}
+            size="small"
+            style={{ width: 90 }}
+          >
+            Search
+          </Button>
+          <Button
+            onClick={() => handleReset(clearFilters)}
+            size="small"
+            style={{ width: 90 }}
+          >
+            Reset
+          </Button>
+        </Space>
+      </div>
+    ),
+    filterIcon: (filtered) => (
+      <SearchOutlined style={{ color: filtered ? "#076096" : undefined }} />
+    ),
+    onFilter: (value, record) =>
+      record[dataIndex].toString().toLowerCase().includes(value.toLowerCase()),
+    onFilterDropdownVisibleChange: (visible) => {
+      if (visible) {
+        setTimeout(() => searchInput.current.select(), 100);
+      }
+    },
+    render: (text) =>
+      searchedColumn === dataIndex ? (
+        <Highlighter
+          highlightStyle={{ backgroundColor: "#ffc069", padding: 0 }}
+          searchWords={[searchText]}
+          autoEscape
+          textToHighlight={text ? text.toString() : ""}
+        />
+      ) : (
+        text
+      ),
+  });
 
-    const columns = [
-        {
-            title: 'Name',
-            dataIndex: 'name',
-            key: 'name',
-            width: '30%',
-            ...getColumnSearchProps('name'),
-        },
-        {
-            title: 'Age',
-            dataIndex: 'age',
-            key: 'age',
-            width: '20%',
-            ...getColumnSearchProps('age'),
-        },
-        {
-            title: 'Address',
-            dataIndex: 'address',
-            key: 'address',
-            ...getColumnSearchProps('address'),
-        },
-    ];
+  const columns = [
+    {
+      title: "ID",
+      dataIndex: "id",
+      sorter: true,
+      fixed: 'left',
+      key: "ID",
+      width: "5%",
+      ...getColumnSearchProps("ID"),
+    },
+    {
+      title: "Status",
+      dataIndex: "status",
+      sorter: true,
+      key: "age",
+      width: "10%",
+      ...getColumnSearchProps("status"),
+    },
+    {
+      title: "Topic",
+      dataIndex: "topic",
+      sorter: true,
+      key: "topic",
+      ...getColumnSearchProps("topic"),
+    },
+    {
+      title: "Submitter",
+      dataIndex: "submitter",
+      sorter: true,
+      key: "submitter",
+      ...getColumnSearchProps("submitter"),
+    },
+    {
+      title: "Submitter",
+      dataIndex: "submitter",
+      sorter: true,
+      key: "submitter",
+      ...getColumnSearchProps("submitter"),
+    },
+    {
+      title: "Submitter",
+      dataIndex: "submitter",
+      sorter: true,
+      key: "submitter",
+      ...getColumnSearchProps("submitter"),
+    },
+    {
+      title: "Submitter",
+      dataIndex: "submitter",
+      sorter: true,
+      key: "submitter",
+      ...getColumnSearchProps("submitter"),
+    },
+    {
+      title: "Submitter",
+      dataIndex: "submitter",
+      sorter: true,
+      key: "submitter",
+      ...getColumnSearchProps("submitter"),
+    },
+    {
+      title: "Submitter",
+      dataIndex: "submitter",
+      sorter: true,
+      key: "submitter",
+      ...getColumnSearchProps("submitter"),
+    },
+    {
+      title: "Submitter",
+      dataIndex: "submitter",
+      sorter: true,
+      key: "submitter",
+      ...getColumnSearchProps("submitter"),
+    },
+    
+    
+    {
+      title: "Submitted",
+      dataIndex: "submitted",
+      sorter: true,
+      fixed: 'right',
+      key: "submitted",
+      ...getColumnSearchProps("submitted"),
+    }
+  ];
 
-    const data = [
-        {
-            key: '1',
-            name: 'John Brown',
-            age: 32,
-            address: 'New York No. 1 Lake Park',
-        },
-        {
-            key: '2',
-            name: 'Joe Black',
-            age: 42,
-            address: 'London No. 1 Lake Park',
-        },
-        {
-            key: '3',
-            name: 'Jim Green',
-            age: 32,
-            address: 'Sydney No. 1 Lake Park',
-        },
-        {
-            key: '4',
-            name: 'Jim Red',
-            age: 32,
-            address: 'London No. 2 Lake Park',
-        },
-    ];
+  const data = [
+  {
+    id: "1",
+    submitter: "Alice Smith",
+    status: "Pending",
+    topic: "Topic A",
+    submitted: "2024-07-08",
+  },
+  {
+    id: "2",
+    submitter: "Bob Johnson",
+    status: "Approved",
+    topic: "Topic B",
+    submitted: "2024-07-07",
+  },
+  {
+    id: "3",
+    submitter: "Charlie Brown",
+    status: "Pending",
+    topic: "Topic C",
+    submitted: "2024-07-06",
+  },
+  {
+    id: "4",
+    submitter: "David Lee",
+    status: "Rejected",
+    topic: "Topic D",
+    submitted: "2024-07-05",
+  },
+  {
+    id: "4",
+    submitter: "David Lee",
+    status: "Rejected",
+    topic: "Topic D",
+    submitted: "2024-07-05",
+  },
+  {
+    id: "4",
+    submitter: "David Lee",
+    status: "Rejected",
+    topic: "Topic D",
+    submitted: "2024-07-05",
+  },
+  {
+    id: "4",
+    submitter: "David Lee",
+    status: "Rejected",
+    topic: "Topic D",
+    submitted: "2024-07-05",
+  },
+  {
+    id: "4",
+    submitter: "David Lee",
+    status: "Rejected",
+    topic: "Topic D",
+    submitted: "2024-07-05",
+  },
+];
 
-    return (
-        <Layout title="Activity">
-            <div className={`dc-page ${config.container}`}>
-                <h1>Activity</h1>
-                <div className="dc-page-content row">
-                    <div className="col-md-9 col-sm-12">
-                        <Table columns={columns} dataSource={data} />
-                    </div>
-                </div>
-                <h2>App version:</h2>
-                <div className="dc-page-content row">
-                    <div className="col-12">
-                        <p>data-catalog-app: {version}</p>
-                        <p>data-catalog-components: {dependencies["@civicactions/data-catalog-components"]}</p>
-                    </div>
-                </div>
-            </div>
-        </Layout>
-    );
+
+  return (
+    <Layout title="Activity">
+      <div className={`dc-page ${config.container}`}>
+        <h1>Activity</h1>
+        <div className="dc-page-content row">
+          <div className="col-md-9 col-sm-12">
+            <Table columns={columns} dataSource={data}  bordered scroll={{ x: 1800, y: 1200 }} width={1200} />
+          </div>
+        </div>
+      </div>
+    </Layout>
+  );
 };
 
 export default Activity;
