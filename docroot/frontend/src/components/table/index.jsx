@@ -150,6 +150,7 @@ const WebformSubmissionTable = ({ uuids }) => {
       dataIndex: "do_you_allow_the_use_of_your_data_for_provenance_purposes",
       sorter: (a, b) => (a.do_you_allow_the_use_of_your_data_for_provenance_purposes || "").localeCompare(b.do_you_allow_the_use_of_your_data_for_provenance_purposes || ""),
       key: "do_you_allow_the_use_of_your_data_for_provenance_purposes",
+      fixed: "right",
       width: "15%",
       ...getColumnSearchProps("do_you_allow_the_use_of_your_data_for_provenance_purposes")
     }
