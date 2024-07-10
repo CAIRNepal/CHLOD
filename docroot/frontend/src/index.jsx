@@ -18,6 +18,7 @@ import Form from './templates/form';
 import Curation from './templates/curation';
 import Activity from './templates/activity';
 import Queues from './templates/queues';
+import WebformSubmissions from './templates/test';
 
 const router = createBrowserRouter([
   {
@@ -68,6 +69,11 @@ const router = createBrowserRouter([
     path: "/curation/queues",
     element: <Queues/>
   },
+  {
+    path: "/test",
+    element: <WebformSubmissions />
+  },
+
   {
     path: '*',
     element: <NotFound />,

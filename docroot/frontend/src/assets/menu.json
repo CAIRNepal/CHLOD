@@ -41,6 +41,11 @@
       "target": "_top"
     },
     {
+      "label": "Test",
+      "url": "/test",
+      "target": "_top"
+    },
+    {
       "label": "About",
       "url": "/about",
       "target": "_top"
