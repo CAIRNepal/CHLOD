@@ -3,26 +3,30 @@ import axios from "axios";
 import { Input, Space, Button, Table } from "antd";
 import { SearchOutlined } from "@ant-design/icons";
 import Highlighter from "react-highlight-words";
-import Layout from '../../components/Layout';
-import config from '../../assets/config';
-import { version, dependencies } from '../../../package.json';
 
-const WebformSubmissionTable = ({ uuid }) => {
-  const [submissionData, setSubmissionData] = useState(null);
+const WebformSubmissionTable = ({ uuids }) => {
+  const [submissionData, setSubmissionData] = useState([]);
   const [searchText, setSearchText] = useState("");
   const [searchedColumn, setSearchedColumn] = useState("");
   const searchInput = useRef(null);
 
   useEffect(() => {
-    axios.get(`https://nchlod.ddev.site/webform_rest/heritage_graph/submission/${uuid}`)
-      .then(response => {
-        console.log('API response:', response);
-        setSubmissionData(response.data);
-      })
-      .catch(error => {
+    const fetchData = async () => {
+      try {
+        const responses = await Promise.all(
+          uuids.map(uuid =>
+            axios.get(`https://nchlod.ddev.site/webform_rest/heritage_graph/submission/${uuid}`)
+          )
+        );
+        const data = responses.map(response => response.data);
+        setSubmissionData(data);
+      } catch (error) {
         console.error('Error fetching data:', error);
-      });
-  }, [uuid]);
+      }
+    };
+
+    fetchData();
+  }, [uuids]);
 
   const handleSearch = (selectedKeys, confirm, dataIndex) => {
     confirm();
@@ -77,7 +81,7 @@ const WebformSubmissionTable = ({ uuid }) => {
       <SearchOutlined style={{ color: filtered ? "#076096" : undefined }} />
     ),
     onFilter: (value, record) =>
-      record[dataIndex]
+      (record[dataIndex] || "")
         .toString()
         .toLowerCase()
         .includes(value.toLowerCase()),
@@ -101,78 +105,74 @@ const WebformSubmissionTable = ({ uuid }) => {
 
   const columns = [
     {
-      title: "target_uuid",
-      dataIndex: "target_uuid",
-      sorter: true,
+      title: "UUID",
+      dataIndex: "uuid",
+      sorter: (a, b) => (a.uuid || "").localeCompare(b.uuid || ""),
       fixed: "left",
-      key: "target_uuid",
-      width: "5%",
-      ...getColumnSearchProps("target_uuid")
+      key: "uuid",
+      width: "15%",
+      ...getColumnSearchProps("uuid")
     },
     {
-      title: "enter_your_first_name",
+      title: "First Name",
       dataIndex: "enter_your_first_name",
-      sorter: true,
+      sorter: (a, b) => (a.enter_your_first_name || "").localeCompare(b.enter_your_first_name || ""),
       key: "enter_your_first_name",
-      width: "10%",
+      width: "15%",
       ...getColumnSearchProps("enter_your_first_name")
     },
     {
-      title: "enter_your_email",
+      title: "Last Name",
+      dataIndex: "enter_your_last_name",
+      sorter: (a, b) => (a.enter_your_last_name || "").localeCompare(b.enter_your_last_name || ""),
+      key: "enter_your_last_name",
+      width: "15%",
+      ...getColumnSearchProps("enter_your_last_name")
+    },
+    {
+      title: "Email",
       dataIndex: "enter_your_email",
-      sorter: true,
+      sorter: (a, b) => (a.enter_your_email || "").localeCompare(b.enter_your_email || ""),
       key: "enter_your_email",
+      width: "20%",
       ...getColumnSearchProps("enter_your_email")
     },
     {
-      title: "enter_your_last_name",
-      dataIndex: "enter_your_last_name",
-      sorter: true,
-      key: "enter_your_last_name",
-      ...getColumnSearchProps("enter_your_last_name")
+      title: "Confirm Email",
+      dataIndex: "confirm_your_email",
+      sorter: (a, b) => (a.confirm_your_email || "").localeCompare(b.confirm_your_email || ""),
+      key: "confirm_your_email",
+      width: "20%",
+      ...getColumnSearchProps("confirm_your_email")
+    },
+    {
+      title: "Data Usage Consent",
+      dataIndex: "do_you_allow_the_use_of_your_data_for_provenance_purposes",
+      sorter: (a, b) => (a.do_you_allow_the_use_of_your_data_for_provenance_purposes || "").localeCompare(b.do_you_allow_the_use_of_your_data_for_provenance_purposes || ""),
+      key: "do_you_allow_the_use_of_your_data_for_provenance_purposes",
+      width: "15%",
+      ...getColumnSearchProps("do_you_allow_the_use_of_your_data_for_provenance_purposes")
     }
-    // {
-    //   title: "Submitted",
-    //   dataIndex: "submitted",
-    //   sorter: true,
-    //   fixed: "right",
-    //   key: "submitted",
-    //   ...getColumnSearchProps("submitted"),
-    // },
   ];
 
-  const data = submissionData
-    ? submissionData.data.map((item, index) => ({
-        key: item.id,
-        target_uuid: item.target_uuid,
-        enter_your_first_name: item.enter_your_first_name,
-        enter_your_email: item.enter_your_email,
-        enter_your_last_name: item.enter_your_last_name,
-        // submitted: item.submitted,
-      }))
-    : [];
+  const data = submissionData.map(submission => ({
+    key: submission.entity.uuid[0].value,
+    uuid: submission.entity.uuid[0].value,
+    enter_your_first_name: submission.data.enter_your_first_name || "",
+    enter_your_last_name: submission.data.enter_your_last_name || "",
+    enter_your_email: submission.data.enter_your_email || "",
+    confirm_your_email: submission.data.confirm_your_email || "",
+    do_you_allow_the_use_of_your_data_for_provenance_purposes: submission.data.do_you_allow_the_use_of_your_data_for_provenance_purposes || "",
+  }));
 
   return (
-    <>
-      <div className={`dc-page ${config.container}`}>
-        <h1>Webform Submission</h1>
-        <div className="dc-page-content row">
-          <div className="col-md-12">
-            {submissionData ? (
-              <Table
-                columns={columns}
-                dataSource={data}
-                bordered
-                scroll={{ x: 1800, y: 1200 }}
-                width={1200}
-              />
-            ) : (
-              <p>Loading...</p>
-            )}
-          </div>
-        </div>
-      </div>
-    </>
+    <Table
+      columns={columns}
+      dataSource={data}
+      bordered
+      scroll={{ x: 1800, y: 1200 }}
+      width={1200}
+    />
   );
 };
 

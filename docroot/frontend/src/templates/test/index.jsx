@@ -30,27 +30,14 @@ const WebformSubmissions = () => {
     <Layout title="WebformSubmissions">
       <div className={`dc-page ${config.container}`}>
         <h1>Webform Submissions</h1>
-        <div className="dc-page-content row">
-          <div className="col-12">
-            <Announcement variation="info" heading="Note">
-              <p>Fetching and displaying webform submission IDs.</p>
-            </Announcement>
-          </div>
-        </div>
 
-        <h2>Webform Submission IDs:</h2>
         <div className="dc-page-content row">
           <div className="col-12">
-            < WebformSubmissionTable uuid = {"6b64fbf9-93f1-4d80-a3f5-5b1332f614eb"} />
-            <ul>
-              {submissionIds.length > 0 ? (
-                submissionIds.map(id => (
-                  <li key={id}>{id}</li>
-                ))
-              ) : (
-                <li>No IDs found</li>
-              )}
-            </ul>
+            {submissionIds.length > 0 ? (
+              <WebformSubmissionTable uuids={submissionIds} />
+            ) : (
+              <p>No IDs found</p>
+            )}
           </div>
         </div>
       </div>
