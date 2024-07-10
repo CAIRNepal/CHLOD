@@ -46,6 +46,11 @@
       "target": "_top"
     },
     {
+      "label": "Leaderboard",
+      "url": "/leaderboard",
+      "target": "_top"
+    },
+    {
       "label": "About",
       "url": "/about",
       "target": "_top"
