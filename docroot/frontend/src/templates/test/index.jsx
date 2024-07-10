@@ -4,18 +4,18 @@ import { Announcement } from "@civicactions/data-catalog-components";
 import Layout from '../../components/Layout';
 import config from '../../assets/config';
 import { version, dependencies } from '../../../package.json';
+import WebformSubmissionTable from "../../components/table";
 
 const WebformSubmissions = () => {
   const [submissionIds, setSubmissionIds] = useState([]);
 
   useEffect(() => {
-    // Fetch the data from the JSON:API endpoint
     axios.get('https://nchlod.ddev.site/jsonapi/webform_submission/heritage_graph')
       .then(response => {
-        console.log('API response:', response); // Log the entire response
+        console.log('API response:', response); 
         if (response.data && response.data.data) {
           const ids = response.data.data.map(submission => submission.id);
-          console.log('Extracted IDs:', ids); // Log the extracted IDs
+          console.log('Extracted IDs:', ids); 
           setSubmissionIds(ids);
         } else {
           console.error('Unexpected response structure:', response);
@@ -41,6 +41,7 @@ const WebformSubmissions = () => {
         <h2>Webform Submission IDs:</h2>
         <div className="dc-page-content row">
           <div className="col-12">
+            < WebformSubmissionTable uuid = {"6b64fbf9-93f1-4d80-a3f5-5b1332f614eb"} />
             <ul>
               {submissionIds.length > 0 ? (
                 submissionIds.map(id => (
