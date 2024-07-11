@@ -1,75 +1,95 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { Table } from "antd";
+import axios from "axios";
 import { Announcement } from "@civicactions/data-catalog-components";
 import Layout from '../../components/Layout';
 import config from "../../assets/config";
 import { version, dependencies } from '../../../package.json';
 
-const Leaderboard = () => {
+const UserTable = () => {
+  const [userData, setUserData] = useState([]);
+  const [loading, setLoading] = useState(true);
+
   const columns = [
     {
-      title: 'Rank',
-      dataIndex: 'rank',
-      key: 'rank',
+      title: 'ID',
+      dataIndex: 'id',
+      key: 'id',
     },
     {
-      title: 'Name',
+      title: 'Display Name',
+      dataIndex: 'display_name',
+      key: 'display_name',
+    },
+    {
+      title: 'Username',
       dataIndex: 'name',
       key: 'name',
     },
     {
-      title: 'Score',
-      dataIndex: 'score',
-      key: 'score',
+      title: 'Email',
+      dataIndex: 'mail',
+      key: 'mail',
+    },
+    {
+      title: 'Status',
+      dataIndex: 'status',
+      key: 'status',
+      render: (status) => (status ? 'Active' : 'Inactive')
+    },
+    {
+      title: 'Created',
+      dataIndex: 'created',
+      key: 'created',
     }
   ];
 
-  const data = [
-    {
-      key: '1',
-      rank: '1',
-      name: 'John Doe',
-      score: 98,
-    },
-    {
-      key: '2',
-      rank: '2',
-      name: 'Jane Smith',
-      score: 95,
-    },
-    {
-      key: '3',
-      rank: '3',
-      name: 'Alice Johnson',
-      score: 92,
-    }
-  ];
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const response = await axios.get('https://nchlod.ddev.site/jsonapi/user/user');
+        const users = response.data.data.map(user => ({
+          key: user.id,
+          id: user.id,
+          display_name: user.attributes.display_name,
+          name: user.attributes.name,
+          mail: user.attributes.mail,
+          status: user.attributes.status,
+          created: user.attributes.created
+        }));
+        setUserData(users);
+        setLoading(false);
+      } catch (error) {
+        console.error("Error fetching user data:", error);
+        setLoading(false);
+      }
+    };
+
+    fetchData();
+  }, []);
 
   return (
-    <Layout title="Leaderboard">
+    <Layout title="User Table">
       <div className={`dc-page ${config.container}`}>
-        <h1>Leaderboard</h1>
+        <h1>User Table</h1>
         <div className="dc-page-content row">
           <div className="col-md-9 col-sm-12">
-            <p>Check out the top performers in our application.</p>
-            <Table columns={columns} dataSource={data} pagination={false} />
+            <p>List of registered users.</p>
+            <Table columns={columns} dataSource={userData} loading={loading} pagination={false} />
           </div>
           <div className="col-md-3 col-sm-12">
             <Announcement variation="info" heading="Note">
-              <p>This leaderboard displays the top scores achieved by users.</p>
+              <p>This table displays the details of the registered users.</p>
             </Announcement>
           </div>
         </div>
-        <h2>App version:</h2>
+
         <div className="dc-page-content row">
-          <div className="col-12">
-            <p>data-catalog-app: {version}</p>
-            <p>data-catalog-components: {dependencies["@civicactions/data-catalog-components"]}</p>
-          </div>  
+
         </div>
       </div>
     </Layout>
   );
 };
 
-export default Leaderboard;
+export default UserTable;
