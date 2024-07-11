@@ -3,6 +3,7 @@ import axios from "axios";
 import { Announcement } from "@civicactions/data-catalog-components";
 import Layout from '../../components/Layout';
 import config from '../../assets/config';
+import { Spin } from 'antd';
 import { version, dependencies } from '../../../package.json';
 import WebformSubmissionTable from "../../components/table";
 
@@ -36,7 +37,7 @@ const WebformSubmissions = () => {
             {submissionIds.length > 0 ? (
               <WebformSubmissionTable uuids={submissionIds} />
             ) : (
-              <p>No IDs found</p>
+                 <Spin />
             )}
           </div>
         </div>

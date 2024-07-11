@@ -20,6 +20,9 @@ import Activity from './templates/activity';
 import Queues from './templates/queues';
 import WebformSubmissions from './templates/test';
 import Leaderboard from './templates/leaderboard';
+import LoginPanel from './templates/loginPanel';
+import SignupPanel from './templates/signupPanel';
+import LogoutPanel from './templates/logout';
 
 const router = createBrowserRouter([
   {
@@ -78,6 +81,20 @@ const router = createBrowserRouter([
     path: "/test",
     element: <WebformSubmissions />
   },
+  {
+    path: "/login",
+    element: <LoginPanel />
+  },
+  {
+    path: "/signup",
+    element: <SignupPanel />
+  },
+
+  {
+    path: "/logout",
+    element: <LogoutPanel />
+  },
+
 
   {
     path: '*',
