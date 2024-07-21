@@ -147,9 +147,9 @@ const WebformSubmissionTable = ({ uuids }) => {
     },
     {
       title: "Data Usage Consent",
-      dataIndex: "do_you_allow_the_use_of_your_data_for_provenance_purposes",
+      dataIndex: "i_permit_to_share_data",
       sorter: (a, b) => (a.do_you_allow_the_use_of_your_data_for_provenance_purposes || "").localeCompare(b.do_you_allow_the_use_of_your_data_for_provenance_purposes || ""),
-      key: "do_you_allow_the_use_of_your_data_for_provenance_purposes",
+      key: "i_permit_to_share_data",
       fixed: "right",
       width: "15%",
       ...getColumnSearchProps("do_you_allow_the_use_of_your_data_for_provenance_purposes")
@@ -159,11 +159,11 @@ const WebformSubmissionTable = ({ uuids }) => {
   const data = submissionData.map(submission => ({
     key: submission.entity.uuid[0].value,
     uuid: submission.entity.uuid[0].value,
-    enter_your_first_name: submission.data.enter_your_first_name || "",
-    enter_your_last_name: submission.data.enter_your_last_name || "",
-    enter_your_email: submission.data.enter_your_email || "",
-    confirm_your_email: submission.data.confirm_your_email || "",
-    do_you_allow_the_use_of_your_data_for_provenance_purposes: submission.data.do_you_allow_the_use_of_your_data_for_provenance_purposes || "",
+    enter_your_first_name: submission.data.name || "",
+    enter_your_last_name: submission.data.name || "",
+    enter_your_email: submission.data.email || "",
+    confirm_your_email: submission.data.email|| "",
+    do_you_allow_the_use_of_your_data_for_provenance_purposes: submission.i_permit_to_share_data || "",
   }));
 
   return (

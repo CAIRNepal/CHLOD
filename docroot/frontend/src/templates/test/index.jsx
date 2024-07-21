@@ -11,7 +11,7 @@ const WebformSubmissions = () => {
   const [submissionIds, setSubmissionIds] = useState([]);
 
   useEffect(() => {
-    axios.get('https://nchlod.ddev.site/jsonapi/webform_submission/heritage_graph')
+    axios.get('https://nchlod.ddev.site/jsonapi/webform_submission/7')
       .then(response => {
         console.log('API response:', response); 
         if (response.data && response.data.data) {

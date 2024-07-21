@@ -1,7 +1,7 @@
 name: ddev-dkan
 repository: getdkan/ddev-dkan
-version: 1.1.0
-install_date: "2024-06-24T22:29:58+05:45"
+version: 1.1.1
+install_date: "2024-07-19T17:52:55+05:45"
 project_files:
     - config.dkan.yaml
     - commands/cypress/cypress

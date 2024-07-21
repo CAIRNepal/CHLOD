@@ -58,7 +58,7 @@ const router = createBrowserRouter([
     element: <ApiDocsSpecific />
   },
   {
-    path: "/form",
+    path: "/datacontribution",
     element: <Form />
   },
   {
