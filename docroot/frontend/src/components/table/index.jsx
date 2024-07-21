@@ -14,11 +14,12 @@ const WebformSubmissionTable = ({ uuids }) => {
     const fetchData = async () => {
       try {
         const responses = await Promise.all(
-          uuids.map(uuid =>
-            axios.get(`https://nchlod.ddev.site/webform/nchlod1${uuid}`)
+          uuids.map((uuid) =>
+            axios.get(`https://nchlod.ddev.site/webform_rest/nchlod1/submission/${uuid}`)
           )
         );
-        const data = responses.map(response => response.data);
+        const data = responses.map((response) => response.data);
+        console.log(data);
         setSubmissionData(data);
       } catch (error) {
         console.error('Error fetching data:', error);
@@ -34,24 +35,24 @@ const WebformSubmissionTable = ({ uuids }) => {
     setSearchedColumn(dataIndex);
   };
 
-  const handleReset = clearFilters => {
+  const handleReset = (clearFilters) => {
     clearFilters();
     setSearchText("");
   };
 
-  const getColumnSearchProps = dataIndex => ({
+  const getColumnSearchProps = (dataIndex) => ({
     filterDropdown: ({
       setSelectedKeys,
       selectedKeys,
       confirm,
-      clearFilters
+      clearFilters,
     }) => (
       <div style={{ padding: 8 }}>
         <Input
           ref={searchInput}
           placeholder={`Search ${dataIndex}`}
           value={selectedKeys[0]}
-          onChange={e =>
+          onChange={(e) =>
             setSelectedKeys(e.target.value ? [e.target.value] : [])
           }
           onPressEnter={() => handleSearch(selectedKeys, confirm, dataIndex)}
@@ -77,7 +78,7 @@ const WebformSubmissionTable = ({ uuids }) => {
         </Space>
       </div>
     ),
-    filterIcon: filtered => (
+    filterIcon: (filtered) => (
       <SearchOutlined style={{ color: filtered ? "#076096" : undefined }} />
     ),
     onFilter: (value, record) =>
@@ -85,12 +86,12 @@ const WebformSubmissionTable = ({ uuids }) => {
         .toString()
         .toLowerCase()
         .includes(value.toLowerCase()),
-    onFilterDropdownVisibleChange: visible => {
+    onFilterDropdownVisibleChange: (visible) => {
       if (visible) {
         setTimeout(() => searchInput.current.select(), 100);
       }
     },
-    render: text =>
+    render: (text) =>
       searchedColumn === dataIndex ? (
         <Highlighter
           highlightStyle={{ backgroundColor: "#ffc069", padding: 0 }}
@@ -100,7 +101,7 @@ const WebformSubmissionTable = ({ uuids }) => {
         />
       ) : (
         text
-      )
+      ),
   });
 
   const columns = [
@@ -111,59 +112,51 @@ const WebformSubmissionTable = ({ uuids }) => {
       fixed: "left",
       key: "uuid",
       width: "15%",
-      ...getColumnSearchProps("uuid")
+      ...getColumnSearchProps("uuid"),
     },
     {
       title: "First Name",
-      dataIndex: "enter_your_first_name",
-      sorter: (a, b) => (a.enter_your_first_name || "").localeCompare(b.enter_your_first_name || ""),
-      key: "enter_your_first_name",
+      dataIndex: "first_name",
+      sorter: (a, b) => (a.first_name || "").localeCompare(b.first_name || ""),
+      key: "first_name",
       width: "15%",
-      ...getColumnSearchProps("enter_your_first_name")
+      ...getColumnSearchProps("first_name"),
     },
     {
       title: "Last Name",
-      dataIndex: "enter_your_last_name",
-      sorter: (a, b) => (a.enter_your_last_name || "").localeCompare(b.enter_your_last_name || ""),
-      key: "enter_your_last_name",
+      dataIndex: "last_name",
+      sorter: (a, b) => (a.last_name || "").localeCompare(b.last_name || ""),
+      key: "last_name",
       width: "15%",
-      ...getColumnSearchProps("enter_your_last_name")
+      ...getColumnSearchProps("last_name"),
     },
     {
       title: "Email",
-      dataIndex: "enter_your_email",
-      sorter: (a, b) => (a.enter_your_email || "").localeCompare(b.enter_your_email || ""),
-      key: "enter_your_email",
+      dataIndex: "email",
+      sorter: (a, b) => (a.email || "").localeCompare(b.email || ""),
+      key: "email",
       width: "20%",
-      ...getColumnSearchProps("enter_your_email")
-    },
-    {
-      title: "Confirm Email",
-      dataIndex: "confirm_your_email",
-      sorter: (a, b) => (a.confirm_your_email || "").localeCompare(b.confirm_your_email || ""),
-      key: "confirm_your_email",
-      width: "20%",
-      ...getColumnSearchProps("confirm_your_email")
+      ...getColumnSearchProps("email"),
     },
     {
       title: "Data Usage Consent",
       dataIndex: "i_permit_to_share_data",
-      sorter: (a, b) => (a.do_you_allow_the_use_of_your_data_for_provenance_purposes || "").localeCompare(b.do_you_allow_the_use_of_your_data_for_provenance_purposes || ""),
+      sorter: (a, b) =>
+        (a.i_permit_to_share_data || "").localeCompare(b.i_permit_to_share_data || ""),
       key: "i_permit_to_share_data",
       fixed: "right",
       width: "15%",
-      ...getColumnSearchProps("do_you_allow_the_use_of_your_data_for_provenance_purposes")
-    }
+      ...getColumnSearchProps("i_permit_to_share_data"),
+    },
   ];
 
-  const data = submissionData.map(submission => ({
+  const data = submissionData.map((submission) => ({
     key: submission.entity.uuid[0].value,
     uuid: submission.entity.uuid[0].value,
-    enter_your_first_name: submission.data.name || "",
-    enter_your_last_name: submission.data.name || "",
-    enter_your_email: submission.data.email || "",
-    confirm_your_email: submission.data.email|| "",
-    do_you_allow_the_use_of_your_data_for_provenance_purposes: submission.i_permit_to_share_data || "",
+    first_name: submission.data.first_name || "",
+    last_name: submission.data.last_name || "",
+    email: submission.data.email || "",
+    i_permit_to_share_data: submission.data.i_permit_to_share_data || "",
   }));
 
   return (
