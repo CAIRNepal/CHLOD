@@ -15,7 +15,7 @@ const WebformSubmissionTable = ({ uuids }) => {
       try {
         const responses = await Promise.all(
           uuids.map(uuid =>
-            axios.get(`https://nchlod.ddev.site/webform_rest/heritage_graph/submission/${uuid}`)
+            axios.get(`https://nchlod.ddev.site/webform/nchlod1${uuid}`)
           )
         );
         const data = responses.map(response => response.data);
