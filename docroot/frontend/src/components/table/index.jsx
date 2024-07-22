@@ -14,13 +14,8 @@ const WebformSubmissionTable = ({ uuids }) => {
     const fetchData = async () => {
       try {
         const responses = await Promise.all(
-<<<<<<< HEAD
-          uuids.map(uuid =>
-            axios.get(`https://nchlod.ddev.site/webform/nchlod1/${uuid}`)
-=======
           uuids.map((uuid) =>
             axios.get(`https://nchlod.ddev.site/webform_rest/nchlod1/submission/${uuid}`)
->>>>>>> c603f5ca022afa93efeb0d838e1772994bf93721
           )
         );
         const data = responses.map((response) => response.data);
