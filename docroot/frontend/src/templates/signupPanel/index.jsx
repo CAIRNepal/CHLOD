@@ -5,8 +5,11 @@ import Layout from '../../components/Layout';
 import config from "../../assets/config";
 
 const SignupPanel = () => {
-  const [username, setUsername] = useState('');
+  const [firstName, setFirstName] = useState('');
+  const [lastName, setLastName] = useState('');
   const [email, setEmail] = useState('');
+  const [institution, setInstitution] = useState('');
+  const [dob, setDob] = useState('');
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
 
@@ -16,8 +19,11 @@ const SignupPanel = () => {
     setSuccess('');
 
     const payload = {
-      name: { value: username },
-      mail: { value: email },
+      first_name: { value: firstName },
+      last_name: { value: lastName },
+      email: { value: email },
+      institution: { value: institution },
+      dob: { value: dob },
     };
 
     try {
@@ -44,13 +50,24 @@ const SignupPanel = () => {
           <div className="col-md-9 col-sm-12">
             <form onSubmit={handleSignup}>
               <div className="form-group">
-                <label htmlFor="username">Username:</label>
+                <label htmlFor="firstName">First Name:</label>
                 <input
                   type="text"
-                  id="username"
+                  id="firstName"
                   className="form-control"
-                  value={username}
-                  onChange={(e) => setUsername(e.target.value)}
+                  value={firstName}
+                  onChange={(e) => setFirstName(e.target.value)}
+                  required
+                />
+              </div>
+              <div className="form-group">
+                <label htmlFor="lastName">Last Name:</label>
+                <input
+                  type="text"
+                  id="lastName"
+                  className="form-control"
+                  value={lastName}
+                  onChange={(e) => setLastName(e.target.value)}
                   required
                 />
               </div>
@@ -62,6 +79,28 @@ const SignupPanel = () => {
                   className="form-control"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
+                  required
+                />
+              </div>
+              <div className="form-group">
+                <label htmlFor="institution">Institution Affiliated To:</label>
+                <input
+                  type="text"
+                  id="institution"
+                  className="form-control"
+                  value={institution}
+                  onChange={(e) => setInstitution(e.target.value)}
+                  required
+                />
+              </div>
+              <div className="form-group">
+                <label htmlFor="dob">Date of Birth:</label>
+                <input
+                  type="date"
+                  id="dob"
+                  className="form-control"
+                  value={dob}
+                  onChange={(e) => setDob(e.target.value)}
                   required
                 />
               </div>

@@ -23,6 +23,7 @@ import Leaderboard from './templates/leaderboard';
 import LoginPanel from './templates/loginPanel';
 import SignupPanel from './templates/signupPanel';
 import LogoutPanel from './templates/logout';
+import Profile from './templates/profile';
 
 const router = createBrowserRouter([
   {
@@ -95,6 +96,10 @@ const router = createBrowserRouter([
     element: <LogoutPanel />
   },
 
+  {
+    path: "/profile",
+    element: <Profile />
+  },
 
   {
     path: '*',
