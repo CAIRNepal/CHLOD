@@ -23,6 +23,7 @@ import Leaderboard from './templates/leaderboard';
 import LoginPanel from './templates/loginPanel';
 import SignupPanel from './templates/signupPanel';
 import LogoutPanel from './templates/logout';
+import Moderator from './templates/moderator';
 
 const router = createBrowserRouter([
   {
@@ -88,6 +89,10 @@ const router = createBrowserRouter([
   {
     path: "/signup",
     element: <SignupPanel />
+  },
+  {
+    path: "/moderator",
+    element: <Moderator/>
   },
 
   {
