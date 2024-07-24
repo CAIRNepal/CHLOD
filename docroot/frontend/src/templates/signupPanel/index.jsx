@@ -159,6 +159,28 @@ const SignupPanel = () => {
                   required
                 />
               </div>
+              <div className="form-group">
+                <label htmlFor="institution">Institution Affiliated To:</label>
+                <input
+                  type="text"
+                  id="institution"
+                  className="form-control"
+                  value={institution}
+                  onChange={(e) => setInstitution(e.target.value)}
+                  required
+                />
+              </div>
+              <div className="form-group">
+                <label htmlFor="dob">Date of Birth:</label>
+                <input
+                  type="date"
+                  id="dob"
+                  className="form-control"
+                  value={dob}
+                  onChange={(e) => setDob(e.target.value)}
+                  required
+                />
+              </div>
               <button type="submit" className="btn btn-primary">Signup</button>
             </form>
             {error && <div className="alert alert-danger mt-3">{error}</div>}

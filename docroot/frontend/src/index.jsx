@@ -100,6 +100,10 @@ const router = createBrowserRouter([
     element: <LogoutPanel />
   },
 
+  {
+    path: "/profile",
+    element: <Profile />
+  },
 
   {
     path: '*',
