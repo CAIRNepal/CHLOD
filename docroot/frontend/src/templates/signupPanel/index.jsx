@@ -41,6 +41,8 @@ const SignupPanel = () => {
       position
     };
 
+    console.log(payload);
+
     try {
       const response = await axios.post('https://nchlod.ddev.site/user/register?_format=json', payload, {
         headers: {
