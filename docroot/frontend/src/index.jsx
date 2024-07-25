@@ -24,6 +24,7 @@ import LoginPanel from './templates/loginPanel';
 import SignupPanel from './templates/signupPanel';
 import LogoutPanel from './templates/logout';
 import Moderator from './templates/moderator';
+import Profile from './templates/profile';
 
 const router = createBrowserRouter([
   {
