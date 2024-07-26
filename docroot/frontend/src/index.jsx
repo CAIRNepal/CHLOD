@@ -25,6 +25,7 @@ import SignupPanel from './templates/signupPanel';
 import LogoutPanel from './templates/logout';
 import Moderator from './templates/moderator';
 import Profile from './templates/profile';
+import Viewresponse from './templates/viewResponse';
 
 const router = createBrowserRouter([
   {
@@ -100,7 +101,10 @@ const router = createBrowserRouter([
     path: "/logout",
     element: <LogoutPanel />
   },
-
+  {
+    path: "/viewresponse/:id",
+    element: <Viewresponse />
+  },
   {
     path: "/profile",
     element: <Profile />
