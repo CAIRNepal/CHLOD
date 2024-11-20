@@ -37,7 +37,9 @@ INSTALLED_APPS = [
     "djoser",
     "rest_framework_simplejwt.token_blacklist",
     "corsheaders",
+    "django_extensions",
 
+    # Pre-installed apps
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -160,3 +162,8 @@ CORS_ALLOWED_ORIGINS = [
     "http://localhost:3000",
     "http://127.0.0.1:3000",
 ]
+
+GRAPH_MODELS ={
+'all_applications': True,
+'graph_models': True,
+}
