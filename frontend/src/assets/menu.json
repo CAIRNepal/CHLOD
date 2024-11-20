@@ -1,0 +1,91 @@
+{
+  "main": [
+    {
+      "label": "Home",
+      "url": "/",
+      "target": "_top"
+    },
+    {
+      "label": "Datasets",
+      "url": "/search",
+      "target": "_top"
+    },
+    {
+      "label": "Community",
+      "url": "/publishers",
+      "target": "_top"
+    },
+    {
+      "label": "API",
+      "url": "/api",
+      "target": "_top"
+    },
+    {
+      "label": "Curation",
+      "url": "/curation",
+      "target": "_top"
+    },
+    {
+      "label": "Activity",
+      "url": "/curation/activity",
+      "target": "_top"
+    },
+    {
+      "label": "Queues",
+      "url": "/curation/queues",
+      "target": "_top"
+    },
+    {
+      "label": "Form",
+      "url": "/datacontribution",
+      "target": "_top"
+    },
+    {
+      "label": "Test",
+      "url": "/test",
+      "target": "_top"
+    },
+    {
+      "label": "Leaderboard",
+      "url": "/leaderboard",
+      "target": "_top"
+    },
+    {
+      "label": "About",
+      "url": "/about",
+      "target": "_top"
+    }
+  ],
+  "footer1": [
+    {
+      "label": "Documentation",
+      "url": "https://dkan.readthedocs.io/en/latest/index.html",
+      "target": "_blank"
+    },
+    {
+      "label": "Download",
+      "url": "https://github.com/getdkan/dkan"
+    },
+    {
+      "label": "CivicActions",
+      "url": "https://civicactions.com",
+      "target": "_blank"
+    }
+  ],
+  "footer2": [
+    {
+      "label": "Project Open Data",
+      "url": "https://project-open-data.cio.gov"
+    },
+    {
+      "label": "DCAT",
+      "url": "https://www.w3.org/TR/vocab-dcat/",
+      "target": "_blank"
+    },
+    {
+      "label": "Drupal",
+      "url": "https://drupal.org",
+      "target": "_blank"
+    }
+  ]
+}
