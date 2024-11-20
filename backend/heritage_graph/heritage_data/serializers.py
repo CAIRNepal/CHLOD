@@ -1,5 +1,6 @@
 from rest_framework import serializers
 from .models import Submission, Moderation
+from django import forms
 
 class SubmissionSerializer(serializers.ModelSerializer):
     class Meta:
@@ -12,4 +13,3 @@ class ModerationSerializer(serializers.ModelSerializer):
     class Meta:
         model = Moderation
         fields = ['id', 'submission', 'moderator', 'comment', 'reviewed_at']
-
