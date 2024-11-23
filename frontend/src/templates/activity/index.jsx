@@ -1,65 +1,39 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
+import { Timeline, Pagination, Spin } from "antd";
+import { ClockCircleOutlined } from "@ant-design/icons";
 import Layout from "../../components/Layout";
 import config from "../../assets/config";
-import { ClockCircleOutlined } from "@ant-design/icons";
-import { Timeline, Pagination, Spin } from "antd";
 
 const Activity = () => {
   const [activities, setActivities] = useState([]);
   const [loading, setLoading] = useState(true);
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 15;
-  const [uuids, setUuids] = useState([]);
-
-  useEffect(() => {
-    const fetchUuids = async () => {
-      try {
-        const response = await axios.get('https://nchlod.ddev.site/jsonapi/webform_submission/nchlod1');
-        if (response.data && response.data.data) {
-          const fetchedUuids = response.data.data.map(submission => submission.id);
-          setUuids(fetchedUuids);
-        } else {
-          console.error('Unexpected response structure:', response);
-        }
-      } catch (error) {
-        console.error('Error fetching UUIDs:', error);
-      }
-    };
-
-    fetchUuids();
-  }, []);
 
   useEffect(() => {
     const fetchActivities = async () => {
-      if (uuids.length === 0) return;
-
       try {
-        const responses = await Promise.all(
-          uuids.map((uuid) =>
-            axios.get(`https://nchlod.ddev.site/webform_rest/nchlod1/submission/${uuid}`)
-          )
-        );
-        const fetchedActivities = responses.map(response => {
-          const submission = response.data;
-  
-          const work = 'contributed to NCHLOD';
-          return {
-            // dot: <ClockCircleOutlined className="timeline-clock-icon" />,
-            color: "red",
-            children: `${submission.data.first_name || 'No Name'} ${submission.data.last_name || 'No Last Name'} - ${work}`
-          };
-        });
-        setActivities(fetchedActivities);
+        const response = await axios.get("http://127.0.0.1:8000/data/activity-logs/");
+        if (response.status === 200) {
+          const fetchedActivities = response.data.map((activity) => ({
+            dot: <ClockCircleOutlined className="timeline-clock-icon" />,
+            color: "blue",
+            children: `${activity.user} - ${activity.description} (${new Date(activity.timestamp).toLocaleString()})`,
+          }));
+          setActivities(fetchedActivities);
+        } else {
+          console.error("Unexpected response:", response);
+        }
       } catch (error) {
-        console.error('Error fetching activities:', error);
+        console.error("Error fetching activities:", error);
       } finally {
         setLoading(false);
       }
     };
 
     fetchActivities();
-  }, [uuids]);
+  }, []);
 
   // Pagination logic
   const indexOfLastItem = currentPage * itemsPerPage;
@@ -71,9 +45,9 @@ const Activity = () => {
   };
 
   return (
-    <Layout title="Activity">
+    <Layout title="Activity Log">
       <div className={`dc-page ${config.container}`}>
-        <h1>Activity</h1>
+        <h1>Activity Log</h1>
         <div className="dc-page-content row">
           <div className="col-md-9 col-sm-12">
             {loading ? (

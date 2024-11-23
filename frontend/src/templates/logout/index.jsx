@@ -13,18 +13,24 @@ const LogoutPanel = () => {
     setSuccess('');
 
     try {
-      const response = await axios.post('https://nchlod.ddev.site/user/logout?_format=json', {}, {
+      // Send a request to the server to log out (this could be optional depending on your backend setup)
+      const response = await axios.post('http://127.0.0.1:8000/api/logout/', {}, {
         headers: {
-          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${localStorage.getItem('accessToken')}`, // Include the access token in the request
         },
       });
-      if (response.status === 200) {
-        setSuccess('Logout successful!');
+
+      if (response.status === 200 || response.status === 204) {
+        // Clear the JWT tokens from localStorage
+        localStorage.removeItem('accessToken');
+        localStorage.removeItem('refreshToken');
+        
+        setSuccess('Logout successful! You are now logged out.');
       } else {
-        setError('Logout failed.');
+        setError('Logout failed. Please try again.');
       }
     } catch (error) {
-      setError('An error occurred. Please try again.');
+      setError('An error occurred during logout. Please try again.');
     }
   };
 
@@ -40,7 +46,7 @@ const LogoutPanel = () => {
           </div>
           <div className="col-md-3 col-sm-12">
             <Announcement variation="info" heading="Note">
-              <p>Click the button to logout.</p>
+              <p>Click the button to log out and clear your session.</p>
             </Announcement>
           </div>
         </div>

@@ -26,6 +26,9 @@ import LogoutPanel from './templates/logout';
 import Moderator from './templates/moderator';
 import Profile from './templates/profile';
 import Viewresponse from './templates/viewResponse';
+import ViewProfile from './templates/viewprofile';
+import ViewForm from './templates/viewform';
+import ViewProfileOrForm from './templates/viewprofile';
 
 const router = createBrowserRouter([
   {
@@ -114,6 +117,14 @@ const router = createBrowserRouter([
     path: '*',
     element: <NotFound />,
   },
+  {
+    path:'/view/:username',
+    element: <ViewProfileOrForm />
+  },
+  {
+    path:'/view/:title',
+    element: <ViewProfileOrForm  />
+  }
 ]);
 
 createRoot(document.getElementById("root")).render(

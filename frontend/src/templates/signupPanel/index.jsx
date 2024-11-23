@@ -161,7 +161,7 @@ const SignupPanel = () => {
                   required
                 />
               </div>
-              <button type="submit" className="btn btn-primary">Signup</button>
+              <button type="submit" className="custom-button">Signup</button>
             </form>
             {error && <div className="alert alert-danger mt-3">{error}</div>}
             {success && <div className="alert alert-success mt-3">{success}</div>}

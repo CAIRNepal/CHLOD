@@ -1,87 +1,114 @@
-import React, { useState } from 'react';
-import axios from 'axios';
-import { Announcement } from "@civicactions/data-catalog-components";
+import React from "react";
+import { useForm } from "react-hook-form";
+import { useNavigate, Link } from "react-router-dom";
 import Layout from '../../components/Layout';
 import config from "../../assets/config";
+import { Button } from 'antd';
 
-const LoginPanel = () => {
-  const [username, setUsername] = useState('');
-  const [password, setPassword] = useState('');
-  const [error, setError] = useState('');
-  const [success, setSuccess] = useState('');
-  const [userData, setUserData] = useState(null);
+const Login = () => {
+  const {
+    register,
+    handleSubmit,
+    formState: { errors },
+    setError,
+  } = useForm();
 
-  const handleLogin = async (event) => {
-    event.preventDefault();
-    setError('');
-    setSuccess('');
+  const navigate = useNavigate();
 
-    const payload = {
-      name: username,
-      pass: password,
-    };
-
+  const onSubmit = async (data) => {
     try {
-      const response = await axios.post('https://nchlod.ddev.site/user/login?_format=json', payload, {
+      // Send request to obtain tokens
+      const response = await fetch("http://127.0.0.1:8000/api/token/", {
+        method: "POST",
         headers: {
-          'Content-Type': 'application/json',
+          "Content-Type": "application/json",
         },
+        body: JSON.stringify({
+          username: data.username,
+          password: data.password,
+        }),
       });
-      if (response.status === 200) {
-        setSuccess('Login successful!');
-        setUserData(response.data);
+
+      const json = await response.json();
+
+      if (response.ok) {
+        // Store tokens securely in localStorage
+        localStorage.setItem("accessToken", json.access);
+        localStorage.setItem("refreshToken", json.refresh);
+
+        console.log("Access Token: ", json.access);
+        console.log("Refresh Token: ", json.refresh);
+
+        // Redirect to the dashboard (authenticated page)
+        navigate("/dashboard");
       } else {
-        setError('Login failed. Please check your credentials.');
+        throw new Error(json.detail || "Login failed");
       }
     } catch (error) {
-      setError('An error occurred. Please try again.');
+      setError("root", { type: "manual", message: error.message });
     }
   };
 
   return (
     <Layout title="Login">
       <div className={`dc-page ${config.container}`}>
-        <h1>Login</h1>
-        <div className="dc-page-content row">
-          <div className="col-md-9 col-sm-12">
-            <form onSubmit={handleLogin}>
-              <div className="form-group">
-                <label htmlFor="username">Username:</label>
-                <input
-                  type="text"
-                  id="username"
-                  className="form-control"
-                  value={username}
-                  onChange={(e) => setUsername(e.target.value)}
-                  required
-                />
-              </div>
-              <div className="form-group">
-                <label htmlFor="password">Password:</label>
-                <input
-                  type="password"
-                  id="password"
-                  className="form-control"
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
-                  required
-                />
-              </div>
-              <button type="submit" className="btn btn-primary">Login</button>
-            </form>
-            {error && <div className="alert alert-danger mt-3">{error}</div>}
-            {success && <div className="alert alert-success mt-3">{success}</div>}
-            {userData && (
-              <div className="mt-3">
-                <h3>User Data</h3>
-                <pre>{JSON.stringify(userData, null, 2)}</pre>
-              </div>
-            )}
-          </div>
-          <div className="col-md-3 col-sm-12">
-            <Announcement variation="info" heading="Note">
-              <p>Enter your credentials to login.</p>
-            </Announcement>
+        <div className="m-20">
+          <div className="flex items-center justify-center m-20">
+            <div className="px-10 py-6 mt-20 text-center">
+              <form onSubmit={handleSubmit(onSubmit)} className="mt-4">
+                <div className="h-[200rem]">
+                  <input
+                    type="text"
+                    id="username"
+                    placeholder="Username"
+                    {...register("username", { required: "Username is required" })}
+                    className="w-full px-4 py-2 mt-2 border rounded-md focus:outline-none focus:ring-1 focus:ring-blue-600"
+                  />
+                  {errors.username && (
+                    <span className="text-xs text-red-600">{errors.username.message}</span>
+                  )}
+                </div>
+                <div className="mt-4">
+                  <input
+                    type="password"
+                    id="password"
+                    placeholder="Password"
+                    {...register("password", { required: "Password is required" })}
+                    className="w-full px-4 py-2 mt-2 border rounded-md focus:outline-none focus:ring-1 focus:ring-blue-600"
+                  />
+                  {errors.password && (
+                    <span className="text-xs text-red-600">
+                      {errors.password.message}
+                    </span>
+                  )}
+                </div>
+                <div className="flex items-between justify-between mt-4">
+                  <Link
+                    to="/auth/password/reset-password"
+                    className="text-sm text-blue-600 hover:underline"
+                  >
+                    Forgot password?
+                  </Link><br />
+                  <Button
+                    type="primary"
+                    htmlType="submit"
+                    className="custom-button px-20 py-2 leading-5 text-white transition-colors duration-200 transform bg-blue-600 rounded-md hover:bg-blue-700 focus:outline-none focus:bg-blue-700"
+                  >
+                    Login
+                  </Button>
+                  <Link to="/signup"
+                      type="default"
+                      className="custom-button px-20 py-2 leading-5 text-white transition-colors duration-200 transform bg-blue-600 rounded-md focus:outline-none focus:bg-blue-700"
+                    >
+                      Create new account
+                    
+                  </Link>
+                </div>
+                {errors.root && (
+                  <span className="text-xs text-red-600">{errors.root.message}</span>
+                )}
+              </form>
+            </div>
           </div>
         </div>
       </div>
@@ -89,4 +116,4 @@ const LoginPanel = () => {
   );
 };
 
-export default LoginPanel;
+export default Login;

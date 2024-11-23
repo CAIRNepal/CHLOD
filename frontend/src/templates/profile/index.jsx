@@ -1,76 +1,122 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { Announcement } from "@civicactions/data-catalog-components";
 import Layout from '../../components/Layout';
 import config from "../../assets/config";
 import { UserOutlined } from '@ant-design/icons';
-import { Avatar, Space } from 'antd';
-
+import { Avatar, Spin, Button } from 'antd';
+import { useNavigate } from 'react-router-dom'; // Import useNavigate for navigation
 
 const SignupPanel = () => {
-  const [firstName, setFirstName] = useState('');
-  const [lastName, setLastName] = useState('');
-  const [email, setEmail] = useState('');
-  const [institution, setInstitution] = useState('');
-  const [dob, setDob] = useState('');
+  const [profileData, setProfileData] = useState(null);
   const [error, setError] = useState('');
-  const [success, setSuccess] = useState('');
+  const [loading, setLoading] = useState(true);
+  const navigate = useNavigate(); // Hook to navigate to different routes
 
-  const handleSignup = async (event) => {
-    event.preventDefault();
-    setError('');
-    setSuccess('');
+  // Fetch user profile data from the API
+  useEffect(() => {
+    const fetchProfile = async () => {
+      const token = localStorage.getItem('accessToken'); // Get the JWT access token from localStorage
+      if (!token) {
+        setError('You are not logged in. Please log in to view your profile.');
+        setLoading(false);
+        return;
+      }
 
-    const payload = {
-      first_name: { value: firstName },
-      last_name: { value: lastName },
-      email: { value: email },
-      institution: { value: institution },
-      dob: { value: dob },
+      try {
+        const response = await axios.get('http://127.0.0.1:8000/data/auth/users/me/', {
+          headers: {
+            'Authorization': `Bearer ${token}`, 
+          },
+        });
+        setProfileData(response.data);  // Set the profile data to the state
+        setLoading(false);
+      } catch (error) {
+        if (error.response && error.response.status === 401) {
+          setError('Your session has expired. Please log in again.');
+        } else {
+          setError('Failed to load profile data. Please refresh the page or check your internet connection.');
+        }
+        setLoading(false);
+      }
     };
 
-    try {
-      const response = await axios.post('https://nchlod.ddev.site/user/register?_format=json', payload, {
-        headers: {
-          'Content-Type': 'application/json',
-        },
-      });
-      if (response.status === 200) {
-        setSuccess('Signup successful!');
-      } else {
-        setError('Signup failed. Please check your inputs.');
-      }
-    } catch (error) {
-      setError('An error occurred. Please try again.');
-    }
+    fetchProfile();
+  }, []); // The empty dependency array means this will run once when the component mounts
+
+  // Logout function
+  const handleLogout = () => {
+    // Remove the access token from localStorage
+    localStorage.removeItem('accessToken');
+    localStorage.removeItem('refreshToken'); // Optionally remove refresh token
+
+    // Optionally redirect to login page or homepage after logout
+    navigate('/login'); // Assuming the login route is '/login'
   };
 
+  // Loading state: display a spinner while the data is being fetched
+  if (loading) {
+    return (
+      <Layout title="Your Profile">
+        <div className={`dc-page ${config.container}`}>
+          <h1>Loading...</h1>
+          <Spin size="large" />
+        </div>
+      </Layout>
+    );
+  }
+
+  // Error state: display the error message and a button to refresh the page
+  if (error) {
+    return (
+      <Layout title="Your Profile">
+        <div className={`dc-page ${config.container}`}>
+          <h1>{error}</h1>
+          <Button type="primary" onClick={() => window.location.reload()}>
+            Refresh Page
+          </Button>
+        </div>
+      </Layout>
+    );
+  }
+
+  // Profile data state: display the profile information when data is successfully loaded
   return (
-    <Layout title="Signup">
+    <Layout title="Your Profile">
       <div className={`dc-page ${config.container}`}>
         <h1>Your Profile</h1>
         <div className="dc-page-content row">
           <div className="col-md-9 col-sm-12">
-   
-    <div>
-    <Avatar size={164} icon={<UserOutlined />} />
-    <h1>Nabin Oli </h1>
+            <Announcement variation="info" heading="Details">
+              <div>
+                <Avatar size={164} icon={<UserOutlined />} />
+                <h1>{profileData.first_name} {profileData.last_name}</h1>
+                <p><strong>Email:</strong> {profileData.email}</p>
 
-    
-    </div>
-      
-
-
-
-
-
-
+                {/* Check if profile exists before rendering organization and score */}
+                {profileData.profile ? (
+                  <>
+                    <p><strong>Organization:</strong> {profileData.profile.organization}</p>
+                    <p><strong>Score:</strong> {profileData.profile.score}</p>
+                  </>
+                ) : (
+                  <p><strong>Profile details are unavailable.</strong></p>
+                )}
+              </div>
+                        {/* Logout Button */}
+          <div className="col-md-3 col-sm-12 justify-end">
+            <Button
+              type="primary"
+              onClick={handleLogout}
+              className="mt-4"
+            >
+              Logout
+            </Button>
           </div>
-          <div className="col-md-3 col-sm-12">
-            <Announcement variation="info" heading="Note">
-              <p>This is your profile</p>
             </Announcement>
           </div>
+          
+
         </div>
       </div>
     </Layout>

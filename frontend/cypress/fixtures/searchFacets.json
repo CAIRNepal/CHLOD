@@ -3,27 +3,27 @@
     "facets": [
       {
         "type": "theme",
-        "name": "Transportation",
+        "name": "Archaeology",
         "total": "1"
       },
       {
         "type": "theme",
-        "name": "City Planning",
+        "name": "Cultural Practices",
         "total": "3"
       },
       {
         "type": "theme",
-        "name": "Finance and Budgeting",
+        "name": "Historical Sites",
         "total": "3"
       },
       {
         "type": "theme",
-        "name": "Public Safety",
+        "name": "Traditional Artforms",
         "total": "1"
       },
       {
         "type": "theme",
-        "name": "Health Care",
+        "name": "Heritage Preservation",
         "total": "3"
       }
     ]
@@ -32,92 +32,92 @@
     "facets": [
       {
         "type": "keyword",
-        "name": "bike-lanes",
+        "name": "heritage-sites",
         "total": "1"
       },
       {
         "type": "keyword",
-        "name": "streets",
-        "total": "1"
-      },
-      {
-        "type": "keyword",
-        "name": "infrastructure",
-        "total": "1"
-      },
-      {
-        "type": "keyword",
-        "name": "foreclosures",
-        "total": "1"
-      },
-      {
-        "type": "keyword",
-        "name": "economy",
+        "name": "cultural-heritage",
         "total": "3"
       },
       {
         "type": "keyword",
-        "name": "affordable-housing",
+        "name": "intangible-heritage",
         "total": "1"
       },
       {
         "type": "keyword",
-        "name": "housing-markets",
+        "name": "folk-art",
         "total": "1"
       },
       {
         "type": "keyword",
-        "name": "crime",
-        "total": "1"
-      },
-      {
-        "type": "keyword",
-        "name": "city",
-        "total": "1"
-      },
-      {
-        "type": "keyword",
-        "name": "health",
+        "name": "museum-collections",
         "total": "3"
       },
       {
         "type": "keyword",
-        "name": "asthma",
+        "name": "archaeological-dig",
         "total": "1"
       },
       {
         "type": "keyword",
-        "name": "demographics",
+        "name": "cultural-practices",
         "total": "1"
       },
       {
         "type": "keyword",
-        "name": "election",
+        "name": "ethnography",
+        "total": "1"
+      },
+      {
+        "type": "keyword",
+        "name": "cultural-preservation",
+        "total": "1"
+      },
+      {
+        "type": "keyword",
+        "name": "artifacts",
+        "total": "1"
+      },
+      {
+        "type": "keyword",
+        "name": "heritage-management",
+        "total": "3"
+      },
+      {
+        "type": "keyword",
+        "name": "historical-sites",
+        "total": "1"
+      },
+      {
+        "type": "keyword",
+        "name": "conservation",
         "total": "2"
       },
       {
         "type": "keyword",
-        "name": "politics",
+        "name": "restoration",
         "total": "2"
       },
       {
         "type": "keyword",
-        "name": "transparency",
+        "name": "cultural-legacy",
         "total": "2"
       },
       {
         "type": "keyword",
-        "name": "price",
+        "name": "tradition",
         "total": "1"
       },
       {
         "type": "keyword",
-        "name": "time-series",
+        "name": "time-capsule",
         "total": "1"
       },
       {
         "type": "keyword",
-        "name": "country-afghanistan",
+        "name": "country-nepal",
         "total": "1"
       }
     ]
@@ -126,17 +126,17 @@
     "facets": [
       {
         "type": "publisher__name",
-        "name": "State Economic Council",
+        "name": "National Cultural Heritage Institute",
         "total": "5"
       },
       {
         "type": "publisher__name",
-        "name": "National Health Council",
+        "name": "Cultural Preservation Council",
         "total": "3"
       },
       {
         "type": "publisher__name",
-        "name": "Committee on International Affairs",
+        "name": "World Heritage Foundation",
         "total": "2"
       }
     ]

@@ -1,16 +1,51 @@
-import React, { useState, useRef } from "react";
+import React, { useState, useEffect, useRef } from "react";
+import axios from "axios";
 import Layout from "../../components/Layout";
 import config from "../../assets/config";
-import { version, dependencies } from "../../../package.json";
-import UUIDFetcher from "../../components/formcomponent/UUIDFetcher";
-import { Input, Space, Button, Table, Tag } from "antd";
+import { Input, Space, Button, Table } from "antd";
 import { SearchOutlined } from "@ant-design/icons";
 import Highlighter from "react-highlight-words";
+import { useNavigate } from "react-router-dom";  // Import useNavigate for navigation
 
 const Queues = () => {
+  const [data, setData] = useState([]);
+  const [loading, setLoading] = useState(true);
   const [searchText, setSearchText] = useState("");
   const [searchedColumn, setSearchedColumn] = useState("");
   const searchInput = useRef(null);
+  const navigate = useNavigate();  // Hook to navigate to different routes
+
+  // Fetch data from the submissions API
+  useEffect(() => {
+    const fetchSubmissions = async () => {
+      try {
+        const response = await axios.get("http://127.0.0.1:8000/data/submissions/");
+        if (response.status === 200) {
+          // Filter only "pending" submissions
+          const pendingSubmissions = response.data
+            .filter((submission) => submission.status.toLowerCase() === "pending")
+            .map((submission, index) => ({
+              key: index + 1, // Table requires a unique key
+              id: submission.id,
+              title: submission.title,
+              description: submission.description,
+              contributor: submission.contributor_username, 
+              status: submission.status,
+              created_at: new Date(submission.created_at).toLocaleDateString(), // Formatting the date
+            }));
+          setData(pendingSubmissions);
+        } else {
+          console.error("Unexpected response:", response);
+        }
+      } catch (error) {
+        console.error("Error fetching submissions:", error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchSubmissions();
+  }, []);
 
   const handleSearch = (selectedKeys, confirm, dataIndex) => {
     confirm();
@@ -84,98 +119,87 @@ const Queues = () => {
       ),
   });
 
+  const handleContributorClick = (username) => {
+    // Navigate to the user's profile page using their username
+    navigate(`/view/${username}`);
+  };
+
+  // Handle title click: Navigate to /view/:title
+  const handleTitleClick = (title) => {
+    navigate(`/view/${title}`);  // Navigate to the title's page
+  };
+
   const columns = [
     {
       title: "ID",
       dataIndex: "id",
       sorter: true,
-      fixed: "left",
       key: "id",
-      width: "5%",
+      width: "10%",
       ...getColumnSearchProps("id"),
     },
     {
-      title: "Status",
-      dataIndex: "status",
+      title: "Title",
+      dataIndex: "title",
       sorter: true,
-      key: "status",
-      width: "10%",
-      ...getColumnSearchProps("status"),
+      key: "title",
+      width: "20%",
+      ...getColumnSearchProps("title"),
+      render: (text) => (
+        <Button
+          type="link"
+          onClick={() => handleTitleClick(text)} // Handle click to navigate to the title's page
+        >
+          {text}
+        </Button>
+      ),
     },
     {
-      title: "Topic",
-      dataIndex: "topic",
+      title: "Description",
+      dataIndex: "description",
       sorter: true,
-      key: "topic",
-      ...getColumnSearchProps("topic"),
+      key: "description",
+      width: "30%",
+      ...getColumnSearchProps("description"),
     },
     {
-      title: "Submitter",
-      dataIndex: "submitter",
+      title: "Contributor",
+      dataIndex: "contributor",
       sorter: true,
-      key: "submitter",
-      ...getColumnSearchProps("submitter"),
+      key: "contributor",
+      width: "20%",
+      ...getColumnSearchProps("contributor"),
+      render: (text) => (
+        <Button
+          type="link"
+          onClick={() => handleContributorClick(text)} // Handle click to navigate to profile
+        >
+          {text}
+        </Button>
+      ),
     },
     {
-      title: "Submitted",
-      dataIndex: "submitted",
+      title: "Created At",
+      dataIndex: "created_at",
       sorter: true,
-      fixed: "right",
-      key: "submitted",
-      ...getColumnSearchProps("submitted"),
-    },
-  ];
-
-  const data = [
-    {
-      id: "1",
-      submitter: "Alice Smith",
-      status: "Pending",
-      topic: "Topic A",
-      submitted: "2024-07-08",
-    },
-    {
-      id: "2",
-      submitter: "Bob Johnson",
-      status: "Approved",
-      topic: "Topic B",
-      submitted: "2024-07-07",
-    },
-    {
-      id: "3",
-      submitter: "Charlie Brown",
-      status: "Pending",
-      topic: "Topic C",
-      submitted: "2024-07-06",
-    },
-    {
-      id: "4",
-      submitter: "David Lee",
-      status: "Rejected",
-      topic: "Topic D",
-      submitted: "2024-07-05",
-    },
-    {
-      id: "5",
-      submitter: "Eva Green",
-      status: "Approved",
-      topic: "Topic E",
-      submitted: "2024-07-04",
+      key: "created_at",
+      width: "20%",
+      ...getColumnSearchProps("created_at"),
     },
   ];
 
   return (
     <Layout title="Queues">
       <div className={`dc-page ${config.container}`}>
-        <h1>Queues</h1>
+        <h1>Pending Submissions</h1>
         <div className="dc-page-content row">
-          <div className="col-md-9 col-sm-12">
+          <div className="col-md-12 col-sm-12">
             <Table
               columns={columns}
               dataSource={data}
               bordered
-              scroll={{ x: 1800, y: 1200 }}
-              width={1200}
+              scroll={{ x: 1200, y: 600 }}
+              loading={loading}
             />
           </div>
         </div>

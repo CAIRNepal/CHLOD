@@ -55,7 +55,7 @@ const Home = () => {
             <IconList
                 items={items}
                 component={IconListItem}
-                paneTitle="Dataset Topics"
+                paneTitle="Popular Datasets"
                 className="opendata-icon-list"
             />
         </div>

@@ -1,4 +1,10 @@
 @import "./fonts/rubik-cufonfonts-webfont/style.css";
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+
 html {
   /*Convert font size to base 10 for easier calculations (1rem = 10px)*/
   font-size: 62.5%;

@@ -1,19 +1,29 @@
 [
   {
-    "name": "State Economic Council",
-    "description": "The State Economic Council is responsible for increasing economic development of the state by collecting statistics and performing analysis on the labor force, workforce and employer demographics, generational trends, etc.",
-    "searchUrl":"/search/?publisher__name=State Economic Council"
+    "name": "राष्ट्रिय सांस्कृतिक प्रतिष्ठान",
+    "description": "राष्ट्रिय सांस्कृतिक प्रतिष्ठान नेपालको सांस्कृतिक सम्पदा संरक्षण, प्रवर्द्धन र प्रबर्धनका लागि काम गर्ने सरकारी निकाय हो। यस संस्थाले सांस्कृतिक धरोहरको संरक्षण र समृद्धिको लागि विभिन्न योजनाहरू बनाउँछ र कार्यान्वयन गर्दछ।",
+    "searchUrl": "/search/?publisher__name=राष्ट्रिय सांस्कृतिक प्रतिष्ठान"
   },
   {
-    "name": "National Health Council",
-    "imageUrl": "https://dkan-default-content-files.s3.amazonaws.com/files/publishers/clipboard.png",
-    "description": "National Health Council is a working group that performs research and prepares reports to inform treatment and prevention programs nationally.",
-    "searchUrl":"/search/?publisher__name=National Health Council"
+    "name": "नेपाल संग्रहालय परिषद्",
+    "imageUrl": "https://dkan-default-content-files.s3.amazonaws.com/files/publishers/museum.png",
+    "description": "नेपाल संग्रहालय परिषद् नेपालको विभिन्न संग्रहालयहरूको समन्वय र व्यवस्थापनको लागि जिम्मेवार एक निकाय हो। यस परिषद्ले संग्रहालयहरूको संरक्षण, सुधार र जनचेतना अभिवृद्धि गर्न काम गर्दछ।",
+    "searchUrl": "/search/?publisher__name=नेपाल संग्रहालय परिषद्"
   },
   {
-    "name": "Committee on International Affairs",
-    "imageUrl": "https://dkan-default-content-files.s3.amazonaws.com/files/publishers/map.png",
-    "description": "The Committee on International Affairs is a working group to identify opportunities to learn from and collaborate with government and organizations across the globe.",
-    "searchUrl":"/search/?publisher__name=Committee on International Affairs"
+    "name": "नेपाल कला परिषद्",
+    "imageUrl": "https://dkan-default-content-files.s3.amazonaws.com/files/publishers/art.png",
+    "description": "नेपाल कला परिषद् नेपालको सांस्कृतिक र कलात्मक सम्पदाको संरक्षण र प्रवर्द्धनका लागि काम गर्ने एक प्रतिष्ठान हो। यसले नेपाली कला र संस्कृतिको संरक्षण र नयाँ कलाकारहरूको प्रोत्साहन गर्ने कार्य गर्दछ।",
+    "searchUrl": "/search/?publisher__name=नेपाल कला परिषद्"
+  },
+  {
+    "name": "सांस्कृतिक विरासत संरक्षण परिषद्",
+    "description": "सांस्कृतिक विरासत संरक्षण परिषद् नेपालको ऐतिहासिक र सांस्कृतिक धरोहरहरूको संरक्षण र मर्मतसम्भार गर्ने निकाय हो। यस परिषद्ले पुराना भवन, मूर्तिहरू र अन्य सांस्कृतिक सम्पदाको संरक्षणमा काम गर्दछ।",
+    "searchUrl": "/search/?publisher__name=सांस्कृतिक विरासत संरक्षण परिषद्"
+  },
+  {
+    "name": "नेपाली संगीत परिषद्",
+    "description": "नेपाली संगीत परिषद् नेपालको पारंपरिक र आधुनिक संगीतको संरक्षण, प्रचार र प्रोत्साहन गर्ने संस्था हो। यस परिषद्ले संगीत शिक्षाका कार्यक्रमहरू सञ्चालन गर्ने र नयाँ संगीत प्रतिभाहरूको खोजी गर्ने काम गर्दछ।",
+    "searchUrl": "/search/?publisher__name=नेपाली संगीत परिषद्"
   }
 ]
