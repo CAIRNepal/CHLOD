@@ -35,12 +35,8 @@ const Login = () => {
         // Store tokens securely in localStorage
         localStorage.setItem("accessToken", json.access);
         localStorage.setItem("refreshToken", json.refresh);
-
-        console.log("Access Token: ", json.access);
-        console.log("Refresh Token: ", json.refresh);
-
         // Redirect to the dashboard (authenticated page)
-        navigate("/dashboard");
+        navigate("/");
       } else {
         throw new Error(json.detail || "Login failed");
       }
