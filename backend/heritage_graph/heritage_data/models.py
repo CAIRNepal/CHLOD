@@ -29,11 +29,13 @@ class Moderation(models.Model):
         moderator_name = self.moderator.username if self.moderator else "No Moderator"
         return f"Moderation for {self.submission.title} by {moderator_name}"
 
-
 class UserProfile(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE, related_name='profile')
     organization = models.CharField(max_length=255, blank=True, null=True)
     score = models.IntegerField(default=0)
+    position = models.CharField(max_length=255, blank=True, null=True)  # Added field for user's position
+    birth_date = models.DateField(null=True, blank=True)  # Added field for user's birth date
+    university_school = models.CharField(max_length=255, blank=True, null=True)  # Added field for university or school name
 
     def __str__(self):
         return self.user.username

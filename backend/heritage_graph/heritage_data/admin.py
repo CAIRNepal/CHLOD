@@ -1,6 +1,5 @@
 from django.contrib import admin
-from .models import Submission, Moderation
-from .models import UserProfile
+from .models import Submission, Moderation,ActivityLog, UserProfile
 
 
 # Admin for Submission model
@@ -25,8 +24,12 @@ class ModerationAdmin(admin.ModelAdmin):
 
 
 class UserProfileAdmin(admin.ModelAdmin):
-    list_display = ('user', 'organization', 'score')
+    list_display = ('user', 'organization', 'score','position','birth_date','university_school')
+
+class ActivityLogAdmin(admin.ModelAdmin):
+    lisst_display = ('user','action','description','timestamp')
 
 admin.site.register(UserProfile, UserProfileAdmin)
 admin.site.register(Submission, SubmissionAdmin)
 admin.site.register(Moderation, ModerationAdmin)
+admin.site.register(ActivityLog, ActivityLogAdmin)
