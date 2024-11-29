@@ -11,6 +11,10 @@ const SubmissionForm = () => {
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
 
+  const getAuthToken = () => {
+    return localStorage.getItem('accessToken'); 
+  };
+
   // Handle form submission
   const handleSubmit = async (event) => {
     event.preventDefault();
@@ -26,25 +30,35 @@ const SubmissionForm = () => {
     const payload = {
       title,
       description,
-      status: 'pending'  // Status is always set to 'pending'
+      status: 'Pending', // Status is always set to 'pending'
     };
 
-    console.log(payload);
-
     try {
+      // Get the JWT token
+      const token = getAuthToken();
+
+      if (!token) {
+        setError('User is not authenticated. Please log in again.');
+        return;
+      }
+
       // Sending POST request to backend
-      const response = await axios.post('http://127.0.0.1:8000/your-api-endpoint/', payload, {
+      const response = await axios.post('http://127.0.0.1:8000/data/submissions/create/', payload, {
         headers: {
           'Content-Type': 'application/json',
+          Authorization: `Bearer ${token}`, // Adding JWT token in Authorization header
         },
       });
 
       if (response.status === 200) {
         setSuccess('Submission created successfully!');
+        setTitle(''); // Resets form
+        setDescription('');
       } else {
         setError('Submission failed. Please try again.');
       }
     } catch (error) {
+      console.error(error);
       setError('An error occurred while submitting. Please try again.');
     }
   };
@@ -89,7 +103,7 @@ const SubmissionForm = () => {
           </div>
 
           <div className="col-md-3 col-sm-12">
-          <Announcement variation="info" heading="Note">
+            <Announcement variation="info" heading="Note">
               <p>Make sure to fill in all fields and submit your work properly. The status will automatically be set to "Pending".</p>
             </Announcement>
           </div>

@@ -20,10 +20,11 @@ const Login = () => {
       const json = await response.json();
 
       if (response.ok) {
+        
         storeToken(json.access, "access");
         storeToken(json.refresh, "refresh");
-        console.log("Access Token: ", json.access);
-        navigate("/dashboard");
+        
+        // navigate("/dashboard");
       } else {
         throw new Error(json.detail || "Login failed");
       }

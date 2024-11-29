@@ -20,16 +20,7 @@
       "url": "/api",
       "target": "_top"
     },
-    {
-      "label": "Curation",
-      "url": "/curation",
-      "target": "_top"
-    },
-    {
-      "label": "Activity",
-      "url": "/curation/activity",
-      "target": "_top"
-    },
+
     {
       "label": "Queues",
       "url": "/curation/queues",
@@ -38,11 +29,6 @@
     {
       "label": "Form",
       "url": "/datacontribution",
-      "target": "_top"
-    },
-    {
-      "label": "Test",
-      "url": "/test",
       "target": "_top"
     },
     {

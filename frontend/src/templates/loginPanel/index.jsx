@@ -35,6 +35,7 @@ const Login = () => {
         // Store tokens securely in localStorage
         localStorage.setItem("accessToken", json.access);
         localStorage.setItem("refreshToken", json.refresh);
+        console.log("Access Token: ", json.access);
         // Redirect to the dashboard (authenticated page)
         navigate("/");
       } else {
