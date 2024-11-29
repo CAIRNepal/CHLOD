@@ -2,7 +2,7 @@
   "name": "@civicactions/data-catalog-app",
   "version": "1.6.1",
   "private": false,
-  "homepage": "frontend/build",
+  "homepage": "/",
   "dependencies": {
     "@civicactions/data-catalog-components": "1.18.0",
     "@fortawesome/fontawesome-svg-core": "^6.4.2",
@@ -33,10 +33,10 @@
   },
   "scripts": {
     "start": "vite",
-    "build": "vite build --base=/frontend/build/static/",
+    "build": "vite build --base=/",
     "test": "vitest",
     "preview": "vite preview",
-    "sass": "sass ./src/theme/index.scss ./src/theme/index.css"
+       "sass": "sass ./src/theme/index.scss ./src/theme/index.css"
   },
   "eslintConfig": {
     "extends": "react-app"
