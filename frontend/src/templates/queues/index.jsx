@@ -5,7 +5,7 @@ import config from "../../assets/config";
 import { Input, Space, Button, Table } from "antd";
 import { SearchOutlined } from "@ant-design/icons";
 import Highlighter from "react-highlight-words";
-import { useNavigate } from "react-router-dom";  // Import useNavigate for navigation
+import { useNavigate } from "react-router-dom";  
 
 const Queues = () => {
   const [data, setData] = useState([]);
@@ -13,7 +13,7 @@ const Queues = () => {
   const [searchText, setSearchText] = useState("");
   const [searchedColumn, setSearchedColumn] = useState("");
   const searchInput = useRef(null);
-  const navigate = useNavigate();  // Hook to navigate to different routes
+  const navigate = useNavigate();  
 
   // Fetch data from the submissions API
   useEffect(() => {
@@ -125,8 +125,8 @@ const Queues = () => {
   };
 
   // Handle title click: Navigate to /view/:title
-  const handleTitleClick = (title) => {
-    navigate(`/view/${title}`);  // Navigate to the title's page
+  const handleTitleClick = (title) => { 
+    navigate(`/viewform/${title}`);  // Navigate to the title's page
   };
 
   const columns = [

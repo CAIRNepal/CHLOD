@@ -109,7 +109,7 @@ const router = createBrowserRouter([
     element: <Viewresponse />
   },
   {
-    path: "/profile",
+    path: "/me",
     element: <Profile />
   },
 
@@ -122,7 +122,7 @@ const router = createBrowserRouter([
     element: <ViewProfileOrForm />
   },
   {
-    path:'/view/:title',
+    path:'/viewform/:title',
     element: <ViewProfileOrForm  />
   }
 ]);

@@ -60,7 +60,7 @@ const Layout = ({
           ) : (
             <>
               {/* Show Profile and Logout if the user is logged in */}
-              <Link to="/profile">
+              <Link to="/me">
                 <Space direction="vertical" size={16}>
                   <Space wrap size={16}>
                     <Avatar size={40} icon={<UserOutlined />} />

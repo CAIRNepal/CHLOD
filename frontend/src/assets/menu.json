@@ -27,7 +27,7 @@
       "target": "_top"
     },
     {
-      "label": "Form",
+      "label": "Contribute",
       "url": "/datacontribution",
       "target": "_top"
     },
@@ -43,34 +43,26 @@
     }
   ],
   "footer1": [
+
+  ],
+  "footer2": [
+    {
+      "label": "Heritage Graph",
+      "url": "https://cair-nepal.org/research/projects/heritagegraph-illuminating-cultural-legacies-throu"
+    },
     {
       "label": "Documentation",
       "url": "https://dkan.readthedocs.io/en/latest/index.html",
       "target": "_blank"
     },
     {
-      "label": "Download",
-      "url": "https://github.com/getdkan/dkan"
-    },
-    {
       "label": "CAIR-Nepal",
       "url": "https://cair-nepal.org/",
       "target": "_blank"
-    }
-  ],
-  "footer2": [
-    {
-      "label": "Project Open Data",
-      "url": "https://project-open-data.cio.gov"
     },
     {
-      "label": "DCAT",
-      "url": "https://www.w3.org/TR/vocab-dcat/",
-      "target": "_blank"
-    },
-    {
-      "label": "Drupal",
-      "url": "https://drupal.org",
+      "label": "Github",
+      "url": "https://github.com/CAIRNepal/CHLOD",
       "target": "_blank"
     }
   ]

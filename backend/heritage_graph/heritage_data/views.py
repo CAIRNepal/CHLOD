@@ -10,6 +10,9 @@ from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated, IsAdminUser
 from .models import Submission, Moderation
 from .serializers import SubmissionSerializer, ModerationSerializer
+from .serializers import CustomUserSerializer
+from .models import ActivityLog
+from .serializers import ActivityLogSerializer
 
 # Contributor view: Submit data
 class SubmissionCreateView(generics.CreateAPIView):
@@ -50,9 +53,22 @@ class ModerationReviewView(generics.UpdateAPIView):
             "moderation": ModerationSerializer(moderation).data
         })
 
+class CustomUserMeView(APIView):
+    permission_classes = [IsAuthenticated]
 
+    def get(self, request):
+        user = request.user
+        serializer = CustomUserSerializer(user)
+        return Response(serializer.data)
 
+class ActivityLogView(APIView):
+    permission_classes = [AllowAny]
 
+    def get(self, request):
+        # Fetch the latest activity logs, !!! NEEDS Pagination here !!!
+        logs = ActivityLog.objects.order_by('-timestamp')[:50]
+        serializer = ActivityLogSerializer(logs, many=True)
+        return Response(serializer.data)
 
 
 

@@ -57,7 +57,7 @@ const SignupPanel = () => {
   // Loading state: display a spinner while the data is being fetched
   if (loading) {
     return (
-      <Layout title="Your Profile">
+      <Layout title="Profile">
         <div className={`dc-page ${config.container}`}>
           <h1>Loading...</h1>
           <Spin size="large" />

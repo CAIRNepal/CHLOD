@@ -5,10 +5,10 @@ import Layout from '../../components/Layout';
 import config from "../../assets/config";
 import { UserOutlined } from '@ant-design/icons';
 import { Avatar, Spin, Input, Button, Form, message } from 'antd';
-import { useParams } from 'react-router-dom'; 
+import { useParams } from 'react-router-dom';
 
 const ViewProfileOrForm = () => {
-  const { username, title } = useParams(); 
+  const { username, title } = useParams();
   const [decodedTitle, setDecodedTitle] = useState('');
 
   const [profileData, setProfileData] = useState(null);
@@ -27,6 +27,7 @@ const ViewProfileOrForm = () => {
         setIsProfileView(true); // It's a profile view
         try {
           const response = await axios.get(`http://127.0.0.1:8000/data/user/${username}/`);
+          console.log(response);
           setProfileData(response.data);
         } catch (error) {
           setError('User not found.');
@@ -105,13 +106,13 @@ const ViewProfileOrForm = () => {
                 <div>
                   <Avatar size={164} icon={<UserOutlined />} />
                   <h1>{profileData.first_name} {profileData.last_name}</h1>
-                  <p><strong>Email:</strong> {profileData.email}</p>
+                  <p><strong>Email:</strong> {profileData.profile.email}</p>
                   <p><strong>Username:</strong> {profileData.username}</p>
-
-                  {/* Optional: Display organization or additional profile data */}
-                  {profileData.organization && (
-                    <p><strong>Organization:</strong> {profileData.organization}</p>
-                  )}
+                  <p><strong>Organization:</strong> {profileData.profile.organization}</p>
+                  <p><strong>Position:</strong> {profileData.profile.position}</p>
+                  <p><strong>University/School:</strong> {profileData.profile.university_school}</p>
+                  <p><strong>Score:</strong> {profileData.profile.score}</p>
+                  <p><strong>Birth Date:</strong> {profileData.profile.birth_date}</p>
                 </div>
               </Announcement>
             </div>
@@ -131,10 +132,14 @@ const ViewProfileOrForm = () => {
             <Form
               initialValues={isProfileView
                 ? {
-                    first_name: profileData?.first_name || '',
-                    last_name: profileData?.last_name || '',
-                    email: profileData?.email || '',
-                    organization: profileData?.organization || '',
+                    first_name: profileData?.profile.first_name || '',
+                    last_name: profileData?.profile.last_name || '',
+                    email: profileData?.profile.email || '',
+                    organization: profileData?.profile.organization || '',
+                    position: profileData?.profile.position || '',
+                    university_school: profileData?.profile.university_school || '',
+                    score: profileData?.profile.score || 0,
+                    birth_date: profileData?.profile.birth_date || '',
                   }
                 : {
                     title: submissionData?.title || '',
@@ -174,6 +179,34 @@ const ViewProfileOrForm = () => {
                     name="organization"
                   >
                     <Input />
+                  </Form.Item>
+
+                  <Form.Item
+                    label="Position"
+                    name="position"
+                  >
+                    <Input />
+                  </Form.Item>
+
+                  <Form.Item
+                    label="University/School"
+                    name="university_school"
+                  >
+                    <Input />
+                  </Form.Item>
+
+                  <Form.Item
+                    label="Score"
+                    name="score"
+                  >
+                    <Input type="number" />
+                  </Form.Item>
+
+                  <Form.Item
+                    label="Birth Date"
+                    name="birth_date"
+                  >
+                    <Input type="date" />
                   </Form.Item>
                 </>
               ) : (
