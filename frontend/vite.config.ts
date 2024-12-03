@@ -3,7 +3,12 @@ import react from '@vitejs/plugin-react';
 
 export default defineConfig(() => {
   return {
+<<<<<<< HEAD
     base: '/',  
+=======
+    base: '/',
+
+>>>>>>> f725563038f2b6b9f78b122803bc5756ff5968c1
     build: {
       outDir: 'build/static',
       manifest: true,
@@ -32,4 +37,4 @@ export default defineConfig(() => {
       }
     }
   }
-})
+});
