@@ -156,7 +156,7 @@ class LeaderboardView(APIView):
     
 class UserDetailView(generics.RetrieveAPIView):
     queryset = User.objects.all()
-    serializer_class = UserSerializer
+    serializer_class = UserSerializer 
 
     def get_object(self):
         # Get the username from URL parameters

@@ -85,7 +85,13 @@ class UserSignupSerializer(serializers.ModelSerializer):
 
         return user, profile
     
+class UserProfileSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = UserProfile
+        fields = ['email', 'first_name', 'last_name', 'organization', 'score', 'birth_date', 'position', 'university_school']
+
 class UserSerializer(serializers.ModelSerializer):
+    profile = UserProfileSerializer(read_only=True) 
     class Meta:
         model = User
-        fields = ['username', 'email', 'first_name', 'last_name'] 
+        fields = ['username','profile']

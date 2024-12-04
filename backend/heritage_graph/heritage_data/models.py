@@ -31,15 +31,19 @@ class Moderation(models.Model):
 
 class UserProfile(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE, related_name='profile')
+    first_name = models.CharField(max_length=50, blank=True) 
+    middle_name = models.CharField(max_length=50, blank=True, null=True)  
+    last_name = models.CharField(max_length=50, blank=True)
+    email = models.EmailField(unique=True, null=True, blank=True)
+    birth_date = models.DateField(null=True, blank=True) 
     organization = models.CharField(max_length=255, blank=True, null=True)
+    position = models.CharField(max_length=255, blank=True, null=True)  
     score = models.IntegerField(default=0)
-    position = models.CharField(max_length=255, blank=True, null=True)  # Added field for user's position
-    birth_date = models.DateField(null=True, blank=True)  # Added field for user's birth date
-    university_school = models.CharField(max_length=255, blank=True, null=True)  # Added field for university or school name
+    university_school = models.CharField(max_length=255, blank=True, null=True) 
 
     def __str__(self):
         return self.user.username
-    
+
 class ActivityLog(models.Model):
     ACTION_CHOICES = [
         ('add', 'Added'),
