@@ -1,4 +1,4 @@
-# Data Catalog App
+<!-- # Data Catalog App
 
 The React frontend is built with [Vite](https://vitejs.dev/).
 
@@ -84,4 +84,7 @@ Runs the React site in production mode, independently from drupal.
 
 To run Cypress tests on a local React-only install of this repo, ensure the app is running at `localhost:3000`. In a separate terminal, use `npx cypress run --config baseUrl="http://localhost:3000"`.
 
-If the frontend is installed within a DKAN site, navigate to the `frontend` folder containing your installation of this repo. Ensure your full site is running, and take note of its URL (PROJECT_NAME.ddev.site), where `PROJECT_NAME` is variable. Run tests using `npx cypress run --config baseUrl="YOUR_DDEV_URL"`, using your project URL for the baseUrl argument
+If the frontend is installed within a DKAN site, navigate to the `frontend` folder containing your installation of this repo. Ensure your full site is running, and take note of its URL (PROJECT_NAME.ddev.site), where `PROJECT_NAME` is variable. Run tests using `npx cypress run --config baseUrl="YOUR_DDEV_URL"`, using your project URL for the baseUrl argument -->
+
+npm install\
+npm run start
