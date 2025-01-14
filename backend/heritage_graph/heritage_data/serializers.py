@@ -79,9 +79,9 @@ class UserSignupSerializer(serializers.ModelSerializer):
         user.save()
         profile.save()
 
-        # # Check if the UserProfile already exists, if not, create one
-        # if not UserProfile.objects.filter(user=user).exists():
-        #     UserProfile.objects.create(user=user, organization=organization, position=position, birth_date=birth_date, university_school=university_school)
+        # Check if the UserProfile already exists, if not, create one
+        if not UserProfile.objects.filter(user=user).exists():
+            UserProfile.objects.create(user=user, organization=organization, position=position, birth_date=birth_date, university_school=university_school)
 
         return user, profile
     
