@@ -81,7 +81,7 @@ const SubmissionForm = () => {
         <div className="dc-page-content row">
           <div className="col-md-9 col-sm-12">
             {/* If user is not authenticated, show a message to sign in */}
-            {!isAuthenticated ? (
+            {isAuthenticated ? (
               <Alert
                 message="You need to be signed in to contribute to Heritage Graph."
                 description="Please log in to submit your contribution."
