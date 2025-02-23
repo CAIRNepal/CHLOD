@@ -1,1 +1,9 @@
+
 data/
+# Ignore everything in the docs directory
+/docs/*
+# But do not ignore the docs directory itself
+!/docs/
+
+# Optional: Do not ignore a placeholder file if needed
+!/docs/.gitkeep
