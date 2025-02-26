@@ -1,0 +1,45 @@
+name: Deploy Jupyter Book
+
+on:
+  push:
+    branches:
+      - master
+      - documentation
+
+jobs:
+  deploy-book:
+    runs-on: ubuntu-latest
+    permissions:
+      pages: write
+      id-token: write
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Python 3.11
+        uses: actions/setup-python@v4
+        with:
+          python-version: 3.11
+
+      - name: Install dependencies
+        run: pip install -r docs/requirements.txt
+
+      - name: Cache executed notebooks
+        uses: actions/cache@v4
+        with:
+          path: docs/_build/.jupyter_cache
+          key: jupyter-book-cache-${{ hashFiles('docs/requirements.txt') }}
+
+      - name: Build the book
+        run: jupyter-book build docs/
+
+      # Upload the book's HTML as a Pages artifact
+      - name: Upload artifact
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: docs/_build/html
+
+      # Deploy to Pages
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4

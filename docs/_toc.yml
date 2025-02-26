@@ -1,0 +1,31 @@
+# Table of contents
+# Learn more at https://jupyterbook.org/customize/toc.html
+format: jb-book
+root: index
+parts:
+  - caption: Before you Begin 
+    numbered: True 
+    chapters:
+    - file: getting_started
+  - caption: Heritage Graph Overview 
+    numbered: True 
+    chapters:
+    - file: heritage_graph_overview
+    - file: audience_usecases 
+  - caption: Heritage Graph Design
+    numbered: True 
+    chapters:
+    - file: heritage_graph_architecutre
+  - caption: Heritage Graph User Interface
+    numbered: True 
+    chapters:
+    - file: heritagegraph_ui
+  - caption: Deployment Guidelines
+    numbered: True 
+    chapters:
+    - file: deployment_instructions
+  - caption: Research Outputs
+    numbered: True 
+    chapters:
+    - file: list_of_libaries
+    - file: publications
