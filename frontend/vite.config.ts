@@ -3,23 +3,23 @@ import react from '@vitejs/plugin-react';
 
 export default defineConfig(() => {
   return {
-    base: '/', // Ensure this is correct for your deployment environment
+    base: './', // Changed from '/' to './' for relative paths
     build: {
-      outDir: 'build', // Change this to 'build' instead of 'build/static'
+      outDir: 'build',
       manifest: true,
       rollupOptions: {
         output: {
-          entryFileNames: `assets/[name].js`, // Use 'assets' folder for better organization
-          chunkFileNames: `assets/chunks/[name].[hash].js`,
+          // Ensure assets use hash for cache busting
+          entryFileNames: `assets/[name].[hash].js`,
+          chunkFileNames: `assets/[name].[hash].js`,
           assetFileNames: ({ name }) => {
             if (/\.css$/.test(name ?? '')) {
-              return `assets/css/[name].[ext]`; // CSS files in 'assets/css'
+              return `assets/css/[name].[hash].[ext]`;
             }
             if (/\.(png|jpe?g|gif|svg|webp)$/.test(name ?? '')) {
-              return `assets/media/[name].[ext]`; // Images in 'assets/media'
+              return `assets/media/[name].[hash].[ext]`;
             }
-            // Default for other assets
-            return 'assets/[name].[ext]';
+            return 'assets/[name].[hash].[ext]';
           },
         },
       },

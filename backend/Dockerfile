@@ -8,9 +8,15 @@ ENV PYTHONUNBUFFERED=1
 # Set the working directory in the container
 WORKDIR /app/heritage_graph
 
-# Install dependencies
+# Install system dependencies and clean up
+RUN apt-get update && \
+    apt-get install -y --no-install-recommends gcc python3-dev && \
+    rm -rf /var/lib/apt/lists/*
+
+# Install Python dependencies
 COPY requirements.txt /app/
-RUN pip install --no-cache-dir -r /app/requirements.txt
+RUN pip install --no-cache-dir -r /app/requirements.txt && \
+    rm -rf /root/.cache/pip
 
 # Copy the Django project into the container
 COPY . /app/

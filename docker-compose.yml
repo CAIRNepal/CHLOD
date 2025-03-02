@@ -1,23 +1,12 @@
-version: '3.8'
-
 services:
+  frontend:
+    build: ./frontend
+    ports:
+      - "3000:3000"
+    depends_on:
+      - backend
+
   backend:
     build: ./backend
     ports:
       - "8000:8000"
-    volumes:
-      - ./backend:/app
-    working_dir: /app/heritage_graph
-    environment:
-      - ALLOWED_HOSTS=0.0.0.0,localhost,127.0.0.1
-    restart: on-failure
-
-  frontend:
-    build: ./frontend
-    ports:
-      - "3000:3000"  # Map host port 3000 to container port 3000
-    volumes:
-      - ./frontend:/app
-      - /app/node_modules  # Avoid overwriting node_modules in the container
-
-    # command: npm run start  # Use 'npm run build && serve -s build -l 3000' for production
