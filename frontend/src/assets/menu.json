@@ -20,7 +20,6 @@
       "url": "/api",
       "target": "_top"
     },
-
     {
       "label": "Queues",
       "url": "/curation/queues",
@@ -39,6 +38,31 @@
     {
       "label": "About",
       "url": "/about",
+      "target": "_top"
+    },
+    {
+      "label": "Login",
+      "url": "/login",
+      "target": "_top"
+    },
+    {
+      "label": "Signup",
+      "url": "/signup",
+      "target": "_top"
+    },
+    {
+      "label": "Logout",
+      "url": "/logout",
+      "target": "_top"
+    },
+    {
+      "label": "Profile",
+      "url": "/me",
+      "target": "_top"
+    },
+    {
+      "label": "Moderator",
+      "url": "/moderator",
       "target": "_top"
     }
   ],
