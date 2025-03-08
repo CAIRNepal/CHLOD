@@ -1,0 +1,93 @@
+{
+  "main": [
+    {
+      "label": "Home",
+      "url": "/",
+      "target": "_top"
+    },
+    {
+      "label": "Datasets",
+      "url": "/search",
+      "target": "_top"
+    },
+    {
+      "label": "Community",
+      "url": "/publishers",
+      "target": "_top"
+    },
+    {
+      "label": "API",
+      "url": "/api",
+      "target": "_top"
+    },
+    {
+      "label": "Queues",
+      "url": "/curation/queues",
+      "target": "_top"
+    },
+    {
+      "label": "Contribute",
+      "url": "/datacontribution",
+      "target": "_top"
+    },
+    {
+      "label": "Leaderboard",
+      "url": "/leaderboard",
+      "target": "_top"
+    },
+    {
+      "label": "About",
+      "url": "/about",
+      "target": "_top"
+    },
+    {
+      "label": "Login",
+      "url": "/login",
+      "target": "_top"
+    },
+    {
+      "label": "Signup",
+      "url": "/signup",
+      "target": "_top"
+    },
+    {
+      "label": "Logout",
+      "url": "/logout",
+      "target": "_top"
+    },
+    {
+      "label": "Profile",
+      "url": "/me",
+      "target": "_top"
+    },
+    {
+      "label": "Moderator",
+      "url": "/moderator",
+      "target": "_top"
+    }
+  ],
+  "footer1": [
+
+  ],
+  "footer2": [
+    {
+      "label": "Heritage Graph",
+      "url": "https://cair-nepal.org/research/projects/heritagegraph-illuminating-cultural-legacies-throu"
+    },
+    {
+      "label": "Documentation",
+      "url": "https://dkan.readthedocs.io/en/latest/index.html",
+      "target": "_blank"
+    },
+    {
+      "label": "CAIR-Nepal",
+      "url": "https://cair-nepal.org/",
+      "target": "_blank"
+    },
+    {
+      "label": "Github",
+      "url": "https://github.com/CAIRNepal/CHLOD",
+      "target": "_blank"
+    }
+  ]
+}
