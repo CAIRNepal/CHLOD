@@ -28,9 +28,10 @@ export default defineConfig(() => {
     server: {
       port: 3000,
       proxy: {
-        '/api/1': {
-          target: 'https://demo.getdkan.org',
+        '/data': {
+          target: 'http://localhost:8000', 
           changeOrigin: true,
+          rewrite: (path) => path.replace(/^\/api/, ''), 
         },
       },
     },

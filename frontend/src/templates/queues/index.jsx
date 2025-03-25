@@ -1,11 +1,11 @@
 import React, { useState, useEffect, useRef } from "react";
-import axios from "axios";
 import Layout from "../../components/Layout";
 import config from "../../assets/config";
 import { Input, Space, Button, Table } from "antd";
 import { SearchOutlined } from "@ant-design/icons";
 import Highlighter from "react-highlight-words";
 import { useNavigate } from "react-router-dom";  
+import "./index.css"
 
 const Queues = () => {
   const [data, setData] = useState([]);
@@ -15,33 +15,54 @@ const Queues = () => {
   const searchInput = useRef(null);
   const navigate = useNavigate();  
 
-  // Fetch data from the submissions API
+  // Dummy data for the submissions
   useEffect(() => {
-    const fetchSubmissions = async () => {
-      try {
-        const response = await axios.get("http://127.0.0.1:8000/data/submissions/");
-        if (response.status === 200) {
-          // Filter only "pending" submissions
-          const pendingSubmissions = response.data
-            .filter((submission) => submission.status.toLowerCase() === "pending")
-            .map((submission, index) => ({
-              key: index + 1, // Table requires a unique key
-              id: submission.id,
-              title: submission.title,
-              description: submission.description,
-              contributor: submission.contributor_username, 
-              status: submission.status,
-              created_at: new Date(submission.created_at).toLocaleDateString(), // Formatting the date
-            }));
-          setData(pendingSubmissions);
-        } else {
-          console.error("Unexpected response:", response);
-        }
-      } catch (error) {
-        console.error("Error fetching submissions:", error);
-      } finally {
-        setLoading(false);
-      }
+    const fetchSubmissions = () => {
+      const dummyData = [
+        {
+          id: 1,
+          title: "Submission 1",
+          description: "Description for submission 1",
+          contributor: "User1",
+          status: "pending",
+          created_at: "2025-03-25",
+        },
+        {
+          id: 2,
+          title: "Submission 2",
+          description: "Description for submission 2",
+          contributor: "User2",
+          status: "pending",
+          created_at: "2025-03-24",
+        },
+        {
+          id: 3,
+          title: "Submission 3",
+          description: "Description for submission 3",
+          contributor: "User3",
+          status: "pending",
+          created_at: "2025-03-23",
+        },
+        {
+          id: 4,
+          title: "Submission 4",
+          description: "Description for submission 4",
+          contributor: "User4",
+          status: "pending",
+          created_at: "2025-03-22",
+        },
+        {
+          id: 5,
+          title: "Submission 5",
+          description: "Description for submission 5",
+          contributor: "User5",
+          status: "pending",
+          created_at: "2025-03-21",
+        },
+      ];
+
+      setData(dummyData);
+      setLoading(false);
     };
 
     fetchSubmissions();
@@ -83,6 +104,7 @@ const Queues = () => {
             icon={<SearchOutlined />}
             size="small"
             style={{ width: 90 }}
+            className="button-custom" // Apply the custom button class
           >
             Search
           </Button>
@@ -90,6 +112,7 @@ const Queues = () => {
             onClick={() => handleReset(clearFilters)}
             size="small"
             style={{ width: 90 }}
+            className="button-custom" // Apply the custom button class
           >
             Reset
           </Button>
@@ -149,6 +172,7 @@ const Queues = () => {
         <Button
           type="link"
           onClick={() => handleTitleClick(text)} // Handle click to navigate to the title's page
+          className="button-custom" // Apply the custom button class
         >
           {text}
         </Button>
@@ -172,7 +196,8 @@ const Queues = () => {
       render: (text) => (
         <Button
           type="link"
-          onClick={() => handleContributorClick(text)} // Handle click to navigate to profile
+          onClick={() => handleContributorClick(text)}
+          className="button-custom" 
         >
           {text}
         </Button>
