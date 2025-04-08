@@ -1,25 +1,18 @@
 import React from "react";
 import config from "../../assets/config";
 import Layout from "../../components/Layout";
-import { Card, Button, Typography } from "antd";
+import { ApiDocs } from "@civicactions/data-catalog-components";
 
-const { Title, Text } = Typography;
+// Use Vite's environment variable for the backend API URL
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || "http://localhost:8000";
 
 const ApiDocsFull = () => (
   <Layout title="API Documentation">
     <div className={`dc-page ${config.container}`}>
       <div className="page-content">
-        <Card
-          bordered={false}
-          style={{ width: "100%", maxWidth: 800, margin: "0 auto" }}
-          bodyStyle={{ padding: "24px" }}
-        >
-          <div style={{ textAlign: "center" }}>
-            <Text strong style={{ fontSize: 18 }}>
-              API docs will be available soon!
-            </Text>
-          </div>
-        </Card>
+        {typeof window !== "undefined" && (
+          <ApiDocs endpoint={`${API_BASE_URL}/openapi.json/`} />
+        )}
       </div>
     </div>
   </Layout>

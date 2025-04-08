@@ -28,12 +28,17 @@
     },
     {
       "label": "Contribute",
-      "url": "/datacontribution",
+      "url": "/contribution",
       "target": "_top"
     },
     {
       "label": "Leaderboard",
       "url": "/leaderboard",
+      "target": "_top"
+    },
+    {
+      "label": "Contributors",
+      "url": "/contributors",
       "target": "_top"
     },
     {

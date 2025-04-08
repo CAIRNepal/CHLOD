@@ -3,6 +3,7 @@ from django.contrib.auth.models import User
 from .models import Submission, Moderation
 from .models import UserProfile
 from .models import ActivityLog
+from rest_framework.serializers import ModelSerializer, ValidationError
 from rest_framework.permissions import AllowAny  
 
 class SubmissionSerializer(serializers.ModelSerializer):
@@ -95,3 +96,22 @@ class UserSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
         fields = ['username','profile']
+
+
+class RegisterSerializer(ModelSerializer):
+    """
+    Serializer for registering a new user.
+
+    Validates that the email is unique.
+    """
+    class Meta:
+        model = User
+        fields = ("username", "email", "password")
+
+    def create(self, validated_data):
+        return User.objects.create_user(**validated_data)
+
+    def validate_email(self, value):
+        if User.objects.filter(email=value).exists():
+            raise ValidationError("Email already exists.")
+        return value

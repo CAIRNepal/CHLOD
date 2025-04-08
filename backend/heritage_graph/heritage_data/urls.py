@@ -11,4 +11,5 @@ urlpatterns = [
     path('auth/register/', UserRegistrationView.as_view(), name='user-register'),
     path('leaderboard/', LeaderboardView.as_view(), name='leaderboard'),
     path('user/<str:username>/', UserDetailView.as_view(), name='user-detail'),
+
 ]

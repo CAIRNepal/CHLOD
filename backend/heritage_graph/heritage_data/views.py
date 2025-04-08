@@ -7,9 +7,18 @@ from rest_framework.permissions import AllowAny, IsAuthenticated, IsAdminUser
 from rest_framework_simplejwt.tokens import RefreshToken
 from rest_framework_simplejwt.exceptions import TokenError
 from rest_framework.exceptions import NotFound
+from drf_yasg.utils import swagger_auto_schema
+from rest_framework.decorators import api_view
+from django.shortcuts import render
+from django.http import HttpResponse
+
+
+from .models import UserProfile
+from .serializers import UserProfileSerializer
+
 
 from .models import Submission, Moderation, ActivityLog
-from .serializers import SubmissionSerializer, ModerationSerializer, CustomUserSerializer, ActivityLogSerializer, UserSignupSerializer, UserSerializer
+from .serializers import SubmissionSerializer, ModerationSerializer, CustomUserSerializer, ActivityLogSerializer, UserSignupSerializer, UserSerializer, RegisterSerializer
 from django.db.models import Count, Q
 
 User = get_user_model()
@@ -177,3 +186,40 @@ class SubmissionDetailView(generics.RetrieveAPIView):
         # Fetch the title parameter from the URL
         title = self.kwargs['title']
         return Submission.objects.filter(Q(title__iexact=title))
+    
+
+class RegisterView(APIView):
+    """
+    post:
+    Register a new user account.
+
+    Accepts username, email, and password. Validates unique email.
+    On success, returns a 201 status with a success message.
+    """
+    permission_classes = [AllowAny]
+
+    def post(self, request):
+        serializer = RegisterSerializer(data=request.data)
+        if serializer.is_valid():
+            serializer.save()
+            return Response({"message": "User created successfully!"}, status=status.HTTP_201_CREATED)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+    
+
+
+class CurrentUserView(APIView):
+    """
+    get:
+    Return the currently authenticated user's username and email.
+
+    This endpoint requires a valid JWT token in the Authorization header.
+    """
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request):
+        user = request.user
+        return Response({
+            "username": user.username,
+            "email": user.email,
+        })
+    

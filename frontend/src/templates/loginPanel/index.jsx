@@ -1,115 +1,104 @@
-import React from "react";
-import { useForm } from "react-hook-form";
-import { useNavigate, Link } from "react-router-dom";
-import Layout from '../../components/Layout';
-import config from "../../assets/config";
-import { Button } from 'antd';
+import React, { useState } from 'react';
+import { useNavigate, Link } from 'react-router-dom';
+import { Form, Input, Button, Card, Typography, message, Row, Col, Space } from 'antd';
+import { UserOutlined, LockOutlined } from '@ant-design/icons';
+import axios from 'axios';
+
+const { Title, Text } = Typography;
 
 const Login = () => {
-  const {
-    register,
-    handleSubmit,
-    formState: { errors },
-    setError,
-  } = useForm();
-
+  const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
 
-  const onSubmit = async (data) => {
+  // Handle login form submit
+  const handleSubmit = async (values) => {
+    setLoading(true);
     try {
-      // Send request to obtain tokens
-      const response = await fetch("http://127.0.0.1:8000/api/token/", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          username: data.username,
-          password: data.password,
-        }),
+      const response = await axios.post('http://127.0.0.1:8000/api/token/', {
+        username: values.username,
+        password: values.password,
       });
 
-      const json = await response.json();
+      const { access, refresh } = response.data;
 
-      if (response.ok) {
-        // Store tokens securely in localStorage
-        localStorage.setItem("accessToken", json.access);
-        localStorage.setItem("refreshToken", json.refresh);
-        console.log("Access Token: ", json.access);
-        // Redirect to the dashboard (authenticated page)
-        navigate("/");
-      } else {
-        throw new Error(json.detail || "Login failed");
-      }
+      localStorage.setItem('access_token', access);
+      localStorage.setItem('refresh_token', refresh);
+
+      message.success('Login successful!');
+      // navigate('/datacontribution'); // change this to your desired landing page
+
     } catch (error) {
-      setError("root", { type: "manual", message: error.message });
+      console.error('Login error:', error);
+      message.error('Invalid username or password');
+    } finally {
+      setLoading(false);
     }
   };
 
   return (
-    <Layout title="Login">
-      <div className={`dc-page ${config.container}`}>
-        <div className="m-20">
-          <div className="flex items-center justify-center m-20">
-            <div className="px-10 py-6 mt-20 text-center">
-              <form onSubmit={handleSubmit(onSubmit)} className="mt-4">
-                <div className="h-[200rem]">
-                  <input
-                    type="text"
-                    id="username"
-                    placeholder="Username"
-                    {...register("username", { required: "Username is required" })}
-                    className="w-full px-4 py-2 mt-2 border rounded-md focus:outline-none focus:ring-1 focus:ring-blue-600"
-                  />
-                  {errors.username && (
-                    <span className="text-xs text-red-600">{errors.username.message}</span>
-                  )}
-                </div>
-                <div className="mt-4">
-                  <input
-                    type="password"
-                    id="password"
-                    placeholder="Password"
-                    {...register("password", { required: "Password is required" })}
-                    className="w-full px-4 py-2 mt-2 border rounded-md focus:outline-none focus:ring-1 focus:ring-blue-600"
-                  />
-                  {errors.password && (
-                    <span className="text-xs text-red-600">
-                      {errors.password.message}
-                    </span>
-                  )}
-                </div>
-                <div className="flex items-between justify-between mt-4">
-                  <Link
-                    to="/auth/password/reset-password"
-                    className="text-sm text-blue-600 hover:underline"
-                  >
-                    Forgot password?
-                  </Link><br />
-                  <Button
-                    type="primary"
-                    htmlType="submit"
-                    className="custom-button px-20 py-2 leading-5 text-white transition-colors duration-200 transform bg-blue-600 rounded-md hover:bg-blue-700 focus:outline-none focus:bg-blue-700"
-                  >
-                    Login
-                  </Button>
-                  <Link to="/signup"
-                      type="default"
-                      className="custom-button px-20 py-2 leading-5 text-white transition-colors duration-200 transform bg-blue-600 rounded-md focus:outline-none focus:bg-blue-700"
-                    >
-                      Create new account
-                    
-                  </Link>
-                </div>
-                {errors.root && (
-                  <span className="text-xs text-red-600">{errors.root.message}</span>
-                )}
-              </form>
-            </div>
-          </div>
-        </div>
-      </div>
-    </Layout>
+    <div style={{ minHeight: '100vh', display: 'flex', alignItems: 'center', background: '#f0f2f5' }}>
+      <Row justify="center" style={{ width: '100%' }}>
+        <Col xs={22} sm={16} md={12} lg={8} xl={6}>
+          <Card
+            bordered
+            style={{
+              borderRadius: 12,
+              padding: 24,
+              boxShadow: '0 4px 20px rgba(0,0,0,0.1)',
+              background: '#ffffff',
+            }}
+          >
+            <Title level={3} style={{ textAlign: 'center' }}>Login to Your Account</Title>
+            <Text type="secondary" style={{ display: 'block', textAlign: 'center', marginBottom: 24 }}>
+              Welcome back! Please enter your credentials.
+            </Text>
+
+            <Form layout="vertical" onFinish={handleSubmit}>
+              <Form.Item
+                label="Username"
+                name="username"
+                rules={[{ required: true, message: 'Please enter your username' }]}
+              >
+                <Input prefix={<UserOutlined />} placeholder="Enter your username" />
+              </Form.Item>
+
+              <Form.Item
+                label="Password"
+                name="password"
+                rules={[{ required: true, message: 'Please enter your password' }]}
+              >
+                <Input.Password prefix={<LockOutlined />} placeholder="Enter your password" />
+              </Form.Item>
+
+              <div className="flex justify-between mb-4">
+                <Link to="/auth/password/reset-password">
+                  <Text type="secondary">Forgot password?</Text>
+                </Link>
+              </div>
+
+              <Form.Item>
+                <Button
+                  type="primary"
+                  htmlType="submit"
+                  block
+                  size="large"
+                  loading={loading}
+                >
+                  Log In
+                </Button>
+              </Form.Item>
+
+              <Text type="secondary" style={{ display: 'block', textAlign: 'center' }}>
+                Don’t have an account?{' '}
+                <Link to="/signup">
+                  Create one
+                </Link>
+              </Text>
+            </Form>
+          </Card>
+        </Col>
+      </Row>
+    </div>
   );
 };
 

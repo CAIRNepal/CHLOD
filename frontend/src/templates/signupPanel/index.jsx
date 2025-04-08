@@ -1,180 +1,139 @@
 import React, { useState } from 'react';
+import { useNavigate, Link } from 'react-router-dom';
+import {
+  Form,
+  Input,
+  Button,
+  Card,
+  Typography,
+  message,
+  Row,
+  Col
+} from 'antd';
+import {
+  UserOutlined,
+  LockOutlined,
+  MailOutlined
+} from '@ant-design/icons';
 import axios from 'axios';
-import { Announcement } from "@civicactions/data-catalog-components";
-import Layout from '../../components/Layout';
-import config from "../../assets/config";
 
-const SignupPanel = () => {
-  const [firstName, setFirstName] = useState('');
-  const [middleName, setMiddleName] = useState('');
-  const [lastName, setLastName] = useState('');
-  const [email, setEmail] = useState('');
-  const [confirmEmail, setConfirmEmail] = useState('');
-  const [birthDate, setBirthDate] = useState('');
-  const [organization, setOrganization] = useState('');
-  const [position, setPosition] = useState('');
-  const [error, setError] = useState('');
-  const [success, setSuccess] = useState('');
+const { Title, Text } = Typography;
 
-  const handleSignup = async (event) => {
-    event.preventDefault();
-    setError('');
-    setSuccess('');
+const Signup = () => {
+  const [loading, setLoading] = useState(false);
+  const navigate = useNavigate();
 
-    // Validation checks
-    if (email !== confirmEmail) {
-      setError('Email addresses do not match.');
-      return;
-    }
-    if (!firstName || !lastName || !email || !birthDate || !organization || !position) {
-      setError('All fields are required.');
-      return;
-    }
-
-    const payload = {
-      firstName,
-      middleName,
-      lastName,
-      email,
-      birthDate,
-      organization,
-      position
-    };
-
-    console.log(payload);
+  const handleSubmit = async (values) => {
+    setLoading(true);
 
     try {
-      const response = await axios.post('https://nchlod.ddev.site/user/register?_format=json', payload, {
-        headers: {
-          'Content-Type': 'application/json',
-        },
+      const response = await axios.post('http://127.0.0.1:8000/api/register/', {
+        username: values.username,
+        email: values.email,
+        password: values.password,
       });
-      if (response.status === 200) {
-        setSuccess('Signup successful!');
-      } else {
-        setError('Signup failed. Please check your inputs.');
-      }
+
+      message.success('Account created successfully! Please log in.');
+      navigate('/login');
     } catch (error) {
-      setError('An error occurred. Please try again.');
+      console.error('Signup error:', error);
+      message.error(
+        error.response?.data?.email?.[0] ||
+        error.response?.data?.username?.[0] ||
+        'Signup failed. Please check your input.'
+      );
+    } finally {
+      setLoading(false);
     }
   };
 
   return (
-    <Layout title="Signup">
-      <div className={`dc-page ${config.container}`}>
-        <h1>Signup</h1>
-        <div className="dc-page-content row">
-          <div className="col-md-9 col-sm-12">
-            <form onSubmit={handleSignup}>
-              <div className="form-group">
-                <label htmlFor="firstName">First Name:</label>
-                <input
-                  type="text"
-                  id="firstName"
-                  className="form-control"
-                  value={firstName}
-                  onChange={(e) => setFirstName(e.target.value)}
-                  placeholder="Your first name"
-                  required
-                />
-              </div>
-              <div className="form-group">
-                <label htmlFor="middleName">Middle Name:</label>
-                <input
-                  type="text"
-                  id="middleName"
-                  className="form-control"
-                  value={middleName}
-                  onChange={(e) => setMiddleName(e.target.value)}
-                  placeholder="Enter your middle name"
-                />
-              </div>
-              <div className="form-group">
-                <label htmlFor="lastName">Last Name:</label>
-                <input
-                  type="text"
-                  id="lastName"
-                  className="form-control"
-                  value={lastName}
-                  onChange={(e) => setLastName(e.target.value)}
-                  placeholder="Enter your last name"
-                  required
-                />
-              </div>
-              <div className="form-group">
-                <label htmlFor="email">Email:</label>
-                <input
-                  type="email"
-                  id="email"
-                  className="form-control"
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                  placeholder="Your email"
-                  required
-                />
-              </div>
-              <div className="form-group">
-                <label htmlFor="confirmEmail">Confirm Email:</label>
-                <input
-                  type="email"
-                  id="confirmEmail"
-                  className="form-control"
-                  value={confirmEmail}
-                  onChange={(e) => setConfirmEmail(e.target.value)}
-                  placeholder="Confirm your email"
-                  required
-                />
-              </div>
-              <div className="form-group">
-                <label htmlFor="birthDate">Birth Date:</label>
-                <input
-                  type="date"
-                  id="birthDate"
-                  className="form-control"
-                  value={birthDate}
-                  onChange={(e) => setBirthDate(e.target.value)}
-                  placeholder="Please Enter your birthdate"
-                  required
-                />
-              </div>
-              <div className="form-group">
-                <label htmlFor="organization">Organization Name:</label>
-                <input
-                  type="text"
-                  id="organization"
-                  className="form-control"
-                  value={organization}
-                  onChange={(e) => setOrganization(e.target.value)}
-                  placeholder="Please Enter your organization name"
-                  required
-                />
-              </div>
-              <div className="form-group">
-                <label htmlFor="position">Position:</label>
-                <input
-                  type="text"
-                  id="position"
-                  className="form-control"
-                  value={position}
-                  onChange={(e) => setPosition(e.target.value)}
-                  placeholder="Please Enter your current position"
-                  required
-                />
-              </div>
-              <button type="submit" className="custom-button">Signup</button>
-            </form>
-            {error && <div className="alert alert-danger mt-3">{error}</div>}
-            {success && <div className="alert alert-success mt-3">{success}</div>}
-          </div>
-          <div className="col-md-3 col-sm-12">
-            <Announcement variation="info" heading="Note">
-              <p>Fill out the form to create an account.</p>
-            </Announcement>
-          </div>
-        </div>
-      </div>
-    </Layout>
+    <div style={{ minHeight: '100vh', display: 'flex', alignItems: 'center', background: '#f0f2f5' }}>
+      <Row justify="center" style={{ width: '100%' }}>
+        <Col xs={22} sm={16} md={12} lg={8} xl={6}>
+          <Card
+            bordered
+            style={{
+              borderRadius: 12,
+              padding: 24,
+              boxShadow: '0 4px 20px rgba(0,0,0,0.1)',
+              background: '#ffffff',
+            }}
+          >
+            <Title level={3} style={{ textAlign: 'center' }}>Create Account</Title>
+            <Text type="secondary" style={{ display: 'block', textAlign: 'center', marginBottom: 24 }}>
+              Sign up to get started with your account.
+            </Text>
+
+            <Form layout="vertical" onFinish={handleSubmit}>
+              <Form.Item
+                label="Username"
+                name="username"
+                rules={[{ required: true, message: 'Please enter your username' }]}
+              >
+                <Input prefix={<UserOutlined />} placeholder="Username" />
+              </Form.Item>
+
+              <Form.Item
+                label="Email"
+                name="email"
+                rules={[
+                  { required: true, message: 'Please enter your email' },
+                  { type: 'email', message: 'Enter a valid email address' }
+                ]}
+              >
+                <Input prefix={<MailOutlined />} placeholder="Email" />
+              </Form.Item>
+
+              <Form.Item
+                label="Password"
+                name="password"
+                rules={[{ required: true, message: 'Please enter your password' }]}
+              >
+                <Input.Password prefix={<LockOutlined />} placeholder="Password" />
+              </Form.Item>
+
+              <Form.Item
+                label="Confirm Password"
+                name="confirmPassword"
+                dependencies={['password']}
+                rules={[
+                  { required: true, message: 'Please confirm your password' },
+                  ({ getFieldValue }) => ({
+                    validator(_, value) {
+                      if (!value || getFieldValue('password') === value) {
+                        return Promise.resolve();
+                      }
+                      return Promise.reject(new Error('Passwords do not match!'));
+                    }
+                  })
+                ]}
+              >
+                <Input.Password prefix={<LockOutlined />} placeholder="Confirm Password" />
+              </Form.Item>
+
+              <Form.Item>
+                <Button
+                  type="primary"
+                  htmlType="submit"
+                  block
+                  loading={loading}
+                  size="large"
+                >
+                  Sign Up
+                </Button>
+              </Form.Item>
+
+              <Text type="secondary" style={{ display: 'block', textAlign: 'center' }}>
+                Already have an account?{' '}
+                <Link to="/login">Log in</Link>
+              </Text>
+            </Form>
+          </Card>
+        </Col>
+      </Row>
+    </div>
   );
 };
 
-export default SignupPanel;
+export default Signup;

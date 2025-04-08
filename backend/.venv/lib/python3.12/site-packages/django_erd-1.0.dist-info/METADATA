@@ -1,0 +1,15 @@
+Metadata-Version: 2.0
+Name: django-erd
+Version: 1.0
+Summary: Generates an Entity-Relationship diagram from a Django project
+Home-page: UNKNOWN
+Author: Adam Brenecki
+Author-email: adam@brenecki.id.au
+License: MIT
+Description-Content-Type: UNKNOWN
+Platform: UNKNOWN
+Requires-Dist: begins
+
+UNKNOWN
+
+

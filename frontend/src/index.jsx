@@ -29,6 +29,7 @@ import Viewresponse from './templates/viewResponse';
 import ViewProfile from './templates/viewprofile';
 import ViewForm from './templates/viewform';
 import ViewProfileOrForm from './templates/viewprofile';
+import Contributors from './templates/contributor';
 
 const router = createBrowserRouter([
   {
@@ -64,7 +65,7 @@ const router = createBrowserRouter([
     element: <ApiDocsSpecific />
   },
   {
-    path: "/datacontribution",
+    path: "/contribution",
     element: <Form />
   },
   {
@@ -124,7 +125,11 @@ const router = createBrowserRouter([
   {
     path:'/viewform/:title',
     element: <ViewProfileOrForm  />
-  }
+  },
+  {
+    path:'/contributors',
+    element: <Contributors  />
+  },
 ]);
 
 createRoot(document.getElementById("root")).render(

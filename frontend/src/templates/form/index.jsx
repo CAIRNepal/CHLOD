@@ -1,15 +1,15 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import Layout from '../../components/Layout';
 import config from "../../assets/config";
 import { Announcement } from '@civicactions/data-catalog-components';
 import { Alert, Form, Input, Select, Button, Checkbox, Upload } from 'antd';
 import { UploadOutlined } from '@ant-design/icons';
+import { useNavigate } from 'react-router-dom';
 
 const { TextArea } = Input;
 
 const SubmissionForm = () => {
-  // State to hold form data
   const [userName, setUserName] = useState('');
   const [userEmail, setUserEmail] = useState('');
   const [userRole, setUserRole] = useState('');
@@ -27,14 +27,39 @@ const SubmissionForm = () => {
   const [references, setReferences] = useState('');
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
+  const [loading, setLoading] = useState(false);
+  const navigate = useNavigate();
 
-  // Handle form submission
+  useEffect(() => {
+    const token = localStorage.getItem('access_token');
+    if (!token) {
+      navigate('/login');
+    } else {
+      axios.get('http://127.0.0.1:8000/api/user/info', {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      })
+        .then(response => {
+          const userInfo = response.data;
+          setUserName(userInfo.username || '');  
+          setUserEmail(userInfo.email || '');  
+          setUserRole(userInfo.role || '');  
+          setOrganization(userInfo.organization || '');  
+        })
+        .catch(error => {
+          console.error('Error fetching user info:', error);
+          setError('Error fetching user information. Please try again.');
+        });
+    }
+  }, [navigate]);
+
   const handleSubmit = async (event) => {
     event.preventDefault();
     setError('');
     setSuccess('');
+    setLoading(true);
 
-    // Validate required fields
     if (
       !userName ||
       !userEmail ||
@@ -47,10 +72,10 @@ const SubmissionForm = () => {
       !confirmAccuracy
     ) {
       setError('Please fill in all required fields.');
+      setLoading(false);
       return;
     }
 
-    // Prepare payload
     const payload = {
       user: {
         name: userName,
@@ -75,20 +100,27 @@ const SubmissionForm = () => {
         confirmAccuracy: confirmAccuracy,
         references: references,
       },
-      status: 'Pending', // Default status
+      status: 'Pending',
     };
 
     try {
-      // Send POST request to backend
+      const token = localStorage.getItem('access_token');
+      if (!token) {
+        setError('You must be logged in to submit.');
+        setLoading(false);
+        return;
+      }
+
       const response = await axios.post('http://127.0.0.1:8000/data/submissions/create/', payload, {
         headers: {
           'Content-Type': 'application/json',
+          Authorization: `Bearer ${token}`,
         },
       });
 
       if (response.status === 200) {
         setSuccess('Submission created successfully!');
-        // Reset form fields
+        // Reset form fields here
         setUserName('');
         setUserEmail('');
         setUserRole('');
@@ -108,8 +140,10 @@ const SubmissionForm = () => {
         setError('Submission failed. Please try again.');
       }
     } catch (error) {
-      console.error(error);
+      console.error('Axios error:', error);
       setError('An error occurred while submitting. Please try again.');
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -119,15 +153,14 @@ const SubmissionForm = () => {
         <h1>Contribute to HeritageGraph</h1>
         <div className="dc-page-content row">
           <div className="col-md-9 col-sm-12">
-            {/* Show the form */}
             <Form onFinish={handleSubmit} layout="vertical">
               {/* Section 1: User Information */}
               <h2>User Information</h2>
               <Form.Item
-                label="Name"
+                label="Username"
                 required
                 name="userName"
-                rules={[{ required: true, message: 'Please enter your name!' }]}
+                rules={[{ required: true, message: 'Please enter your username!' }]}
               >
                 <Input
                   value={userName}
@@ -327,7 +360,13 @@ const SubmissionForm = () => {
 
               {/* Section 5: Submission */}
               <Form.Item>
-                <Button type="primary" htmlType="submit" block>
+                <Button
+                  type="primary"
+                  htmlType="submit"
+                  block
+                  loading={loading}
+                  disabled={loading}
+                >
                   Submit
                 </Button>
               </Form.Item>
@@ -339,7 +378,7 @@ const SubmissionForm = () => {
 
           <div className="col-md-3 col-sm-12">
             <Announcement variation="info" heading="Note">
-              <p>Make sure to fill in all fields and submit your work properly. The status will automatically be set to "Pending".</p>
+              <p>Ensure all fields are filled before submitting.</p>
             </Announcement>
           </div>
         </div>
