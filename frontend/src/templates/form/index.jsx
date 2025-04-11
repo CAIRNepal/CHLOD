@@ -6,25 +6,21 @@ import { Announcement } from '@civicactions/data-catalog-components';
 import { Alert, Form, Input, Select, Button, Checkbox, Upload } from 'antd';
 import { UploadOutlined } from '@ant-design/icons';
 import { useNavigate } from 'react-router-dom';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faCheckCircle } from '@fortawesome/free-solid-svg-icons';
 
 const { TextArea } = Input;
 
 const SubmissionForm = () => {
   const [userName, setUserName] = useState('');
   const [userEmail, setUserEmail] = useState('');
-  const [userRole, setUserRole] = useState('');
-  const [organization, setOrganization] = useState('');
-  const [heritageType, setHeritageType] = useState('Tangible');
   const [heritageTitle, setHeritageTitle] = useState('');
   const [heritageDescription, setHeritageDescription] = useState('');
   const [location, setLocation] = useState('');
   const [historicalContext, setHistoricalContext] = useState('');
-  const [mediaFiles, setMediaFiles] = useState([]);
-  const [contributorName, setContributorName] = useState('');
-  const [relationshipToHeritage, setRelationshipToHeritage] = useState('');
   const [consentToShare, setConsentToShare] = useState(false);
   const [confirmAccuracy, setConfirmAccuracy] = useState(false);
-  const [references, setReferences] = useState('');
+  const [mediaFiles, setMediaFiles] = useState([]);
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
   const [loading, setLoading] = useState(false);
@@ -42,10 +38,8 @@ const SubmissionForm = () => {
       })
         .then(response => {
           const userInfo = response.data;
-          setUserName(userInfo.username || '');  
-          setUserEmail(userInfo.email || '');  
-          setUserRole(userInfo.role || '');  
-          setOrganization(userInfo.organization || '');  
+          setUserName(userInfo.username || '');
+          setUserEmail(userInfo.email || '');
         })
         .catch(error => {
           console.error('Error fetching user info:', error);
@@ -54,8 +48,7 @@ const SubmissionForm = () => {
     }
   }, [navigate]);
 
-  const handleSubmit = async (event) => {
-    event.preventDefault();
+  const handleSubmit = async (values) => {
     setError('');
     setSuccess('');
     setLoading(true);
@@ -67,8 +60,6 @@ const SubmissionForm = () => {
       !heritageDescription ||
       !location ||
       !historicalContext ||
-      !contributorName ||
-      !relationshipToHeritage ||
       !confirmAccuracy
     ) {
       setError('Please fill in all required fields.');
@@ -80,11 +71,8 @@ const SubmissionForm = () => {
       user: {
         name: userName,
         email: userEmail,
-        role: userRole,
-        organization: organization,
       },
       heritage: {
-        type: heritageType,
         title: heritageTitle,
         description: heritageDescription,
         location: location,
@@ -92,13 +80,11 @@ const SubmissionForm = () => {
         mediaFiles: mediaFiles,
       },
       contributor: {
-        name: contributorName,
-        relationship: relationshipToHeritage,
+        name: 'nabin2004',  
         consentToShare: consentToShare,
       },
       verification: {
         confirmAccuracy: confirmAccuracy,
-        references: references,
       },
       status: 'Pending',
     };
@@ -111,7 +97,7 @@ const SubmissionForm = () => {
         return;
       }
 
-      const response = await axios.post('http://127.0.0.1:8000/data/submissions/create/', payload, {
+      const response = await axios.post('http://127.0.0.1:8000/data/form-submit/', payload, {
         headers: {
           'Content-Type': 'application/json',
           Authorization: `Bearer ${token}`,
@@ -123,19 +109,13 @@ const SubmissionForm = () => {
         // Reset form fields here
         setUserName('');
         setUserEmail('');
-        setUserRole('');
-        setOrganization('');
-        setHeritageType('Tangible');
         setHeritageTitle('');
         setHeritageDescription('');
         setLocation('');
         setHistoricalContext('');
         setMediaFiles([]);
-        setContributorName('');
-        setRelationshipToHeritage('');
         setConsentToShare(false);
         setConfirmAccuracy(false);
-        setReferences('');
       } else {
         setError('Submission failed. Please try again.');
       }
@@ -182,50 +162,8 @@ const SubmissionForm = () => {
                 />
               </Form.Item>
 
-              <Form.Item
-                label="Role"
-                required
-                name="userRole"
-                rules={[{ required: true, message: 'Please select your role!' }]}
-              >
-                <Select
-                  value={userRole}
-                  onChange={(value) => setUserRole(value)}
-                  placeholder="Select your role"
-                >
-                  <Select.Option value="Researcher">Researcher</Select.Option>
-                  <Select.Option value="Community Member">Community Member</Select.Option>
-                  <Select.Option value="Tourist">Tourist</Select.Option>
-                  <Select.Option value="Other">Other</Select.Option>
-                </Select>
-              </Form.Item>
-
-              <Form.Item label="Organization (optional)" name="organization">
-                <Input
-                  value={organization}
-                  onChange={(e) => setOrganization(e.target.value)}
-                  placeholder="Enter your organization"
-                />
-              </Form.Item>
-
               {/* Section 2: Cultural Heritage Details */}
               <h2>Cultural Heritage Details</h2>
-              <Form.Item
-                label="Type of Heritage"
-                required
-                name="heritageType"
-                rules={[{ required: true, message: 'Please select the type of heritage!' }]}
-              >
-                <Select
-                  value={heritageType}
-                  onChange={(value) => setHeritageType(value)}
-                  placeholder="Select heritage type"
-                >
-                  <Select.Option value="Tangible">Tangible (e.g., monuments, artifacts)</Select.Option>
-                  <Select.Option value="Intangible">Intangible (e.g., traditions, stories, music)</Select.Option>
-                </Select>
-              </Form.Item>
-
               <Form.Item
                 label="Title"
                 required
@@ -291,34 +229,8 @@ const SubmissionForm = () => {
                 </Upload>
               </Form.Item>
 
-              {/* Section 3: Contributor Details */}
-              <h2>Contributor Details</h2>
-              <Form.Item
-                label="Contributor's Name"
-                required
-                name="contributorName"
-                rules={[{ required: true, message: 'Please enter the contributor name!' }]}
-              >
-                <Input
-                  value={contributorName}
-                  onChange={(e) => setContributorName(e.target.value)}
-                  placeholder="Enter contributor's name"
-                />
-              </Form.Item>
-
-              <Form.Item
-                label="Relationship to Heritage"
-                required
-                name="relationshipToHeritage"
-                rules={[{ required: true, message: 'Please enter the relationship to heritage!' }]}
-              >
-                <Input
-                  value={relationshipToHeritage}
-                  onChange={(e) => setRelationshipToHeritage(e.target.value)}
-                  placeholder="Enter relationship to heritage"
-                />
-              </Form.Item>
-
+              {/* Section 3: Consent & Verification */}
+              <h2>Consent & Verification</h2>
               <Form.Item
                 name="consentToShare"
                 valuePropName="checked"
@@ -333,8 +245,6 @@ const SubmissionForm = () => {
                 </Checkbox>
               </Form.Item>
 
-              {/* Section 4: Verification */}
-              <h2>Verification</h2>
               <Form.Item
                 name="confirmAccuracy"
                 valuePropName="checked"
@@ -349,16 +259,7 @@ const SubmissionForm = () => {
                 </Checkbox>
               </Form.Item>
 
-              <Form.Item label="References/Sources (optional)" name="references">
-                <TextArea
-                  value={references}
-                  onChange={(e) => setReferences(e.target.value)}
-                  placeholder="Enter references or sources"
-                  rows={4}
-                />
-              </Form.Item>
-
-              {/* Section 5: Submission */}
+              {/* Section 4: Submission */}
               <Form.Item>
                 <Button
                   type="primary"

@@ -25,7 +25,7 @@ const Login = () => {
       localStorage.setItem('refresh_token', refresh);
 
       message.success('Login successful!');
-      // navigate('/datacontribution'); // change this to your desired landing page
+      navigate('/contribution'); // change this to your desired landing page
 
     } catch (error) {
       console.error('Login error:', error);

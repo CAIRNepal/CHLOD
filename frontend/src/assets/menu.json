@@ -6,18 +6,8 @@
       "target": "_top"
     },
     {
-      "label": "Datasets",
-      "url": "/search",
-      "target": "_top"
-    },
-    {
       "label": "Community",
       "url": "/publishers",
-      "target": "_top"
-    },
-    {
-      "label": "API",
-      "url": "/api",
       "target": "_top"
     },
 
