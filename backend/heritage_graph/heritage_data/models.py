@@ -42,31 +42,27 @@ class Contributor(models.Model):
     def __str__(self):
         return f"{self.user.username} - {self.relationship_to_heritage}"
 
+STATUS_CHOICES = [
+    ('pending', 'Pending'),
+    ('accepted', 'Accepted'),
+    ('rejected', 'Rejected'),
+    ('review', 'Review'),
+]
+
 class Submission(models.Model):
-    STATUS_CHOICES = [
-        ('pending', 'Pending'),
-        ('accepted', 'Accepted'),
-        ('rejected', 'Rejected'),
-        ('review', 'Review'),
-    ]
-    CONTRIBUTION_TYPE_CHOICES = [
-        ('historical_figure', 'Historical Figure'),
-        ('historical_event', 'Historical Event'),
-        ('cultural_artifact', 'Cultural Artifact'),
-        ('tradition_custom', 'Tradition/Custom'),
-        ('other', 'Other'),
-    ]
     title = models.CharField(max_length=255)
     description = models.TextField()
     contributor = models.ForeignKey(User, on_delete=models.CASCADE, related_name='submissions')
     status = models.CharField(max_length=10, choices=STATUS_CHOICES, default='pending')
-    cultural_heritage = models.ForeignKey(CulturalHeritage, on_delete=models.CASCADE, null=True, blank=True)
+    cultural_heritage = models.ForeignKey('CulturalHeritage', on_delete=models.CASCADE, null=True, blank=True)
+    contribution_type = models.CharField(max_length=100) 
     created_at = models.DateTimeField(auto_now_add=True)
-    contribution_type = models.CharField(max_length=50, choices=CONTRIBUTION_TYPE_CHOICES, default='historical_figure')
+
     contribution_data = models.JSONField(default=dict)
-    
+
     def __str__(self):
         return f"{self.title} ({self.get_status_display()})"
+
 
 class Moderation(models.Model):
     submission = models.OneToOneField(Submission, on_delete=models.CASCADE, related_name='moderation')

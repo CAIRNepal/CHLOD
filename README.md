@@ -119,3 +119,8 @@ If you encounter connection issues, follow these steps:
    ```
 
 4. **Check Network Configuration**: Ensure that your firewall or proxy settings are not blocking the connections to ports 3000 and 8000.
+
+
+### Test email
+email: your_email+clerk_test@gmail.com
+code: 424242

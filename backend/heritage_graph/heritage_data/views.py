@@ -23,14 +23,110 @@ from django.db.models import Count, Q
 
 User = get_user_model()
 
-# Contributor view: Submit data
 class SubmissionCreateView(generics.CreateAPIView):
     queryset = Submission.objects.all()
     serializer_class = SubmissionSerializer
-    permission_classes = [AllowAny]
+    permission_classes = [AllowAny]  
 
     def perform_create(self, serializer):
         serializer.save(contributor=self.request.user)
+
+    def create(self, request, *args, **kwargs):
+        response = super().create(request, *args, **kwargs)
+        return Response({
+            "message": "Submission created successfully!",
+            "submission": response.data
+        }, status=status.HTTP_201_CREATED)
+
+
+from rest_framework.views import APIView
+from rest_framework.permissions import AllowAny
+from rest_framework.response import Response
+from rest_framework import status
+from .models import Submission
+from .serializers import SubmissionSerializer
+
+# Optional: For Swagger documentation
+from drf_yasg.utils import swagger_auto_schema
+from drf_yasg import openapi
+
+
+class FormSubmissionAPIView(APIView):
+    """
+    Handles submission of cultural heritage form data.
+
+    This endpoint accepts a JSON payload which can include top-level fields like "title" and "description",
+    or nested under a "heritage" key. It stores the full submitted JSON and associates the submission with 
+    an optional cultural heritage entity.
+
+    Request fields:
+    - title (string): Optional. Title of the submission. Falls back to heritage.title.
+    - description (string): Optional. Description of the submission. Falls back to heritage.description.
+    - cultural_heritage_id (int): Optional. ID of a CulturalHeritage object to associate with this submission.
+    - ... any additional fields are stored in `contribution_data`.
+
+    Returns:
+    - 201: JSON representation of the created submission.
+    - 400: If `cultural_heritage_id` is invalid.
+    """
+
+    permission_classes = [AllowAny]
+
+    @swagger_auto_schema(
+        operation_summary="Submit cultural heritage form",
+        operation_description="Creates a new submission with optional linkage to a CulturalHeritage entry.",
+        request_body=openapi.Schema(
+            type=openapi.TYPE_OBJECT,
+            properties={
+                'title': openapi.Schema(type=openapi.TYPE_STRING, description='Title of the submission'),
+                'description': openapi.Schema(type=openapi.TYPE_STRING, description='Description of the submission'),
+                'cultural_heritage_id': openapi.Schema(type=openapi.TYPE_INTEGER, description='ID of related CulturalHeritage'),
+                'heritage': openapi.Schema(
+                    type=openapi.TYPE_OBJECT,
+                    properties={
+                        'title': openapi.Schema(type=openapi.TYPE_STRING),
+                        'description': openapi.Schema(type=openapi.TYPE_STRING),
+                    },
+                    description="Fallback object for title and description"
+                ),
+                # Note: Add more expected fields here as needed
+            },
+            required=[],
+        ),
+        responses={
+            201: openapi.Response('Created', SubmissionSerializer),
+            400: openapi.Response('Bad Request'),
+        }
+    )
+    def post(self, request):
+        data = request.data
+        user = request.user
+
+        title = data.get("title") or data.get("heritage", {}).get("title", "")
+        description = data.get("description") or data.get("heritage", {}).get("description", "")
+
+        cultural_heritage_id = data.get("cultural_heritage_id")
+        cultural_heritage = None
+        if cultural_heritage_id:
+            try:
+                from .models import CulturalHeritage
+                cultural_heritage = CulturalHeritage.objects.get(id=cultural_heritage_id)
+            except CulturalHeritage.DoesNotExist:
+                return Response({"error": "Invalid cultural_heritage_id"}, status=status.HTTP_400_BAD_REQUEST)
+
+        submission = Submission.objects.create(
+            title=title,
+            description=description,
+            contributor=user,
+            cultural_heritage=cultural_heritage,
+            contribution_data=data,
+            status="pending"
+        )
+
+        serializer = SubmissionSerializer(submission)
+        return Response(serializer.data, status=status.HTTP_201_CREATED)
+
+
 
 # Public view: List all submissions (pending and reviewed)
 class SubmissionListView(generics.ListAPIView):
@@ -223,3 +319,39 @@ class CurrentUserView(APIView):
             "email": user.email,
         })
     
+
+from django.views.decorators.csrf import csrf_exempt
+from django.http import JsonResponse
+from django.contrib.auth.decorators import login_required
+from .models import Submission
+import json
+
+
+@csrf_exempt
+@login_required
+def create_submission(request):
+    if request.method == "POST":
+        try:
+            data = json.loads(request.body)
+            user = request.user
+
+            heritage_data = data.get("heritage", {})
+            title = heritage_data.get("title", "")
+            description = heritage_data.get("description", "")
+            status = data.get("status", "pending")
+
+            submission = Submission.objects.create(
+                title=title,
+                description=description,
+                contributor=user,
+                status=status,
+                contribution_data=data,
+            )
+
+            return JsonResponse({"message": "Submission saved successfully!"}, status=201)
+
+        except json.JSONDecodeError:
+            return JsonResponse({"error": "Invalid JSON format"}, status=400)
+
+    return JsonResponse({"error": "Invalid request method"}, status=405)
+

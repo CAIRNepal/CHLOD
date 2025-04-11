@@ -6,16 +6,33 @@ from .models import ActivityLog
 from rest_framework.serializers import ModelSerializer, ValidationError
 from rest_framework.permissions import AllowAny  
 
+from rest_framework import serializers
+from .models import Submission
+
 class SubmissionSerializer(serializers.ModelSerializer):
-    contributor_username = serializers.SerializerMethodField()
+    contributor_username = serializers.SerializerMethodField(read_only=True)
 
     class Meta:
         model = Submission
-        fields = ['id', 'title', 'description', 'contributor', 'contributor_username', 'status', 'created_at']
-        read_only_fields = ['contributor', 'contributor_username', 'status', 'created_at']
+        fields = [
+            'id',
+            'title',
+            'description',
+            'contributor',
+            'contributor_username',
+            'status',
+            'created_at',
+        ]
+        read_only_fields = [
+            'contributor',
+            'contributor_username',
+            'status',
+            'created_at',
+        ]
 
     def get_contributor_username(self, obj):
-        return obj.contributor.username if obj.contributor else None
+        return getattr(obj.contributor, 'username', None)
+
     
 class ModerationSerializer(serializers.ModelSerializer):
     submission = serializers.PrimaryKeyRelatedField(queryset=Submission.objects.filter(status='pending'))

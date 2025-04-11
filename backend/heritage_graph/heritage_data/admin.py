@@ -31,16 +31,12 @@ class ContributorAdmin(admin.ModelAdmin):
 
 
 # Admin for Submission model
-class SubmissionAdmin(admin.ModelAdmin):
-    list_display = ('title', 'status', 'created_at')  # Key fields for display
-    list_filter = ('status', 'created_at')  # Filters for narrowing search
-    search_fields = ('title', 'description')  # Searchable fields
-    ordering = ('-created_at',)  # Recent submissions first
 
-    # Add a method to display a short description
-    def short_description(self, obj):
-        return obj.description[:50] + ('...' if len(obj.description) > 50 else '')
-    short_description.short_description = 'Description'
+class SubmissionAdmin(admin.ModelAdmin):
+    fields = ['title', 'description', 'contributor', 'status', 'cultural_heritage', 'contribution_type', 'contribution_data']
+    list_display = ['title', 'contributor', 'status', 'created_at', 'contribution_type']
+    search_fields = ['title', 'contributor__username']
+    list_filter = ['status']
 
 
 # Admin for Moderation model
