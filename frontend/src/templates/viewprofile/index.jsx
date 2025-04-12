@@ -26,7 +26,7 @@ const ViewProfileOrForm = () => {
       if (username) {
         setIsProfileView(true); // It's a profile view
         try {
-          const response = await axios.get(`http://127.0.0.1:8000/data/user/${username}/`);
+          const response = await axios.get(`${import.meta.env.VITE_API_BASE_URL}/data/user/${username}/`);
           console.log(response);
           setProfileData(response.data);
         } catch (error) {
@@ -39,7 +39,7 @@ const ViewProfileOrForm = () => {
         setIsProfileView(false); 
         setDecodedTitle(decodeURIComponent(title));
         try {
-          const response = await axios.get(`http://127.0.0.1:8000/data/submissions/${title}/`);
+          const response = await axios.get(`${import.meta.env.VITE_API_BASE_URL}/data/submissions/${title}/`);
           setSubmissionData(response.data);
         } catch (error) {
           setError('Submission not found.');
@@ -57,12 +57,12 @@ const ViewProfileOrForm = () => {
     try {
       if (isProfileView) {
         // Submit profile updates
-        const response = await axios.put(`http://127.0.0.1:8000/data/user/${username}/`, values);
+        const response = await axios.put(`${import.meta.env.VITE_API_BASE_URL}/data/user/${username}/`, values);
         setProfileData(response.data);
         message.success('Profile updated successfully!');
       } else {
         // Submit submission updates
-        const response = await axios.put(`http://127.0.0.1:8000/data/submissions/${title}/`, values);
+        const response = await axios.put(`${import.meta.env.VITE_API_BASE_URL}/data/submissions/${title}/`, values);
         setSubmissionData(response.data);
         message.success('Submission updated successfully!');
       }

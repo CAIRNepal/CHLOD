@@ -14,7 +14,7 @@ const LogoutPanel = () => {
 
     try {
       // Send a request to the server to log out (this could be optional depending on your backend setup)
-      const response = await axios.post('http://127.0.0.1:8000/api/logout/', {}, {
+      const response = await axios.post(`${import.meta.env.VITE_API_BASE_URL}/api/logout/`, {}, {
         headers: {
           'Authorization': `Bearer ${localStorage.getItem('accessToken')}`, // Include the access token in the request
         },

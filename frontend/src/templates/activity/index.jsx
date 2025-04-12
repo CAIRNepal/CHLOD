@@ -14,7 +14,7 @@ const Activity = () => {
   useEffect(() => {
     const fetchActivities = async () => {
       try {
-        const response = await axios.get("http://127.0.0.1:8000/data/activity-logs/");
+        const response = await axios.get(`${import.meta.env.VITE_API_BASE_URL}/data/activity-logs/`);
         if (response.status === 200) {
           const fetchedActivities = response.data.map((activity) => ({
             dot: <ClockCircleOutlined className="timeline-clock-icon" />,

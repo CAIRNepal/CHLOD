@@ -24,7 +24,7 @@ const ViewForm = () => {
 
       try {
         // Make a GET request to the user profile endpoint using the username
-        const response = await axios.get(`http://127.0.0.1:8000/data/user/${username}/`);
+        const response = await axios.get(`${import.meta.env.VITE_API_BASE_URL}/data/user/${username}/`);
         setProfileData(response.data);  // Set the profile data to the state
         setLoading(false);
       } catch (error) {
@@ -44,7 +44,7 @@ const ViewForm = () => {
   const handleSubmit = async (values) => {
     try {
       // Send a PUT request to update the profile data
-      const response = await axios.put(`http://127.0.0.1:8000/data/user/${username}/`, values);
+      const response = await axios.put(`${import.meta.env.VITE_API_BASE_URL}/data/user/${username}/`, values);
       setProfileData(response.data);
       message.success('Profile updated successfully!');
     } catch (error) {

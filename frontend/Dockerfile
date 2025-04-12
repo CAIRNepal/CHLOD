@@ -18,5 +18,6 @@ COPY . .
 EXPOSE 3000
 
 # Start the Vite dev server
-CMD ["npm", "run", "start", "--", "--host"]
+CMD ["npx", "vite", "--host", "0.0.0.0"]
+
 

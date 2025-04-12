@@ -24,7 +24,7 @@ const SignupPanel = () => {
       }
 
       try {
-        const response = await axios.get('http://127.0.0.1:8000/data/auth/users/me/', {
+        const response = await axios.get(`${import.meta.env.VITE_API_BASE_URL}/data/auth/users/me/`, {
           headers: {
             'Authorization': `Bearer ${token}`, 
           },

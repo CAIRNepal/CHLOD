@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react'; 
+import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 import Layout from '../../components/Layout';
 import config from "../../assets/config";
@@ -10,81 +10,62 @@ import { useNavigate } from 'react-router-dom';
 const { TextArea } = Input;
 
 const SubmissionForm = () => {
-  const [userName, setUserName] = useState('');
-  const [userEmail, setUserEmail] = useState('');
-  const [heritageTitle, setHeritageTitle] = useState('');
-  const [heritageDescription, setHeritageDescription] = useState('');
-  const [location, setLocation] = useState('');
-  const [historicalContext, setHistoricalContext] = useState('');
-  const [consentToShare, setConsentToShare] = useState(false);
-  const [confirmAccuracy, setConfirmAccuracy] = useState(false);
-  const [mediaFiles, setMediaFiles] = useState([]);
+  const [form] = Form.useForm();
+  const [isUserLoggedIn, setIsUserLoggedIn] = useState(false);
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
   const [loading, setLoading] = useState(false);
-  const [isUserLoggedIn, setIsUserLoggedIn] = useState(false); // Track if the user is logged in
+  const [mediaFiles, setMediaFiles] = useState([]);
   const navigate = useNavigate();
 
   useEffect(() => {
     const token = localStorage.getItem('access_token');
     if (!token) {
-      setIsUserLoggedIn(false); // Set to false if token is not available
+      setIsUserLoggedIn(false);
     } else {
-      axios.get('http://127.0.0.1:8000/api/user/info', {
+      axios.get(`${import.meta.env.VITE_API_BASE_URL}/api/user/info`, {
         headers: {
           Authorization: `Bearer ${token}`,
         },
       })
       .then(response => {
         const userInfo = response.data;
-        setUserName(userInfo.username || '');
-        setUserEmail(userInfo.email || '');
-        setIsUserLoggedIn(true); // Set to true if user is logged in
+        form.setFieldsValue({
+          userName: userInfo.username,
+          userEmail: userInfo.email,
+        });
+        setIsUserLoggedIn(true);
       })
-      .catch(error => {
-        console.error('Error fetching user info:', error);
-        setError('Error fetching user information. Please try again.');
+      .catch(err => {
+        console.error('Error fetching user info:', err);
+        setError('Failed to fetch user info.');
       });
     }
-  }, [navigate]);
+  }, [form, navigate]);
 
   const handleSubmit = async (values) => {
     setError('');
     setSuccess('');
     setLoading(true);
 
-    if (
-      !userName ||
-      !userEmail ||
-      !heritageTitle ||
-      !heritageDescription ||
-      !location ||
-      !historicalContext ||
-      !confirmAccuracy
-    ) {
-      setError('Please fill in all required fields.');
-      setLoading(false);
-      return;
-    }
-
     const payload = {
       user: {
-        name: userName,
-        email: userEmail,
+        name: values.userName,
+        email: values.userEmail,
       },
       heritage: {
-        title: heritageTitle,
-        description: heritageDescription,
-        location: location,
-        historicalContext: historicalContext,
-        mediaFiles: mediaFiles,
+        title: values.heritageTitle,
+        description: values.heritageDescription,
+        location: values.location,
+        historicalContext: values.historicalContext,
+        mediaFiles: mediaFiles.map(file => file.name), // store just file names
       },
       contributor: {
-        name: 'nabin2004',  
-        consentToShare: consentToShare,
+        name: values.userName,
+        consentToShare: values.consentToShare || false,
       },
       verification: {
-        confirmAccuracy: confirmAccuracy,
+        confirmAccuracy: values.confirmAccuracy,
       },
       status: 'Pending',
     };
@@ -97,30 +78,24 @@ const SubmissionForm = () => {
         return;
       }
 
-      const response = await axios.post('http://127.0.0.1:8000/data/form-submit/', payload, {
+      const response = await axios.post(
+        `${import.meta.env.VITE_API_BASE_URL}/data/form-submit/`,
+        payload,{
         headers: {
           'Content-Type': 'application/json',
           Authorization: `Bearer ${token}`,
         },
       });
-
-      if (response.status === 200) {
+      console.log("RESPONSE: ", response.status)
+      if (response.status === 201) {
         setSuccess('Submission created successfully!');
-        // Reset form fields here
-        setUserName('');
-        setUserEmail('');
-        setHeritageTitle('');
-        setHeritageDescription('');
-        setLocation('');
-        setHistoricalContext('');
+        form.resetFields();
         setMediaFiles([]);
-        setConsentToShare(false);
-        setConfirmAccuracy(false);
       } else {
         setError('Submission failed. Please try again.');
       }
     } catch (error) {
-      console.error('Axios error:', error);
+      console.error('Submission error:', error);
       setError('An error occurred while submitting. Please try again.');
     } finally {
       setLoading(false);
@@ -132,7 +107,6 @@ const SubmissionForm = () => {
       <div className={`dc-page ${config.container}`}>
         <h1>Contribute to HeritageGraph</h1>
 
-        {/* Show warning if user is not logged in */}
         {!isUserLoggedIn && (
           <Alert 
             message="Authentication Required" 
@@ -141,88 +115,124 @@ const SubmissionForm = () => {
             showIcon 
             style={{ marginBottom: '20px' }} 
           />
-          
         )}
 
-        {/* Show form only if user is authenticated */}
         {isUserLoggedIn && (
           <div className="dc-page-content row">
             <div className="col-md-9 col-sm-12">
-              <Form onFinish={handleSubmit} layout="vertical">
-                {/* Section 1: User Information */}
+              <Form
+                form={form}
+                layout="vertical"
+                onFinish={handleSubmit}
+              >
                 <h2>User Information</h2>
                 <Form.Item
                   label="Username"
-                  required
                   name="userName"
-                  rules={[{ required: true, message: 'Please enter your username!' }]}>
-                  <Input
-                    value={userName}
-                    onChange={(e) => setUserName(e.target.value)}
-                    placeholder="Enter your name"
-                  />
+                  rules={[{ required: true, message: 'Please enter your username!' }]}
+                >
+                  <Input placeholder="Enter your name" />
                 </Form.Item>
 
                 <Form.Item
                   label="Email"
-                  required
                   name="userEmail"
-                  rules={[{ required: true, type: 'email', message: 'Please enter a valid email!' }]}>
-                  <Input
-                    value={userEmail}
-                    onChange={(e) => setUserEmail(e.target.value)}
-                    placeholder="Enter your email"
-                  />
+                  rules={[{ required: true, type: 'email', message: 'Please enter a valid email!' }]}
+                >
+                  <Input placeholder="Enter your email" />
                 </Form.Item>
 
-                {/* Section 2: Cultural Heritage Details */}
                 <h2>Cultural Heritage Details</h2>
                 <Form.Item
                   label="Title"
-                  required
                   name="heritageTitle"
-                  rules={[{ required: true, message: 'Please enter the heritage title!' }]}>
-                  <Input
-                    value={heritageTitle}
-                    onChange={(e) => setHeritageTitle(e.target.value)}
-                    placeholder="Enter the title"
-                  />
+                  rules={[{ required: true, message: 'Please enter the heritage title!' }]}
+                >
+                  <Input placeholder="Enter the title" />
                 </Form.Item>
 
                 <Form.Item
                   label="Description"
-                  required
                   name="heritageDescription"
-                  rules={[{ required: true, message: 'Please provide a description!' }]}>
-                  <TextArea
-                    value={heritageDescription}
-                    onChange={(e) => setHeritageDescription(e.target.value)}
-                    placeholder="Enter a description"
-                    rows={4}
-                  />
+                  rules={[{ required: true, message: 'Please provide a description!' }]}
+                >
+                  <TextArea rows={4} placeholder="Enter a description" />
                 </Form.Item>
 
-                {/* More form sections... */}
+                <Form.Item
+                  label="Location"
+                  name="location"
+                  rules={[{ required: true, message: 'Please enter the location!' }]}
+                >
+                  <Input placeholder="Enter the location" />
+                </Form.Item>
+
+                <Form.Item
+                  label="Historical Context"
+                  name="historicalContext"
+                  rules={[{ required: true, message: 'Please provide the historical context!' }]}
+                >
+                  <TextArea rows={4} placeholder="Enter historical context" />
+                </Form.Item>
+
+                <Form.Item
+                  label="Upload Media"
+                  name="mediaFiles"
+                >
+                  <Upload
+                    beforeUpload={(file) => {
+                      setMediaFiles(prev => [...prev, file]);
+                      return false;
+                    }}
+                    multiple
+                  >
+                    <Button icon={<UploadOutlined />}>Select Files</Button>
+                  </Upload>
+                </Form.Item>
+
+                <Form.Item
+                  name="consentToShare"
+                  valuePropName="checked"
+                >
+                  <Checkbox>
+                    I consent to share my submission publicly.
+                  </Checkbox>
+                </Form.Item>
+
+                <Form.Item
+                  name="confirmAccuracy"
+                  valuePropName="checked"
+                  rules={[
+                    {
+                      validator: (_, value) =>
+                        value ? Promise.resolve() : Promise.reject(new Error('You must confirm the accuracy.')),
+                    },
+                  ]}
+                >
+                  <Checkbox>
+                    I confirm that the information provided is accurate.
+                  </Checkbox>
+                </Form.Item>
 
                 <Form.Item>
                   <Button
                     type="primary"
                     htmlType="submit"
-                    block
                     loading={loading}
-                    disabled={loading}>
+                    block
+                  >
                     Submit
                   </Button>
                 </Form.Item>
               </Form>
 
-              {error && <Alert message={error} type="error" showIcon />}
-              {success && <Alert message={success} type="success" showIcon />}
+              {error && <Alert message={error} type="error" showIcon style={{ marginTop: 16 }} />}
+              {success && <Alert message={success} type="success" showIcon style={{ marginTop: 16 }} />}
             </div>
 
             <div className="col-md-3 col-sm-12">
               <Announcement variation="info" heading="Note">
-                <p>Ensure all fields are filled before submitting.</p>
+                <p>Ensure all fields are filled before submitting. Media files will not be uploaded now, just listed.</p>
               </Announcement>
             </div>
           </div>
