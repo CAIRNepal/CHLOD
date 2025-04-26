@@ -20,9 +20,10 @@ import Activity from './templates/activity';
 import Queues from './templates/queues';
 import WebformSubmissions from './templates/test';
 import Leaderboard from './templates/leaderboard';
-import LoginPanel from './templates/loginPanel';
-import SignupPanel from './templates/signupPanel';
-import LogoutPanel from './templates/logout';
+import { ClerkProvider, SignIn, SignUp, SignOutButton, useUser } from '@clerk/clerk-react';
+// import LoginPanel from './templates/loginPanel';
+// import SignupPanel from './templates/signupPanel';
+// import LogoutPanel from './templates/logout';
 import Moderator from './templates/moderator';
 import Profile from './templates/profile';
 import Viewresponse from './templates/viewResponse';
@@ -30,7 +31,11 @@ import ViewProfile from './templates/viewprofile';
 import ViewForm from './templates/viewform';
 import ViewProfileOrForm from './templates/viewprofile';
 import Contributors from './templates/contributor';
+const clerk_key= import.meta.env.VITE_CLERK_KEY;
+if(!clerk_key){
+  throw new Error("Key Was Not Found");
 
+}
 const router = createBrowserRouter([
   {
     path: "/",
@@ -89,22 +94,40 @@ const router = createBrowserRouter([
     element: <WebformSubmissions />
   },
   {
-    path: "/login",
-    element: <LoginPanel />
+    path: '/login',
+    element: (
+      <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '50vh' }}>
+        <SignIn routing="path" path="/login" signUpUrl="/signup"  />
+      </div>
+    ),
   },
   {
-    path: "/signup",
-    element: <SignupPanel />
+    path: '/signup',
+    element: (
+      <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '50vh' }}>
+        <SignUp routing="path" path="/signup" signInUrl="/login"  />
+      </div>
+    ),
+  },
+  {
+    path: '/logout',
+    element: (
+      
+        <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '50vh' }}>
+          <SignOutButton signOutCallback={() => window.location.href = '/'} />
+        </div>
+      
+    ),
   },
   {
     path: "/moderator",
     element: <Moderator/>
   },
 
-  {
-    path: "/logout",
-    element: <LogoutPanel />
-  },
+  // {
+  //   path: "/logout",
+  //   element: <LogoutPanel />
+  // },
   {
     path: "/viewresponse/:id",
     element: <Viewresponse />
@@ -132,8 +155,10 @@ const router = createBrowserRouter([
   },
 ]);
 
-createRoot(document.getElementById("root")).render(
-  <QueryClientProvider client={queryClient}>
-    <RouterProvider router={router} />
-  </QueryClientProvider>
+createRoot(document.getElementById('root')).render(
+  <ClerkProvider publishableKey={clerk_key} afterSignOutUrl="/">
+    <QueryClientProvider client={queryClient}>
+      <RouterProvider router={router} />
+    </QueryClientProvider>
+  </ClerkProvider>
 );
