@@ -20,9 +20,9 @@ import Activity from './templates/activity';
 import Queues from './templates/queues';
 import WebformSubmissions from './templates/test';
 import Leaderboard from './templates/leaderboard';
-import { ClerkProvider, SignIn, SignUp, SignOutButton, useUser } from '@clerk/clerk-react';
-// import LoginPanel from './templates/loginPanel';
-// import SignupPanel from './templates/signupPanel';
+import { ClerkProvider,SignIn, SignOutButton, useUser } from '@clerk/clerk-react';
+// import Signin from './templates/loginPanel/index.jsx';
+import SignUp from './templates/signupPanel';
 // import LogoutPanel from './templates/logout';
 import Moderator from './templates/moderator';
 import Profile from './templates/profile';
@@ -31,6 +31,7 @@ import ViewProfile from './templates/viewprofile';
 import ViewForm from './templates/viewform';
 import ViewProfileOrForm from './templates/viewprofile';
 import Contributors from './templates/contributor';
+
 const clerk_key= import.meta.env.VITE_CLERK_KEY;
 if(!clerk_key){
   throw new Error("Key Was Not Found");
@@ -96,24 +97,46 @@ const router = createBrowserRouter([
   {
     path: '/login',
     element: (
-      <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '50vh' }}>
-        <SignIn routing="path" path="/login" signUpUrl="/signup"  />
+      <div className="auth-container">
+        <SignIn
+          routing="path"
+          path="/login"
+          signUpUrl="/signup"
+          
+          appearance={{
+            variables: {
+              colorPrimary: '#4A90E2',
+              colorText: '#333',
+              fontFamily: '"Roboto", sans-serif',
+              borderRadius: '8px',
+            },
+            elements: {
+              formButtonPrimary: {
+                backgroundColor: '#4A90E2',
+                color: 'white',
+                padding: '10px 20px',
+                fontSize: '16px',
+              },
+              card: {
+                boxShadow: '0 4px 12px rgba(0, 0, 0, 0.1)',
+                borderRadius: '10px',
+              },
+            },
+          }}
+        />
       </div>
     ),
   },
   {
     path: '/signup',
-    element: (
-      <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '50vh' }}>
-        <SignUp routing="path" path="/signup" signInUrl="/login"  />
-      </div>
-    ),
+    element: <SignUp />
+    
   },
   {
     path: '/logout',
     element: (
       
-        <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '50vh' }}>
+        <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100vh' }}>
           <SignOutButton signOutCallback={() => window.location.href = '/'} />
         </div>
       

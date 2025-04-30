@@ -1282,5 +1282,13 @@ ul.mr-auto.nav {
   margin-top: 20px;
   width: 100%;
 }
-
+.auth-container {
+  display: flex;
+  justify-content: center; /* Centers horizontally */
+  align-items: center; /* Centers vertically */
+  height: 100vh; /* Full viewport height to match the screenshot */
+  background: linear-gradient(180deg, #e6f0fa 0%, #ffffff 100%); /* Light gradient from top to bottom */
+  font-family: 'Roboto', sans-serif;
+  padding: 20px;
+}
 
