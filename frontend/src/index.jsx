@@ -1,5 +1,5 @@
 import React from 'react';
-import { createRoot } from "react-dom/client";
+import { createRoot } from 'react-dom/client';
 import { Navigate, createBrowserRouter, RouterProvider } from 'react-router-dom';
 import { QueryClientProvider } from '@tanstack/react-query';
 import { queryClient } from './config/queryClient';
@@ -20,161 +20,193 @@ import Activity from './templates/activity';
 import Queues from './templates/queues';
 import WebformSubmissions from './templates/test';
 import Leaderboard from './templates/leaderboard';
-import { ClerkProvider,SignIn, SignOutButton, useUser } from '@clerk/clerk-react';
-// import Signin from './templates/loginPanel/index.jsx';
+import { ClerkProvider } from '@clerk/clerk-react';
 import SignUp from './templates/signupPanel';
-// import LogoutPanel from './templates/logout';
 import Moderator from './templates/moderator';
 import Profile from './templates/profile';
 import Viewresponse from './templates/viewResponse';
-import ViewProfile from './templates/viewprofile';
-import ViewForm from './templates/viewform';
 import ViewProfileOrForm from './templates/viewprofile';
 import Contributors from './templates/contributor';
+import LoginPortal from './templates/signin';
+import Layout from './components/Layout/';
 
-const clerk_key= import.meta.env.VITE_CLERK_KEY;
-if(!clerk_key){
-  throw new Error("Key Was Not Found");
-
+const clerk_key = import.meta.env.VITE_CLERK_KEY;
+if (!clerk_key) {
+  throw new Error('Clerk Publishable Key Not Found in Environment Variables');
 }
+
 const router = createBrowserRouter([
   {
-    path: "/",
-    element: <Home />
+    element: (
+      <Layout title="Home" description="Explore Nepal's cultural heritage with Heritage Graph">
+        <Home />
+      </Layout>
+    ),
+    path: '/',
   },
   {
-    path: "/home",
-    element: <Navigate replace to="/" />
+    path: '/home',
+    element: <Navigate replace to="/" />,
   },
   {
-    path: "/about",
-    element: <About />
+    element: (
+      <Layout title="About" description="Learn about Heritage Graph and its mission">
+        <About />
+      </Layout>
+    ),
+    path: '/about',
   },
   {
-    path: "/publishers",
-    element: <Publishers />
+    element: (
+      <Layout title="Publishers" description="Explore publishers on Heritage Graph">
+        <Publishers />
+      </Layout>
+    ),
+    path: '/publishers',
   },
   {
-    path: "/search",
-    element: <SearchTemplate />
+    element: (
+      <Layout title="Search" description="Search datasets on Heritage Graph">
+        <SearchTemplate />
+      </Layout>
+    ),
+    path: '/search',
   },
   {
-    path: "/api",
-    element: <ApiDocsFull />
+    element: (
+      <Layout title="API Docs" description="API documentation for Heritage Graph">
+        <ApiDocsFull />
+      </Layout>
+    ),
+    path: '/api',
   },
   {
-    path: "/dataset/:id",
-    element: <Dataset />
+    element: (
+      <Layout title="Dataset" description="View dataset details on Heritage Graph">
+        <Dataset />
+      </Layout>
+    ),
+    path: '/dataset/:id',
   },
   {
-    path: "/dataset/:id/api",
-    element: <ApiDocsSpecific />
+    element: (
+      <Layout title="Dataset API" description="API details for a dataset on Heritage Graph">
+        <ApiDocsSpecific />
+      </Layout>
+    ),
+    path: '/dataset/:id/api',
   },
   {
-    path: "/contribution",
-    element: <Form />
+    element: (
+      <Layout title="Contribute" description="Contribute to Heritage Graph">
+        <Form />
+      </Layout>
+    ),
+    path: '/contribution',
   },
   {
-    path: "/curation",
-    element: <Curation />
+    element: (
+      <Layout title="Curation" description="Curation tools for Heritage Graph">
+        <Curation />
+      </Layout>
+    ),
+    path: '/curation',
   },
   {
-    path: "/curation/activity",
-    element: <Activity/>
+    element: (
+      <Layout title="Activity" description="View activity on Heritage Graph">
+        <Activity />
+      </Layout>
+    ),
+    path: '/curation/activity',
   },
   {
-    path: "/curation/queues",
-    element: <Queues/>
+    element: (
+      <Layout title="Queues" description="Manage queues on Heritage Graph">
+        <Queues />
+      </Layout>
+    ),
+    path: '/curation/queues',
   },
   {
-    path: "/leaderboard",
-    element: <Leaderboard />
+    element: (
+      <Layout title="Leaderboard" description="View the leaderboard on Heritage Graph">
+        <Leaderboard />
+      </Layout>
+    ),
+    path: '/leaderboard',
   },
   {
-    path: "/test",
-    element: <WebformSubmissions />
+    element: (
+      <Layout title="Test" description="Test page on Heritage Graph">
+        <WebformSubmissions />
+      </Layout>
+    ),
+    path: '/test',
   },
   {
     path: '/login',
-    element: (
-      <div className="auth-container">
-        <SignIn
-          routing="path"
-          path="/login"
-          signUpUrl="/signup"
-          
-          appearance={{
-            variables: {
-              colorPrimary: '#4A90E2',
-              colorText: '#333',
-              fontFamily: '"Roboto", sans-serif',
-              borderRadius: '8px',
-            },
-            elements: {
-              formButtonPrimary: {
-                backgroundColor: '#4A90E2',
-                color: 'white',
-                padding: '10px 20px',
-                fontSize: '16px',
-              },
-              card: {
-                boxShadow: '0 4px 12px rgba(0, 0, 0, 0.1)',
-                borderRadius: '10px',
-              },
-            },
-          }}
-        />
-      </div>
-    ),
+    element: <LoginPortal />,
   },
   {
     path: '/signup',
-    element: <SignUp />
-    
+    element: <SignUp />,
   },
   {
-    path: '/logout',
     element: (
-      
-        <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100vh' }}>
-          <SignOutButton signOutCallback={() => window.location.href = '/'} />
-        </div>
-      
+      <Layout title="Moderator" description="Moderator tools for Heritage Graph">
+        <Moderator />
+      </Layout>
     ),
+    path: '/moderator',
   },
   {
-    path: "/moderator",
-    element: <Moderator/>
-  },
-
-  // {
-  //   path: "/logout",
-  //   element: <LogoutPanel />
-  // },
-  {
-    path: "/viewresponse/:id",
-    element: <Viewresponse />
+    element: (
+      <Layout title="View Response" description="View response details on Heritage Graph">
+        <Viewresponse />
+      </Layout>
+    ),
+    path: '/viewresponse/:id',
   },
   {
-    path: "/me",
-    element: <Profile />
+    element: (
+      <Layout title="Profile" description="View your profile on Heritage Graph">
+        <Profile />
+      </Layout>
+    ),
+    path: '/me',
   },
-
   {
+    element: (
+      <Layout title="Not Found" description="Page not found on Heritage Graph">
+        <NotFound />
+      </Layout>
+    ),
     path: '*',
-    element: <NotFound />,
   },
   {
-    path:'/view/:username',
-    element: <ViewProfileOrForm />
+    element: (
+      <Layout title="View Profile" description="View user profile on Heritage Graph">
+        <ViewProfileOrForm />
+      </Layout>
+    ),
+    path: '/view/:username',
   },
   {
-    path:'/viewform/:title',
-    element: <ViewProfileOrForm  />
+    element: (
+      <Layout title="View Form" description="View form on Heritage Graph">
+        <ViewProfileOrForm />
+      </Layout>
+    ),
+    path: '/viewform/:title',
   },
   {
-    path:'/contributors',
-    element: <Contributors  />
+    element: (
+      <Layout title="Contributors" description="View contributors on Heritage Graph">
+        <Contributors />
+      </Layout>
+    ),
+    path: '/contributors',
   },
 ]);
 

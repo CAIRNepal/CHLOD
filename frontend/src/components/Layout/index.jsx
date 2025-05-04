@@ -1,24 +1,16 @@
 import React from "react";
 import Helmet from "react-helmet";
-import { Link, useNavigate } from 'react-router-dom';
+import { Link } from 'react-router-dom';
+import { useUser, UserButton } from '@clerk/clerk-react';
 import { Header, NavBar, Footer } from "./datacomponent";
 import { Button } from 'antd';
-import { UserOutlined, LoginOutlined, LogoutOutlined } from '@ant-design/icons';
+import { LoginOutlined, UserOutlined } from '@ant-design/icons';
 import config from "../../assets/config.json";
 import links from "../../assets/menu.json";
 import './Layout.css';
 
 const Layout = ({ children, title, description }) => {
-  const navigate = useNavigate();
-
-  // Check if the user is logged in by checking the access token in localStorage
-  const isLoggedIn = localStorage.getItem('access_token');
-
-  // Handle logout
-  const handleLogout = () => {
-    localStorage.removeItem('access_token');
-    navigate('/');
-  };
+  const { isSignedIn } = useUser();
 
   return (
     <div className="App">
@@ -31,48 +23,48 @@ const Layout = ({ children, title, description }) => {
         }}
       />
 
-
       <div className="headerNav">
         <Header site={config.site} slogan={config.slogan} logo={config.logo} customClasses={config.container} />
 
         <div className="navbar-buttons">
-          {!isLoggedIn ? (
+          {isSignedIn ? (
+            <UserButton
+              afterSignOutUrl="/"
+              appearance={{
+                variables: {
+                  colorPrimary: '#4A90E2',
+                  colorText: '#333',
+                  fontFamily: '"Roboto", sans-serif',
+                  borderRadius: '8px',
+                },
+                elements: {
+                  userButtonAvatarBox: {
+                    width: '40px',
+                    height: '40px',
+                    borderRadius: '8px',
+                  },
+                  userButtonTrigger: {
+                    padding: '8px',
+                  },
+                },
+              }}
+            />
+          ) : (
             <div className="auth-buttons">
               <Link to="/login">
                 <Button type="primary" icon={<LoginOutlined />} className="auth-btn">
                   Login
                 </Button>
               </Link>
-         
               <Link to="/signup">
                 <Button type="default" icon={<UserOutlined />} className="auth-btn">
                   Sign Up
                 </Button>
               </Link>
             </div>
-          ) : (
-            <div className="auth-buttons">
-              <Button
-                type="default"
-                icon={<UserOutlined />}
-                className="auth-btn"
-                onClick={() => navigate('/profile')}
-              >
-                Profile
-              </Button>
-              <Button
-                type="default"
-                icon={<LogoutOutlined />}
-                className="auth-btn"
-                onClick={handleLogout}
-              >
-                Logout
-              </Button>
-            </div>
           )}
         </div>
       </div>
-
 
       <NavBar
         navItems={links.main.map(item => (
@@ -81,43 +73,7 @@ const Layout = ({ children, title, description }) => {
           </Link>
         ))}
         customClasses={config.container}
-      >
-        <div className="navbar-buttons">
-          {!isLoggedIn ? (
-            <div className="auth-buttons">
-              <Link to="/login">
-                <Button type="primary" icon={<LoginOutlined />}>
-                  Login
-                </Button>
-              </Link>
-              <Link to="/signup">
-                <Button type="default" icon={<UserOutlined />} className="auth-btn">
-                  Sign Up
-                </Button>
-              </Link>
-            </div>
-          ) : (
-            <div className="auth-buttons">
-              <Button
-                type="default"
-                icon={<UserOutlined />}
-                className="auth-btn"
-                onClick={() => navigate('/profile')}
-              >
-                Profile
-              </Button>
-              <Button
-                type="default"
-                icon={<LogoutOutlined />}
-                className="auth-btn"
-                onClick={handleLogout}
-              >
-                Logout
-              </Button>
-            </div>
-          )}
-        </div>
-      </NavBar>
+      />
 
       <main className="main-content">
         {children}
