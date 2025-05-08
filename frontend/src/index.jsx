@@ -5,7 +5,7 @@ import { QueryClientProvider } from '@tanstack/react-query';
 import { queryClient } from './config/queryClient';
 import '@civicactions/data-catalog-components/dist/index.css';
 import './theme/index.css';
-
+import HomeLayout from './templates/homelayout';
 import Home from './templates/home';
 import About from './templates/about';
 import SearchTemplate from './templates/search';
@@ -30,6 +30,12 @@ import ViewProfile from './templates/viewprofile';
 import ViewForm from './templates/viewform';
 import ViewProfileOrForm from './templates/viewprofile';
 import Contributors from './templates/contributor';
+import Feed from './templates/app/feed';
+import Explore from './templates/app/explore';
+import DiffViewer from './templates/app/moderation';
+import BlogVersionTracker from './templates/app/versiontrack';
+import Submissioneditor from './templates/app/submissioneditor';
+import ErrorBoundary from './ErrorBoundary';
 
 const router = createBrowserRouter([
   {
@@ -130,10 +136,37 @@ const router = createBrowserRouter([
     path:'/contributors',
     element: <Contributors  />
   },
+  {
+    path: '/homelayout',
+    element: <HomeLayout />
+  },
+  {
+    path: '/feed',
+    element: <Feed />
+  },
+  {
+    path: '/explore/:submissionId',
+    element: <Explore />
+  },
+  {
+
+    path: '/diffviewer',
+    element: <DiffViewer />
+  },
+  {
+    path: '/version',
+    element: <BlogVersionTracker />
+  },
+  {
+    path: '/suggestedit',
+    element: <Submissioneditor />
+  }
 ]);
 
 createRoot(document.getElementById("root")).render(
   <QueryClientProvider client={queryClient}>
+    <ErrorBoundary>
     <RouterProvider router={router} />
+    </ErrorBoundary>
   </QueryClientProvider>
 );

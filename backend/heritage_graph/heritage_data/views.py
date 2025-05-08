@@ -1,6 +1,6 @@
 from django.contrib.auth import get_user_model
 from django.core.exceptions import ObjectDoesNotExist
-from rest_framework import generics, status
+from rest_framework import generics, status, viewsets
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework.permissions import AllowAny, IsAuthenticated, IsAdminUser
@@ -8,17 +8,40 @@ from rest_framework_simplejwt.tokens import RefreshToken
 from rest_framework_simplejwt.exceptions import TokenError
 from rest_framework.exceptions import NotFound
 from drf_yasg.utils import swagger_auto_schema
-from rest_framework.decorators import api_view
+from rest_framework.decorators import api_view, action
 from django.shortcuts import render
 from django.http import HttpResponse
+from rest_framework.views import APIView
+from rest_framework.permissions import AllowAny
+from rest_framework.response import Response
+from rest_framework import status
+from .models import Submission, SubmissionEditSuggestion, SubmissionVersion
+from .serializers import SubmissionSerializer,SubmissionEditSuggestionSerializer, SubmissionSerializer, SubmissionVersionSerializer
+
+from django.views.decorators.csrf import csrf_exempt
+from django.http import JsonResponse
+from django.contrib.auth.decorators import login_required
+from .models import Submission
+import json
+from django.utils import timezone
+
+from rest_framework import generics, permissions
+from rest_framework.exceptions import ValidationError, PermissionDenied
 
 
-from .models import UserProfile
-from .serializers import UserProfileSerializer
+#For Swagger documentation
+from drf_yasg.utils import swagger_auto_schema
+from drf_yasg import openapi
 
 
-from .models import Submission, Moderation, ActivityLog
-from .serializers import SubmissionSerializer, ModerationSerializer, CustomUserSerializer, ActivityLogSerializer, UserSignupSerializer, UserSerializer, RegisterSerializer
+
+
+# from .models import UserProfile, Comments
+# from .serializers import UserProfileSerializer
+
+
+from .models import Submission, Moderation, ActivityLog, Comments
+from .serializers import SubmissionSerializer, ModerationSerializer, CustomUserSerializer, ActivityLogSerializer, UserSignupSerializer, UserSerializer, RegisterSerializer, CommentSerializer
 from django.db.models import Count, Q
 
 User = get_user_model()
@@ -37,18 +60,6 @@ class SubmissionCreateView(generics.CreateAPIView):
             "message": "Submission created successfully!",
             "submission": response.data
         }, status=status.HTTP_201_CREATED)
-
-
-from rest_framework.views import APIView
-from rest_framework.permissions import AllowAny
-from rest_framework.response import Response
-from rest_framework import status
-from .models import Submission
-from .serializers import SubmissionSerializer
-
-# Optional: For Swagger documentation
-from drf_yasg.utils import swagger_auto_schema
-from drf_yasg import openapi
 
 
 class FormSubmissionAPIView(APIView):
@@ -264,7 +275,6 @@ class UserDetailView(generics.RetrieveAPIView):
     serializer_class = UserSerializer 
 
     def get_object(self):
-        # Get the username from URL parameters
         username = self.kwargs.get('username')
         try:
             user = User.objects.get(username=username)
@@ -276,12 +286,11 @@ class UserDetailView(generics.RetrieveAPIView):
 class SubmissionDetailView(generics.RetrieveAPIView):
     queryset = Submission.objects.all()
     serializer_class = SubmissionSerializer
-    lookup_field = 'title'
+    lookup_field = 'submission_id'
 
     def get_queryset(self):
-        # Fetch the title parameter from the URL
-        title = self.kwargs['title']
-        return Submission.objects.filter(Q(title__iexact=title))
+        submission_id = self.kwargs['submission_id']
+        return Submission.objects.filter(submission_id=submission_id)
     
 
 class RegisterView(APIView):
@@ -320,13 +329,6 @@ class CurrentUserView(APIView):
         })
     
 
-from django.views.decorators.csrf import csrf_exempt
-from django.http import JsonResponse
-from django.contrib.auth.decorators import login_required
-from .models import Submission
-import json
-
-
 @csrf_exempt
 @login_required
 def create_submission(request):
@@ -355,3 +357,167 @@ def create_submission(request):
 
     return JsonResponse({"error": "Invalid request method"}, status=405)
 
+class PersonalStatsView(APIView):
+    """
+    API endpoint that returns the logged-in user's personal stats
+    including rank, total submissions, accepted submissions, and score.
+    """
+    permission_classes = [IsAuthenticated]
+
+    @swagger_auto_schema(
+        operation_summary="Get personal leaderboard stats",
+        operation_description="Returns the rank, total submissions, accepted submissions, and score for the authenticated user.",
+        responses={
+            200: openapi.Schema(
+                type=openapi.TYPE_OBJECT,
+                properties={
+                    'rank': openapi.Schema(type=openapi.TYPE_INTEGER, description="User's rank in the leaderboard"),
+                    'user_id': openapi.Schema(type=openapi.TYPE_INTEGER, description="User ID"),
+                    'username': openapi.Schema(type=openapi.TYPE_STRING, description="Username"),
+                    'total_submissions': openapi.Schema(type=openapi.TYPE_INTEGER, description="Total number of submissions"),
+                    'accepted_submissions': openapi.Schema(type=openapi.TYPE_INTEGER, description="Number of accepted submissions"),
+                    'score': openapi.Schema(type=openapi.TYPE_INTEGER, description="Calculated score (e.g., accepted submissions × 10)")
+                }
+            ),
+            404: openapi.Response(description="User not found in leaderboard"),
+            401: openapi.Response(description="Authentication credentials were not provided or invalid"),
+        }
+    )
+    def get(self, request):
+        leaderboard = User.objects.annotate(
+            total_submissions=Count('submissions', distinct=True),
+            accepted_submissions=Count('submissions', filter=Q(submissions__status='accepted')),
+            score=Count('submissions', filter=Q(submissions__status='accepted')) * 10
+        ).order_by('-total_submissions', '-accepted_submissions', '-score')
+
+        ranked_data = []
+        current_rank = 1
+        user_rank_info = None
+
+        for idx, user in enumerate(leaderboard):
+            if idx > 0 and (
+                user.total_submissions != leaderboard[idx - 1].total_submissions or
+                user.accepted_submissions != leaderboard[idx - 1].accepted_submissions or
+                user.score != leaderboard[idx - 1].score
+            ):
+                current_rank = idx + 1
+
+            if user.id == request.user.id:
+                user_rank_info = {
+                    "rank": current_rank,
+                    "user_id": user.id,
+                    "username": user.username,
+                    "total_submissions": user.total_submissions,
+                    "accepted_submissions": user.accepted_submissions,
+                    "score": user.score
+                }
+                break
+
+        if user_rank_info:
+            return Response(user_rank_info)
+        else:
+            return Response({"detail": "User not found in leaderboard"}, status=404)
+        
+class CommentListCreateView(generics.ListCreateAPIView):
+    serializer_class = CommentSerializer
+    permission_classes = [permissions.IsAuthenticatedOrReadOnly]
+
+    def get_queryset(self):
+        submission_id = self.request.query_params.get('submission_id')
+        if submission_id:
+            return Comments.objects.filter(submission_id=submission_id).order_by('-created_at')
+        return Comments.objects.all().order_by('-created_at')
+
+    def perform_create(self, serializer):
+        submission_id = self.request.data.get('submission_id')
+        if not submission_id:
+            raise ValidationError({'submission_id': 'This field is required.'})
+
+        try:
+            submission = Submission.objects.get(id=submission_id)
+        except Submission.DoesNotExist:
+            raise ValidationError({'submission_id': 'Invalid submission ID.'})
+
+        serializer.save(user=self.request.user, submission=submission)
+
+
+class CommentDetailView(generics.RetrieveUpdateDestroyAPIView):
+    queryset = Comments.objects.all()
+    serializer_class = CommentSerializer
+    permission_classes = [permissions.IsAuthenticatedOrReadOnly]
+
+    def perform_update(self, serializer):
+        # Only allow comment author to update
+        if self.request.user != self.get_object().user:
+            raise PermissionDenied("You can only update your own Comments.")
+        serializer.save()
+
+    def perform_destroy(self, instance):
+        # Only allow comment author to delete
+        if self.request.user != instance.user:
+            raise PermissionDenied("You can only delete your own Comments.")
+        instance.delete()
+
+class SubmissionSuggestionViewSet(viewsets.ModelViewSet):
+    queryset = SubmissionEditSuggestion.objects.all()
+    serializer_class = SubmissionEditSuggestionSerializer
+
+    @action(detail=True, methods=['post'])
+    def approve(self, request, pk=None):
+        suggestion = self.get_object()
+        submission = suggestion.submission
+
+        # Apply suggestion
+        submission.title = suggestion.title
+        submission.description = suggestion.description
+        submission.contribution_data = suggestion.contribution_data
+        submission.save()
+
+        suggestion.approved = True
+        suggestion.reviewed_by = request.user
+        suggestion.reviewed_at = timezone.now()
+        suggestion.save()
+
+        return Response({"status": "approved"})
+
+    @action(detail=True, methods=['post'])
+    def reject(self, request, pk=None):
+        suggestion = self.get_object()
+        suggestion.approved = False
+        suggestion.reviewed_by = request.user
+        suggestion.reviewed_at = timezone.now()
+        suggestion.save()
+
+        return Response({"status": "rejected"})
+    
+class SubmissionVersionListView(APIView):
+    def get(self, request, submission_id, *args, **kwargs):
+        # Fetch the submission by its submission_id
+        try:
+            submission = Submission.objects.get(submission_id=submission_id)
+        except Submission.DoesNotExist:
+            return Response({"detail": "Submission not found."}, status=status.HTTP_404_NOT_FOUND)
+
+        # Get all versions for this submission
+        versions = SubmissionVersion.objects.filter(submission=submission).order_by('-version_number')
+
+        # Serialize the versions
+        serializer = SubmissionVersionSerializer(versions, many=True)
+
+        return Response(serializer.data, status=status.HTTP_200_OK)
+    
+
+class SubmissionEditSuggestionListView(APIView):
+    def get(self, request, submission_id, *args, **kwargs):
+        try:
+            submission = Submission.objects.get(submission_id=submission_id)
+        except Submission.DoesNotExist:
+            return Response({"detail": "Submission not found."}, status=status.HTTP_404_NOT_FOUND)
+
+        # Get all edit suggestions for this submission
+        suggestions = SubmissionEditSuggestion.objects.filter(submission=submission).order_by('-created_at')
+
+        # Serialize the suggestions
+        serializer = SubmissionEditSuggestionSerializer(suggestions, many=True)
+
+        return Response(serializer.data, status=status.HTTP_200_OK)

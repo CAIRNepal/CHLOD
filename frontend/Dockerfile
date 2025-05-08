@@ -1,22 +1,15 @@
-# Use Node.js 18 Alpine as the base image
-FROM node:18-alpine
-
-# Set the working directory in the container
+# Stage 1: build
+FROM node:18 AS builder
 WORKDIR /app
-
-# Create a non-root user and switch to it
-RUN adduser -D myuser
-
-# Copy package.json and install dependencies
-COPY package.json ./
+COPY package*.json ./
 RUN npm install
-
-# Copy the rest of the application code
 COPY . .
+RUN npm run build
 
-# Expose the port
+# Stage 2: serve
+FROM node:18
+WORKDIR /app
+RUN npm install -g serve
+COPY --from=builder /app/dist ./dist
 EXPOSE 3000
-
-# Start the Vite dev server
-CMD ["npm", "run", "start", "--", "--host"]
-
+CMD ["serve", "-s", "dist", "-l", "3000"]

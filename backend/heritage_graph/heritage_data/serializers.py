@@ -1,13 +1,13 @@
 from rest_framework import serializers, generics
 from django.contrib.auth.models import User
-from .models import Submission, Moderation
+from .models import Submission, Moderation, Comments
 from .models import UserProfile
 from .models import ActivityLog
 from rest_framework.serializers import ModelSerializer, ValidationError
 from rest_framework.permissions import AllowAny  
 
 from rest_framework import serializers
-from .models import Submission
+from .models import Submission, SubmissionEditSuggestion, SubmissionVersion
 
 class SubmissionSerializer(serializers.ModelSerializer):
     contributor_username = serializers.SerializerMethodField(read_only=True)
@@ -15,7 +15,7 @@ class SubmissionSerializer(serializers.ModelSerializer):
     class Meta:
         model = Submission
         fields = [
-            'id',
+            'submission_id',
             'title',
             'description',
             'contributor',
@@ -24,6 +24,7 @@ class SubmissionSerializer(serializers.ModelSerializer):
             'created_at',
         ]
         read_only_fields = [
+            'submission_id',
             'contributor',
             'contributor_username',
             'status',
@@ -38,7 +39,7 @@ class ModerationSerializer(serializers.ModelSerializer):
     submission = serializers.PrimaryKeyRelatedField(queryset=Submission.objects.filter(status='pending'))
     class Meta:
         model = Moderation
-        fields = ['id', 'submission', 'moderator', 'comment', 'reviewed_at']
+        fields = ['id', 'submission', 'moderator', 'remarks', 'reviewed_at']
 
 class ProfileSerializer(serializers.ModelSerializer):
     class Meta:
@@ -132,3 +133,30 @@ class RegisterSerializer(ModelSerializer):
         if User.objects.filter(email=value).exists():
             raise ValidationError("Email already exists.")
         return value
+    
+class CommentSerializer(serializers.ModelSerializer):
+    user = serializers.StringRelatedField(read_only=True)  # show username
+    submission = serializers.PrimaryKeyRelatedField(read_only=True)
+
+    class Meta:
+        model = Comments
+        fields = ['comment_id','id', 'submission', 'user', 'comment', 'created_at']
+
+class SubmissionEditSuggestionSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = SubmissionEditSuggestion
+        fields = '__all__'
+
+class SubmissionVersionSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = SubmissionVersion
+        fields = ['version_number', 'title', 'description', 'contribution_data', 'updated_by', 'updated_at']
+
+
+class SubmissionEditSuggestionSerializer(serializers.ModelSerializer):
+    suggested_by = serializers.StringRelatedField()  # Will show username instead of user ID
+    reviewed_by = serializers.StringRelatedField(required=False)
+
+    class Meta:
+        model = SubmissionEditSuggestion
+        fields = ['id', 'title', 'description', 'contribution_data', 'suggested_by', 'created_at', 'approved', 'reviewed_by', 'reviewed_at']

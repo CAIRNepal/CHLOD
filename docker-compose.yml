@@ -1,12 +1,14 @@
+version: '3.8'  # You can adjust the version based on your needs
+
 services:
   frontend:
     build: ./frontend
     ports:
-      - "3000:3000"
-    depends_on:
-      - backend
+      - 5173:5173
+    # depends_on:
+    #   - backend
 
-  backend:
-    build: ./backend
-    ports:
-      - "8000:8000"
+  # backend:
+  #   build: ./backend
+  #   ports:
+  #     - "8000:8000"
