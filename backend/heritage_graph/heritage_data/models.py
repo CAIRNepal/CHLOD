@@ -196,7 +196,8 @@ class SubmissionEditSuggestion(models.Model):
     description = models.TextField()
     contribution_data = models.JSONField(default=dict)
     created_at = models.DateTimeField(auto_now_add=True)
-    approved = models.BooleanField(null=True, blank=True)  # None = pending, True = approved, False = rejected
+    approved = models.BooleanField(null=True, blank=True)  
+    
     reviewed_by = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, blank=True, related_name='reviewed_suggestions')
     reviewed_at = models.DateTimeField(null=True, blank=True)
 

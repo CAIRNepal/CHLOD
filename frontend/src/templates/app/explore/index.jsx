@@ -113,6 +113,25 @@ const Explore = () => {
         ) : (
           <Paragraph>Loading submission...</Paragraph>
         )}
+        {submission && (
+  <div style={{ marginBottom: 24 }}>
+<Space wrap style={{ marginBottom: 16 }}>
+  <Button type="default" href={`/suggestedit?submissionId=${submissionId}`}>
+    Suggest Edit
+  </Button>
+  <Button type="default" href={`/version?submissionId=${submissionId}`}>
+    Version History
+  </Button>
+  <Button type="default" href={`/diffviewer?submissionId=${submissionId}`}>
+    Diff Viewer
+  </Button>
+  <Button type="default" href={`/feed?submissionId=${submissionId}`}>
+    Feed
+  </Button>
+</Space>
+  </div>
+)}
+
 
         <Card title="Comments" style={{ marginTop: 16 }}>
           <Space direction="vertical" size="large" style={{ width: "100%" }}>

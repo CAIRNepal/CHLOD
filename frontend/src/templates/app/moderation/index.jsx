@@ -4,11 +4,23 @@ import {
 } from "antd";
 import AppLayout from "../../../components/AppLayout";
 import config from "../../../assets/config";
+import { useSearchParams } from "react-router-dom";
 
 const { Title, Text, Paragraph } = Typography;
 const { Option } = Select;
 
-const DiffViewer = ({ slug = "qocYk4ACPKZ" }) => {
+const DiffViewer = () => {
+  const [searchParams] = useSearchParams();
+  const slug = searchParams.get("submissionId");
+  if (!slug) {
+    return (
+      <AppLayout title="Compare Submission Edits">
+        <Card>
+          <Text type="danger">Error: No submissionId provided in the URL.</Text>
+        </Card>
+      </AppLayout>
+    );
+  }
   const [original, setOriginal] = useState(null);
   const [suggestions, setSuggestions] = useState([]);
   const [selectedId, setSelectedId] = useState(null);

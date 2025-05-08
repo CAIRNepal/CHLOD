@@ -3,14 +3,19 @@ import axios from 'axios';
 import AppLayout from '../../../components/AppLayout';
 import config from '../../../assets/config';
 import {
-  Form, Input, Button, Alert, Typography, Card, Row, Col, Divider, Space, Switch, Spin
+  Form, Input, Button, Alert, Typography, Card, Row, Col, Divider, Space, Switch, Spin, Select
 } from 'antd';
+import { useSearchParams, useNavigate } from "react-router-dom";
 
 const { Title, Paragraph, Text } = Typography;
 const { TextArea } = Input;
+const { Option } = Select;
 
 const SubmissionEditor = () => {
-  const submissionId = 'qocYk4ACPKZ';
+  const [searchParams] = useSearchParams();
+  const navigate = useNavigate();
+  const submissionId = searchParams.get("submissionId");
+
   const [form] = Form.useForm();
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
@@ -24,6 +29,9 @@ const SubmissionEditor = () => {
 
   const [liveTitle, setLiveTitle] = useState('');
   const [liveDescription, setLiveDescription] = useState('');
+
+  const [submissions, setSubmissions] = useState([]);
+  const [loadingSubmissions, setLoadingSubmissions] = useState(false);
 
   const getDiff = (originalText, modifiedText) => {
     const oLines = originalText.split("\n");
@@ -51,6 +59,15 @@ const SubmissionEditor = () => {
   };
 
   useEffect(() => {
+    if (!submissionId) {
+      setLoadingSubmissions(true);
+      axios.get('http://localhost:8000/data/submissions/')
+        .then(res => setSubmissions(res.data))
+        .catch(err => console.error("Failed to fetch submissions", err))
+        .finally(() => setLoadingSubmissions(false));
+      return;
+    }
+
     axios.get(`http://localhost:8000/data/submissions/${submissionId}/`)
       .then(res => {
         const data = res.data;
@@ -71,7 +88,7 @@ const SubmissionEditor = () => {
         const suggestions = res.data;
         setSuggestions(suggestions);
         if (suggestions.length > 0) {
-          setSelectedId(suggestions[0].id);
+          setSelectedId(suggestions.submission_id);
         }
       })
       .catch(() => setError('Failed to load suggestions.'));
@@ -85,43 +102,80 @@ const SubmissionEditor = () => {
     }
   }, [original, liveTitle, liveDescription]);
 
-  const handleSubmit = async () => {
-    try {
-      const values = await form.validateFields();
-      setLoading(true);
-      setError('');
-      setSuccess('');
+const handleSubmit = async () => {
+  if (!submissionId) {
+    setError("No submission selected. Please choose a submission first.");
+    return;
+  }
 
-      const payload = {
-        submission: submissionId,
-        title: values.title,
-        description: values.description,
-        contribution_data: {
-          field1: values.field1,
-          field2: values.field2,
-        },
-        suggested_by: null,
-      };
+  try {
+    const values = await form.validateFields();
+    setLoading(true);
+    setError('');
+    setSuccess('');
 
-      const response = await axios.post(
-        'http://localhost:8000/data/submission-suggestions/',
-        payload,
-        { headers: { 'Content-Type': 'application/json' } }
-      );
+    const payload = {
+      submission: submissionId, 
+      title: values.title,
+      description: values.description,
+      contribution_data: {
+        field1: values.field1,
+        field2: values.field2,
+      },
+    };
 
-      if (response.status === 201 || response.status === 200) {
-        setSuccess('Suggestion submitted successfully!');
-        form.resetFields();
-      } else {
-        setError('Failed to submit suggestion.');
-      }
-    } catch (err) {
-      console.error(err);
-      setError('An error occurred during submission.');
-    } finally {
-      setLoading(false);
+    const response = await axios.post(
+      `http://localhost:8000/data/submission-suggestions/`,
+      payload,
+      { headers: { 'Content-Type': 'application/json' } }
+    );
+
+    if (response.status === 201 || response.status === 200) {
+      setSuccess('Suggestion submitted successfully!');
+      form.resetFields();
+    } else {
+      setError('Failed to submit suggestion.');
     }
-  };
+  } catch (err) {
+    console.error(err);
+    setError('An error occurred during submission.');
+  } finally {
+    setLoading(false);
+  }
+};
+
+  if (!submissionId) {
+    return (
+      <AppLayout title="Choose Submission">
+        <Card>
+          <Title level={4}>Select a Submission to Suggest Edits</Title>
+          {loadingSubmissions ? (
+            <Spin />
+          ) : (
+<Select
+  showSearch
+  placeholder="Select a submission"
+  optionFilterProp="children"
+  onChange={(selectedSubmissionId) => {
+    navigate(`?submissionId=${selectedSubmissionId}`); 
+  }}
+  style={{ width: '100%' }}
+  filterOption={(input, option) =>
+    option.children.toLowerCase().includes(input.toLowerCase())
+  }
+>
+  {submissions.map((s) => (
+    <Option key={s.submission_id} value={s.submission_id}>
+      {s.title + ' == == ' + s.submission_id}
+    </Option>
+  ))}
+</Select>
+         
+)}
+        </Card>
+      </AppLayout>
+    );
+  }
 
   return (
     <AppLayout title="Suggest an Edit">
