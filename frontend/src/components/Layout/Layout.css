@@ -1,0 +1,131 @@
+/* Layout.css */
+.navbar-buttons {
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  margin-right: 20px;
+}
+
+.auth-buttons .auth-btn {
+  margin-left: 10px;
+  padding: 6px;
+  cursor: pointer;
+}
+
+.auth-btn:hover {
+  background-color: #1890ff;
+}
+
+.auth-buttons button {
+  display: inline-block;
+}
+
+/* Ensure Navbar takes full width */
+.navbar {
+  display: flex;
+  justify-content: space-between;
+  width: 100%;
+  position: relative;
+  padding: 10px 20px;
+}
+
+
+  
+  .custom-button {
+    background-color: #0056b3 ;
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    margin: 5px;
+    cursor: pointer;
+    border-radius: 4px;
+    font-size: 16px;
+  }
+  
+  .custom-button:hover {
+    background-color:#007bff;
+  }
+  
+  .nav-link {
+    text-decoration: none;
+    color: #007bff;
+
+  }
+  
+  .nav-link:hover {
+    text-decoration: underline;
+  }
+
+  .headerNav{
+    display: flex;
+    justify-content:space-between;
+    margin: 5px 8px;
+  }
+
+
+  
+
+
+  /* Media Queries */
+@media (max-width: 768px) {
+  .button-container {
+    justify-content: center;
+  }
+
+  .nav-link {
+    margin: 0 5px;
+    font-size: 16px;
+  }
+}
+
+.navbar-buttons {
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  margin-right: 20px;
+}
+
+.auth-buttons .auth-btn {
+  margin-left: 10px;
+}
+
+.profile-btn {
+  display: flex;
+  align-items: center;
+  margin-left: 10px;
+}
+
+.auth-btn, .profile-btn {
+  padding: 8px 16px;
+  cursor: pointer;
+}
+
+.auth-btn:hover {
+  background-color: #1890ff;
+}
+
+.profile-btn:hover {
+  background-color: #52c41a;
+}
+
+
+.navbar-buttons {
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  margin-right: 20px;
+}
+
+.auth-buttons .auth-btn {
+  margin-left: 10px;
+  padding: 8px 16px;
+  cursor: pointer;
+}
+
+.auth-btn:hover {
+  background-color: #1890ff;
+}
+
+.auth-buttons button {
+  display: inline-block;
+}

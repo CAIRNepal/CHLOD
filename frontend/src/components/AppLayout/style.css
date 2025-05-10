@@ -1,0 +1,8 @@
+.ant-menu-item:hover {
+    background-color: #005b73;  /* Darker shade for hover effect */
+  }
+  
+  .ant-menu-item-selected {
+    background-color: #004d66;  /* Darker selected item background */
+  }
+  
