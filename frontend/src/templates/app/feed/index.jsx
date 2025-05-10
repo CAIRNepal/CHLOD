@@ -1,19 +1,21 @@
 import React, { useState, useEffect } from "react";
-import { useNavigate } from "react-router-dom"; // Import useNavigate hook from React Router
+import { useNavigate } from "react-router-dom";
 import AppLayout from "../../../components/AppLayout";
-import { Card, Input, Spin, List } from "antd";
+import { Card, Input, Spin, List, Typography, Tag } from "antd";
 import { SearchOutlined } from "@ant-design/icons";
+// import './index.css';
+const { Title, Paragraph, Text } = Typography;
 
 const ExploreFeed = () => {
   const [feedData, setFeedData] = useState([]);
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState("");
-  const navigate = useNavigate(); // Initialize useNavigate hook
+  const navigate = useNavigate();
 
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const response = await fetch("http://localhost:8000/data/submissions");
+        const response = await fetch("/data/submissions");
         const data = await response.json();
         const formattedData = data.map((item) => ({
           id: item.submission_id,
@@ -40,41 +42,59 @@ const ExploreFeed = () => {
   );
 
   const handleCardClick = (id) => {
-    navigate(`/explore/${id}`); 
+    navigate(`/explore/${id}`);
   };
 
   return (
     <AppLayout title="Explore Feed">
-      <div>
+      <div style={{ padding: "24px", fontFamily: '"Proxima Centauri", "Poppins", sans-serif' }}>
         <Input
-          placeholder="Search posts..."
+          placeholder="🔍 Search posts..."
           prefix={<SearchOutlined />}
           value={searchTerm}
           onChange={(e) => setSearchTerm(e.target.value)}
-          style={{ marginBottom: 20 }}
+          style={{
+            marginBottom: 24,
+            padding: "10px 16px",
+            borderRadius: "8px",
+            boxShadow: "0 2px 8px rgba(0,0,0,0.05)",
+            fontSize: "16px"
+          }}
         />
         {loading ? (
-          <Spin size="large" />
-        ) : (
-          <div style={{ overflowY: "scroll" }}>
-            <List
-              grid={{ gutter: 16, column: 3 }}
-              dataSource={filteredData}
-              renderItem={(item) => (
-                <List.Item key={item.id}>
-                  <Card
-                    title={item.title}
-                    onClick={() => handleCardClick(item.id)} // Add onClick event to navigate
-                    style={{ cursor: "pointer" }} // Make it look clickable
-                  >
-                    <p>{item.description}</p>
-                    <p><strong>By:</strong> {item.author}</p>
-                    <p><em>{new Date(item.date).toLocaleDateString()}</em></p>
-                  </Card>
-                </List.Item>
-              )}
-            />
+          <div style={{ textAlign: "center", marginTop: 80 }}>
+            <Spin size="large" />
           </div>
+        ) : (
+          <List
+            grid={{ gutter: 24, column: 3 }}
+            dataSource={filteredData}
+            style={{ maxHeight: "calc(100vh - 200px)", overflowY: "auto" }}
+            renderItem={(item) => (
+              <List.Item key={item.id}>
+                <Card
+                  hoverable
+                  onClick={() => handleCardClick(item.id)}
+                  style={{
+                    cursor: "pointer",
+                    borderRadius: "16px",
+                    boxShadow: "0 8px 24px rgba(0, 0, 0, 0.06)",
+                    transition: "transform 0.2s ease",
+                  }}
+                  bodyStyle={{ minHeight: "200px" }}
+                >
+                  <Title level={4} style={{ marginBottom: 8 }}>{item.title}</Title>
+                  <Paragraph ellipsis={{ rows: 3 }}>{item.description}</Paragraph>
+                  <div style={{ marginTop: 12 }}>
+                    <Tag color="blue">{item.author}</Tag>
+                    <Text type="secondary" style={{ float: "right" }}>
+                      {new Date(item.date).toLocaleDateString()}
+                    </Text>
+                  </div>
+                </Card>
+              </List.Item>
+            )}
+          />
         )}
       </div>
     </AppLayout>

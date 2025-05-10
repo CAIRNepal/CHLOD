@@ -13,13 +13,12 @@ const Dashboard = () => {
   const [searchedColumn, setSearchedColumn] = useState("");
   const searchInput = useRef(null);
 
-  // Example: Current logged-in username LATER TO BE FETCHED FROM AUTH CONTEXT OR API
   const currentUsername = "nabin2004";  
 
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const response = await axios.get("http://localhost:8000/data/leaderboard/");
+        const response = await axios.get("/data/leaderboard/");
         setHomeData(response.data);
       } catch (error) {
         console.error("Error fetching leaderboard data:", error);
@@ -136,64 +135,72 @@ const Dashboard = () => {
     },
   ];
 
-  // 📈 Stats calculations
   const totalSubmissions = homeData.reduce((sum, user) => sum + (user.total_submissions || 0), 0);
   const totalAccepted = homeData.reduce((sum, user) => sum + (user.accepted_submissions || 0), 0);
   const averageScore = homeData.length > 0
     ? (homeData.reduce((sum, user) => sum + (user.score || 0), 0) / homeData.length).toFixed(2)
     : 0;
 
-  // 🏆 Find YOUR rank
   const yourData = homeData.find(user => user.username === currentUsername);
   const yourRank = yourData ? yourData.rank : "N/A";
 
   return (
     <AppLayout title="Dashboard">
-      <div style={{ padding: "24px" }}>
-        <h1 style={{ marginBottom: "24px" }}>🏠 Home Dashboard</h1>
+      <div style={{ padding: "24px", background: "#f4f7fb", borderRadius: "8px" }}>
+        <h1 style={{ marginBottom: "24px", color: "#333" }}>Home Dashboard</h1>
 
         <Row gutter={[16, 16]} style={{ marginBottom: "24px" }}>
           <Col xs={24} sm={12} md={6}>
-            <Card>
+            <Card
+              style={{ background: "#fff", borderRadius: "8px", boxShadow: "0 2px 8px rgba(0,0,0,0.1)" }}
+            >
               <Statistic title="Your Rank" value={yourRank} />
             </Card>
           </Col>
           <Col xs={24} sm={12} md={6}>
-            <Card>
+            <Card
+              style={{ background: "#fff", borderRadius: "8px", boxShadow: "0 2px 8px rgba(0,0,0,0.1)" }}
+            >
               <Statistic title="Total Submissions" value={totalSubmissions} />
             </Card>
           </Col>
           <Col xs={24} sm={12} md={6}>
-            <Card>
+            <Card
+              style={{ background: "#fff", borderRadius: "8px", boxShadow: "0 2px 8px rgba(0,0,0,0.1)" }}
+            >
               <Statistic title="Accepted Submissions" value={totalAccepted} />
             </Card>
           </Col>
           <Col xs={24} sm={12} md={6}>
-            <Card>
+            <Card
+              style={{ background: "#fff", borderRadius: "8px", boxShadow: "0 2px 8px rgba(0,0,0,0.1)" }}
+            >
               <Statistic title="Average Score" value={averageScore} precision={2} />
             </Card>
           </Col>
         </Row>
 
         <div style={{ display: 'flex', justifyContent: 'center', marginBottom: '34px' }}>
-  <Space>
-    <Button type="primary" href="/submissions">
-      Explore Submissions
-    </Button>
-    <Button type="default" href="/queues">
-      Explore Queues
-    </Button>
-  </Space>
-</div>
+          <Space>
+            <Button type="primary" href="/submissions" style={{ borderRadius: "8px" }}>
+              Explore Submissions
+            </Button>
+            <Button type="default" href="/queues" style={{ borderRadius: "8px" }}>
+              Explore Queues
+            </Button>
+          </Space>
+        </div>
 
-        <Card>
+        <Card
+          style={{ background: "#fff", borderRadius: "8px", boxShadow: "0 2px 8px rgba(0,0,0,0.1)" }}
+        >
           <Table
             columns={columns}
             dataSource={homeData}
             bordered
             scroll={{ x: 1200, y: 600 }}
             loading={loading}
-            rowKey="id" // Important!
+            rowKey="id"
             rowClassName={(record) => {
               const rank = record.rank;
               if (rank === 1) return "bg-darkgold";

@@ -1,45 +1,41 @@
-import React from 'react';
-import { UploadOutlined, UserOutlined, VideoCameraOutlined } from '@ant-design/icons';
+import React, { useState } from 'react';
+import {
+  UploadOutlined,
+  UserOutlined,
+  VideoCameraOutlined,
+} from '@ant-design/icons';
 import { Layout, Menu, theme } from 'antd';
-import { useLocation, Link } from 'react-router-dom'; // To track the current path
-import config from "../../assets/config.json";  // Assuming config.json contains logo and other details
+import { useLocation, Link } from 'react-router-dom';
+import config from "../../assets/config.json"; 
 
 const { Header, Content, Footer, Sider } = Layout;
 
 const menuItems = [
   { key: '1', icon: UserOutlined, label: 'Home', path: '/homelayout' },
   { key: '2', icon: VideoCameraOutlined, label: 'Feed', path: '/feed' },
-  { key: '4', icon: UserOutlined, label: 'Diff Viewer', path: '/diffviewer' },
-  { key: '5', icon: UploadOutlined, label: 'Version Tracker', path: '/version' },
-  { key: '6', icon: VideoCameraOutlined, label: 'Submission Editor', path: '/suggestedit' },
-
+  { key: '3', icon: VideoCameraOutlined, label: 'Queue', path: '/queuepage' },
+  { key: '4', icon: VideoCameraOutlined, label: 'Submission Editor', path: '/suggestedit' },
+  { key: '5', icon: UserOutlined, label: 'Diff Viewer', path: '/diffviewer' },
+  { key: '', icon: UploadOutlined, label: 'Version Tracker', path: '/version' },
 ];
 
-const AppLayout = ({ children }) => {
+const AppLayout = ({ children }: { children: React.ReactNode }) => {
+  const [collapsed, setCollapsed] = useState(false);
+  const location = useLocation();
   const {
     token: { colorBgContainer, borderRadiusLG },
   } = theme.useToken();
 
-  const location = useLocation();
-
-  // Get the current path to set the active menu item
-  const currentPath = location.pathname;
-
-  // Highlight the active item based on the current path
-  const selectedKey = menuItems.find(item => item.path === currentPath)?.key;
+  const selectedKey = menuItems.find(item => item.path === location.pathname)?.key;
 
   return (
-    <Layout style={{ minHeight: '100vh' }}>
-      <Sider
-        breakpoint="lg"
-        collapsedWidth="0"
-        onBreakpoint={(broken) => console.log(broken)}
-        onCollapse={(collapsed, type) => console.log(collapsed, type)}
-      >
+    <Layout style={{ minHeight: '100vh'}}>
+      <Sider collapsible collapsed={collapsed} onCollapse={setCollapsed}>
+        <div style={{ height: 14, margin: 16 }} />
         <Menu
           theme="dark"
           mode="inline"
-          selectedKeys={[selectedKey]} // Set the active item based on the current path
+          selectedKeys={[selectedKey]}
         >
           {menuItems.map(item => (
             <Menu.Item key={item.key} icon={React.createElement(item.icon)}>
@@ -49,19 +45,16 @@ const AppLayout = ({ children }) => {
         </Menu>
       </Sider>
       <Layout>
-        <Header style={{ padding: 12, background: colorBgContainer }}>
-          {/* Logo Container */}
-          <div className="logo-container" style={{ display: 'flex', alignItems: 'center', padding: '10px' }}>
+        <Header style={{ padding: 22, background: colorBgContainer, }}>
+          <div style={{ display: 'flex', alignItems: 'center', justifyContent:'flex-start'}}>
             <img
-              src={config.logo} 
+              src={config.logo}
               alt="Logo"
-              style={{ width: '200px', height: 'auto' }}  
+              style={{ width: '250px'}}
             />
           </div>
         </Header>
-
-        {/* Content Section */}
-        <Content style={{ margin: '24px 16px 0' }}>
+        <Content style={{ margin: '24px 16px 0'}}>
           <div
             style={{
               padding: 24,
@@ -73,8 +66,6 @@ const AppLayout = ({ children }) => {
             {children}
           </div>
         </Content>
-
-        {/* Footer Section */}
         <Footer style={{ textAlign: 'center' }}>
           CAIR-nepal ©{new Date().getFullYear()} Created by HeritageGraph Team
         </Footer>

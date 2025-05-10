@@ -16,7 +16,7 @@ from rest_framework.permissions import AllowAny
 from rest_framework.response import Response
 from rest_framework import status
 from .models import Submission, SubmissionEditSuggestion, SubmissionVersion
-from .serializers import SubmissionSerializer,SubmissionEditSuggestionSerializer, SubmissionSerializer, SubmissionVersionSerializer
+from .serializers import SubmissionSerializer,SubmissionEditSuggestionSerializer, SubmissionSerializer, SubmissionVersionSerializer, SubmissionIdSerializer
 
 from django.views.decorators.csrf import csrf_exempt
 from django.http import JsonResponse
@@ -521,3 +521,10 @@ class SubmissionEditSuggestionListView(APIView):
         serializer = SubmissionEditSuggestionSerializer(suggestions, many=True)
 
         return Response(serializer.data, status=status.HTTP_200_OK)
+
+class SubmissionIdListView(APIView):
+    def get(self, request):
+        # Get all submissions, just the ID field
+        submissions = Submission.objects.all()
+        serializer = SubmissionIdSerializer(submissions, many=True)
+        return Response([submission['submission_id'] for submission in serializer.data], status=status.HTTP_200_OK)

@@ -35,7 +35,7 @@ const Explore = () => {
   useEffect(() => {
     if (!submissionId) return;
 
-    fetch(`http://localhost:8000/data/submissions/${submissionId}`)
+    fetch(`/data/submissions/${submissionId}`)
       .then((res) => res.json())
       .then((data) => {
         setSubmission(data);

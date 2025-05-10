@@ -1,5 +1,5 @@
 from django.urls import path
-from .views import SubmissionCreateView, SubmissionListView, ModerationReviewView, UserRegistrationView, CustomUserMeView, ActivityLogView, LeaderboardView, UserDetailView, SubmissionDetailView, FormSubmissionAPIView, SubmissionCreateView, PersonalStatsView, CommentListCreateView, CommentDetailView, SubmissionSuggestionViewSet, SubmissionVersionListView, SubmissionEditSuggestionListView
+from .views import SubmissionCreateView, SubmissionListView, ModerationReviewView, UserRegistrationView, CustomUserMeView, ActivityLogView, LeaderboardView, UserDetailView, SubmissionDetailView, FormSubmissionAPIView, SubmissionCreateView, PersonalStatsView, CommentListCreateView, CommentDetailView, SubmissionSuggestionViewSet, SubmissionVersionListView, SubmissionEditSuggestionListView, SubmissionIdListView
 
 urlpatterns = [
     path('submissions/', SubmissionListView.as_view(), name='submission-list'), 
@@ -25,5 +25,7 @@ urlpatterns = [
 
     path('submissions/<str:submission_id>/versions/', SubmissionVersionListView.as_view(), name='submission-versions-list'),
     path('submissions/<str:submission_id>/edit-suggestions', SubmissionEditSuggestionListView.as_view(), name='submission-edit-suggestions-list'),
+
+    path('submissions/ids', SubmissionIdListView.as_view(), name='submission_ids'),
 
 ]

@@ -1,10 +1,11 @@
 import React, { useEffect, useState } from "react";
 import {
-  Card, Typography, Switch, Row, Col, Divider, Space, Select, Spin
+  Card, Typography, Switch, Row, Col, Divider, Space, Select, Spin, Button
 } from "antd";
 import AppLayout from "../../../components/AppLayout";
+import { useSearchParams, useNavigate } from "react-router-dom";
+import axios from 'axios';
 import config from "../../../assets/config";
-import { useSearchParams } from "react-router-dom";
 
 const { Title, Text, Paragraph } = Typography;
 const { Option } = Select;
@@ -12,15 +13,10 @@ const { Option } = Select;
 const DiffViewer = () => {
   const [searchParams] = useSearchParams();
   const slug = searchParams.get("submissionId");
-  if (!slug) {
-    return (
-      <AppLayout title="Compare Submission Edits">
-        <Card>
-          <Text type="danger">Error: No submissionId provided in the URL.</Text>
-        </Card>
-      </AppLayout>
-    );
-  }
+  const navigate = useNavigate();
+
+  const [loadingSubmissions, setLoadingSubmissions] = useState(false);
+  const [submissions, setSubmissions] = useState([]);
   const [original, setOriginal] = useState(null);
   const [suggestions, setSuggestions] = useState([]);
   const [selectedId, setSelectedId] = useState(null);
@@ -54,10 +50,19 @@ const DiffViewer = () => {
   };
 
   useEffect(() => {
+    if (!slug) {
+      setLoadingSubmissions(true);
+      axios.get('/data/submissions/')
+        .then(res => setSubmissions(res.data))
+        .catch(err => console.error("Failed to fetch submissions", err))
+        .finally(() => setLoadingSubmissions(false));
+      return;
+    }
+
     const fetchData = async () => {
       const [originalRes, suggestionsRes] = await Promise.all([
-        fetch(`http://localhost:8000/data/submissions/${slug}`),
-        fetch(`http://localhost:8000/data/submissions/${slug}/edit-suggestions`)
+        fetch(`/data/submissions/${slug}`),
+        fetch(`/data/submissions/${slug}/edit-suggestions`)
       ]);
       const originalData = await originalRes.json();
       const suggestionsData = await suggestionsRes.json();
@@ -83,9 +88,69 @@ const DiffViewer = () => {
     }
   }, [original, selectedId]);
 
+  if (!slug) return (
+    <AppLayout title="Choose Submission">
+      <Card style={{ minHeight: '70vh', display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
+        <Title level={3} style={{ textAlign: 'center', color: config.primaryColor, textTransform: 'uppercase' }}>
+          Select a Submission to Suggest Edits
+        </Title>
+        {loadingSubmissions ? (
+          <div style={{ display: 'flex', justifyContent: 'center' }}>
+            <Spin size="large" />
+          </div>
+        ) : (
+          <Select
+            showSearch
+            placeholder="Choose a submission below to begin suggesting improvements..."
+            optionFilterProp="children"
+            onChange={(selectedSubmissionId) => {
+              navigate(`?submissionId=${selectedSubmissionId}`);
+            }}
+            style={{
+              width: '100%',
+              fontSize: '16px',
+              borderRadius: 12,
+              boxShadow: '0 4px 12px rgba(0,0,0,0.05)',
+              height: 60,
+              display: 'flex',
+              alignItems: 'center',
+            }}
+            size="large"
+            listHeight={400}
+            dropdownStyle={{ borderRadius: 12, maxHeight: 500, overflow: 'auto' }}
+            filterOption={(input, option) =>
+              option?.children?.toLowerCase().includes(input.toLowerCase())
+            }
+          >
+            {submissions.map((s) => (
+              <Option key={s.submission_id} value={s.submission_id}>
+                <Text strong>{s.title}</Text>
+              </Option>
+            ))}
+          </Select>
+        )}
+      </Card>
+    </AppLayout>
+  );
+
   if (!original || suggestions.length === 0) return (
-    <AppLayout title="Loading Submission Diff...">
-      <Spin size="large" />
+    <AppLayout title="No Submission Found">
+      <Card style={{ minHeight: '70vh', display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
+        <Title level={3} style={{ textAlign: 'center', color: config.primaryColor, fontWeight: 'bold', marginBottom: '20px' }}>
+          No Versions Available to Edit for This Submission
+        </Title>
+        <Paragraph style={{ textAlign: 'center', color: '#8c8c8c', fontSize: '16px', marginBottom: '30px' }}>
+          It seems that there are no versions or edit suggestions available for this submission yet. You can check back later or make a new submission to get started.
+        </Paragraph>
+        <Space style={{ justifyContent: 'center', width: '100%', marginTop: 20 }}>
+          <Button type="primary" onClick={() => navigate('/')} style={{ padding: '0 20px' }}>
+            Return to Home
+          </Button>
+          <Button onClick={() => navigate('/diffviewer')} style={{ marginLeft: 10, padding: '0 20px' }}>
+            Return to Diff Viewer
+          </Button>
+        </Space>
+      </Card>
     </AppLayout>
   );
 
@@ -119,6 +184,10 @@ const DiffViewer = () => {
             </Space>
           </Space>
         }
+        style={{
+          borderRadius: '10px',
+          boxShadow: '0 4px 12px rgba(0, 0, 0, 0.1)',
+        }}
       >
         {viewMode === "inline" ? (
           <div>

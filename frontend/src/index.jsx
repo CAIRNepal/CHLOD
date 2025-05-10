@@ -36,6 +36,7 @@ import DiffViewer from './templates/app/moderation';
 import BlogVersionTracker from './templates/app/versiontrack';
 import Submissioneditor from './templates/app/submissioneditor';
 import ErrorBoundary from './ErrorBoundary';
+import QueuePage from './templates/app/QueuePage';
 
 const router = createBrowserRouter([
   {
@@ -160,6 +161,10 @@ const router = createBrowserRouter([
   {
     path: '/suggestedit',
     element: <Submissioneditor />
+  },
+  {
+    path: '/queuepage',
+    element: <QueuePage />
   }
 ]);
 

@@ -32,6 +32,8 @@ const SubmissionEditor = () => {
 
   const [submissions, setSubmissions] = useState([]);
   const [loadingSubmissions, setLoadingSubmissions] = useState(false);
+  const [hasChanges, setHasChanges] = useState(false);
+
 
   const getDiff = (originalText, modifiedText) => {
     const oLines = originalText.split("\n");
@@ -59,16 +61,33 @@ const SubmissionEditor = () => {
   };
 
   useEffect(() => {
+    if (original) {
+      const originalTitle = original.title.trim();
+      const originalDescription = original.description.trim();
+      const currentTitle = liveTitle.trim();
+      const currentDescription = liveDescription.trim();
+  
+      const isChanged = originalTitle !== currentTitle || originalDescription !== currentDescription;
+      setHasChanges(isChanged);
+  
+      const originalText = `${originalTitle}\n\n${originalDescription}`;
+      const modifiedText = `${currentTitle}\n\n${currentDescription}`;
+      setDiff(getDiff(originalText, modifiedText));
+    }
+  }, [original, liveTitle, liveDescription]);
+  
+
+  useEffect(() => {
     if (!submissionId) {
       setLoadingSubmissions(true);
-      axios.get('http://localhost:8000/data/submissions/')
+      axios.get('/data/submissions/')
         .then(res => setSubmissions(res.data))
         .catch(err => console.error("Failed to fetch submissions", err))
         .finally(() => setLoadingSubmissions(false));
       return;
     }
 
-    axios.get(`http://localhost:8000/data/submissions/${submissionId}/`)
+    axios.get(`/data/submissions/${submissionId}/`)
       .then(res => {
         const data = res.data;
         setOriginal(data);
@@ -83,7 +102,7 @@ const SubmissionEditor = () => {
       })
       .catch(() => setError('Failed to fetch submission data.'));
 
-    axios.get(`http://localhost:8000/data/submissions/${submissionId}/edit-suggestions`)
+    axios.get(`/data/submissions/${submissionId}/edit-suggestions`)
       .then(res => {
         const suggestions = res.data;
         setSuggestions(suggestions);
@@ -125,7 +144,7 @@ const handleSubmit = async () => {
     };
 
     const response = await axios.post(
-      `http://localhost:8000/data/submission-suggestions/`,
+      `/data/submission-suggestions/`,
       payload,
       { headers: { 'Content-Type': 'application/json' } }
     );
@@ -147,32 +166,45 @@ const handleSubmit = async () => {
   if (!submissionId) {
     return (
       <AppLayout title="Choose Submission">
-        <Card>
-          <Title level={4}>Select a Submission to Suggest Edits</Title>
-          {loadingSubmissions ? (
-            <Spin />
-          ) : (
-<Select
-  showSearch
-  placeholder="Select a submission"
-  optionFilterProp="children"
-  onChange={(selectedSubmissionId) => {
-    navigate(`?submissionId=${selectedSubmissionId}`); 
-  }}
-  style={{ width: '100%' }}
-  filterOption={(input, option) =>
-    option.children.toLowerCase().includes(input.toLowerCase())
-  }
->
-  {submissions.map((s) => (
-    <Option key={s.submission_id} value={s.submission_id}>
-      {s.title + ' == == ' + s.submission_id}
-    </Option>
-  ))}
-</Select>
-         
-)}
-        </Card>
+<Card style={{ minHeight: '70vh', display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
+  <Title level={3} style={{ textAlign: 'center', color: config.primaryColor , textTransform: 'uppercase',}}>Select a Submission to Suggest Edits</Title>
+  {loadingSubmissions ? (
+    <div style={{ display: 'flex', justifyContent: 'center' }}>
+      <Spin size="large" />
+    </div>
+  ) : (
+    <Select
+      showSearch
+      placeholder="Choose a submission below to begin suggesting improvements..."
+      optionFilterProp="children"
+      onChange={(selectedSubmissionId) => {
+        navigate(`?submissionId=${selectedSubmissionId}`);
+      }}
+      style={{
+        width: '100%',
+        fontSize: '16px',
+        borderRadius: 12,
+        boxShadow: '0 4px 12px rgba(0,0,0,0.05)',
+        height: 60,
+        display: 'flex',
+        alignItems: 'center',
+      }}
+      size="large"
+      listHeight={400}
+      dropdownStyle={{ borderRadius: 12, maxHeight: 500, overflow: 'auto' }}
+      filterOption={(input, option) =>
+        option?.children?.toLowerCase().includes(input.toLowerCase())
+      }
+    >
+      {submissions.map((s) => (
+        <Option key={s.submission_id} value={s.submission_id}>
+          <Text strong>{s.title}</Text> 
+        </Option>
+      ))}
+    </Select>
+  )}
+</Card>
+
       </AppLayout>
     );
   }

@@ -160,3 +160,8 @@ class SubmissionEditSuggestionSerializer(serializers.ModelSerializer):
     class Meta:
         model = SubmissionEditSuggestion
         fields = ['id', 'title', 'description', 'contribution_data', 'suggested_by', 'created_at', 'approved', 'reviewed_by', 'reviewed_at']
+
+class SubmissionIdSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Submission
+        fields = ['submission_id']  
