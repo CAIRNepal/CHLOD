@@ -9,7 +9,7 @@ const ApiDocsFull = () => (
   <Layout title="API Documentation">
     <div className={`dc-page ${config.container}`}>
       <div className="page-content">
-    =     API comming soon.
+    =     API coming soon.
       </div>
     </div>
   </Layout>

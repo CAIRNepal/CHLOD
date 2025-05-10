@@ -9,7 +9,7 @@ context('Search stubbed', () => {
   // FULLTEXT FILTER
   it('I can use the text input filter', () => {
     cy.stubSearchResults('/search');
-    const placholder = 'Type your search term here';
+    const placeholder = 'Type your search term here';
     const filteredFacets = [
       'economy (1)',
       'price (1)',
@@ -21,13 +21,13 @@ context('Search stubbed', () => {
 
     // Load default page
     cy.get(searchList).children().its('length').should('eq', 10)
-    cy.findByPlaceholderText(placholder).should('exist');
+    cy.findByPlaceholderText(placeholder).should('exist');
     cy.findByLabelText('Search').should('exist');
     cy.findByText('10 datasets found').should('exist');
     cy.findByLabelText('City Planning (3)').should('exist');
 
     // Search for "gold" and recheck
-    cy.findByPlaceholderText(placholder).type('gold');
+    cy.findByPlaceholderText(placeholder).type('gold');
     cy.get('.dc-search-results-message').contains('1 dataset found for "gold"');
     cy.findByRole('button', {name: 'Show 9 more'}).click();
     filteredFacets.forEach((facet) => {
