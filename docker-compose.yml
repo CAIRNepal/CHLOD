@@ -1,19 +1,6 @@
 version: '3.9'
 
 services:
-  frontend:
-    build:
-      context: ./frontend
-      dockerfile: Dockerfile
-    ports:
-      - "3000:3000"
-    volumes:
-      - ./frontend:/app/frontend
-    working_dir: /app/frontend
-    command: npm start
-    depends_on:
-      - backend
-
   backend:
     build:
       context: ./backend
@@ -23,4 +10,18 @@ services:
     volumes:
       - ./backend:/app
     working_dir: /app
-    command: python heritage_graph/manage.py runserver 0.0.0.0:8000
+    entrypoint: ["/app/entrypoint.sh"]
+    command: ["python", "heritage_graph/manage.py", "runserver", "0.0.0.0:8000"]
+
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    ports:
+      - "3000:3000"
+    volumes:
+      - ./frontend:/app/frontend
+    working_dir: /app/frontend
+    command: ["npm", "start"]
+    depends_on:
+      - backend

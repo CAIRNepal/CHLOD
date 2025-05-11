@@ -10,9 +10,12 @@ WORKDIR /app/heritage_graph
 
 # Install system dependencies and clean up
 RUN apt-get update && \
-    apt-get install -y --no-install-recommends gcc python3-dev && \
+    apt-get install -y --no-install-recommends \
+    gcc \
+    python3-dev \
+    netcat && \
     rm -rf /var/lib/apt/lists/*
-
+    
 # Install Python dependencies
 COPY requirements.txt /app/
 RUN pip install --no-cache-dir -r /app/requirements.txt && \
@@ -32,4 +35,4 @@ EXPOSE 8000
 ENTRYPOINT ["/app/entrypoint.sh"]
 
 # Default command
-CMD ["python", "manage.py", "runserver", "0.0.0.0:8000"]
+CMD ["python", "manage.py", "runserver"]

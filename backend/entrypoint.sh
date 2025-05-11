@@ -3,9 +3,9 @@
 # Wait for the database to be available (can be modified as per your DB setup)
 # This is useful if your DB is hosted in another container
 echo "Waiting for database to be ready..."
-while ! nc -z db 5432; do
-  sleep 1
-done
+# while ! nc -z db 5432; do
+#   sleep 1
+# done
 echo "Database is ready."
 
 # Apply database migrations

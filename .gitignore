@@ -1,3 +1,4 @@
 .env
 __pycache__/
 ./frontend/.env
+./backend/heritage_graph/heritage_data/migrations

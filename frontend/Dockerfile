@@ -1,5 +1,5 @@
 # Use the official Ubuntu as a base image
-FROM ubuntu:20.04
+FROM node:16-slim
 
 # Set environment variables to avoid prompts during installation
 ENV DEBIAN_FRONTEND=noninteractive
@@ -40,4 +40,5 @@ RUN npm install
 # Expose the port your app will run on
 EXPOSE 3000
 
-RUN npm run start
+CMD ["npm","run", "start"]
+
