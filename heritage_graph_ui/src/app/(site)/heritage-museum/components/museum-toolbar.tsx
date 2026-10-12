@@ -21,6 +21,9 @@ import { cn } from '@/lib/utils';
 import { MuseumMethodsPanel } from './MuseumMethodsPanel';
 
 export type MuseumViewMode = '2d' | 'xr' | 'map';
+
+/** The one region the view tabs switch; each tab's aria-controls points here. */
+export const MUSEUM_VIEW_PANEL_ID = 'museum-view';
 export type MuseumDataSource = 'demo' | 'live';
 
 export interface MuseumCorpusProvenance {
@@ -148,15 +151,15 @@ export function MuseumToolbar({
         className="shrink-0"
       >
         <TabsList className="h-8">
-          <TabsTrigger value="xr" className="text-xs gap-1 px-2.5">
+          <TabsTrigger value="xr" aria-controls={MUSEUM_VIEW_PANEL_ID} className="text-xs gap-1 px-2.5">
             <IconBook className="w-3.5 h-3.5" aria-hidden />
             {t('views.xr')}
           </TabsTrigger>
-          <TabsTrigger value="map" className="text-xs gap-1 px-2.5">
+          <TabsTrigger value="map" aria-controls={MUSEUM_VIEW_PANEL_ID} className="text-xs gap-1 px-2.5">
             <IconMapPin className="w-3.5 h-3.5" aria-hidden />
             {t('views.map')}
           </TabsTrigger>
-          <TabsTrigger value="2d" className="text-xs gap-1 px-2.5">
+          <TabsTrigger value="2d" aria-controls={MUSEUM_VIEW_PANEL_ID} className="text-xs gap-1 px-2.5">
             <IconGraph className="w-3.5 h-3.5" aria-hidden />
             {t('views.graph')}
           </TabsTrigger>

@@ -396,6 +396,12 @@
   z-index: 0;
 }
 
+/* The basemap is a light raster; in dark mode invert it rather than show a
+   bright map inside a dark page. Markers sit in another pane and keep their colours. */
+.dark .leaflet-container.hm-map-root .leaflet-tile-pane {
+  filter: invert(1) hue-rotate(180deg) brightness(0.95) contrast(0.9);
+}
+
 .hm-map-marker.leaflet-div-icon {
   background: transparent !important;
   border: none !important;

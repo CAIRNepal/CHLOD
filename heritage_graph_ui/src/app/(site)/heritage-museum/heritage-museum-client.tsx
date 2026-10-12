@@ -7,9 +7,11 @@ import { useRouter, useSearchParams } from 'next/navigation';
 import dynamic from 'next/dynamic';
 import Link from 'next/link';
 import { IconX } from '@tabler/icons-react';
+import { toast } from 'sonner';
 
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
+import { Sheet, SheetContent, SheetTitle } from '@/components/ui/sheet';
 import { getPublicApiUrl, isPublicApiUrlConfigured } from '@/lib/api-base';
 import {
   fetchHeritageDemoCorpus,
@@ -34,7 +36,12 @@ import { StoryPanel } from './components/StoryPanel';
 import { MandalaLoader } from './components/MandalaLoader';
 import { TimelineStrip } from './components/TimelineStrip';
 import { GraphLegend } from './components/GraphLegend';
-import { MuseumToolbar, type MuseumDataSource, type MuseumViewMode } from './components/museum-toolbar';
+import {
+  MUSEUM_VIEW_PANEL_ID,
+  MuseumToolbar,
+  type MuseumDataSource,
+  type MuseumViewMode,
+} from './components/museum-toolbar';
 import {
   datasetMetaFromKgResponse,
   downloadJson,
@@ -51,10 +58,27 @@ import { cn } from '@/lib/utils';
 import { exportVisibleGraphPayload } from './utils/exportGraph';
 
 const API_BASE = getPublicApiUrl();
+/** Give up on the live graph after this long and say so, rather than spin forever. */
+const LIVE_TIMEOUT_MS = 20_000;
+/** The story panel is a sidebar from this width up and a bottom sheet below it (Tailwind `lg`). */
+const SIDEBAR_QUERY = '(min-width: 1024px)';
 
 // ── View / data mode types ─────────────────────────────────────────────────────
 type ViewMode = MuseumViewMode;
 type DataSource = MuseumDataSource;
+type LiveError = 'unconfigured' | 'notfound' | 'timeout' | 'live';
+
+function useSidebarLayout(): boolean {
+  const [wide, setWide] = useState(true);
+  useEffect(() => {
+    const mql = window.matchMedia(SIDEBAR_QUERY);
+    const sync = () => setWide(mql.matches);
+    sync();
+    mql.addEventListener('change', sync);
+    return () => mql.removeEventListener('change', sync);
+  }, []);
+  return wide;
+}
 
 // ── Live Knowledge Graph → museum graph conversion ────────────────────────────
 //
@@ -231,8 +255,10 @@ export function HeritageMindMapClient() {
   // ── Live data ──────────────────────────────────────────────────────────────
   const [liveGraph,   setLiveGraph]   = useState<GraphData | null>(null);
   const [liveLoading, setLiveLoading] = useState(false);
-  const [liveError,   setLiveError]   = useState<string | null>(null);
+  const [liveError,   setLiveError]   = useState<LiveError | null>(null);
   const [datasetMeta, setDatasetMeta] = useState<DatasetMeta | null>(null);
+  const liveAbortRef = useRef<AbortController | null>(null);
+  const sidebarLayout = useSidebarLayout();
 
   // ── UI state ───────────────────────────────────────────────────────────────
   const [dataSource,   setDataSource]   = useState<DataSource>('demo');
@@ -262,40 +288,73 @@ export function HeritageMindMapClient() {
   }, []);
 
   // ── Load live data on demand ───────────────────────────────────────────────
+  const applyLiveResponse = useCallback((resp: KgGraphResponse) => {
+    const { nodes, links } = kgToGraphData(resp);
+    setDatasetMeta(datasetMetaFromKgResponse(resp, API_BASE));
+    // Populate node.relations so the StoryPanel "Connections" section
+    // and the neighbor-highlight logic both work for live data.
+    attachRelations(nodes, links);
+    enrichMuseumGraph({ nodes, links });
+    setLiveGraph({ nodes, links });
+  }, []);
+
   const loadLiveData = useCallback(async () => {
     if (!API_BASE || !isPublicApiUrlConfigured()) {
+      console.error('heritage-museum: NEXT_PUBLIC_API_URL is not set, so the live graph cannot load.');
       setLiveError('unconfigured');
       setLiveLoading(false);
       return;
     }
+    liveAbortRef.current?.abort();
+    const ctrl = new AbortController();
+    liveAbortRef.current = ctrl;
+    let timedOut = false;
+    const timer = window.setTimeout(() => {
+      timedOut = true;
+      ctrl.abort();
+    }, LIVE_TIMEOUT_MS);
     setLiveLoading(true);
     setLiveError(null);
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const token = (session as any)?.accessToken as string | undefined;
     try {
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      const token = (session as any)?.accessToken as string | undefined;
-      const resp = await fetchKgGraph(API_BASE, token, { includeLux: 'linked' });
-      const { nodes, links } = kgToGraphData(resp);
-      setDatasetMeta(datasetMetaFromKgResponse(resp, API_BASE));
-      // Populate node.relations so the StoryPanel "Connections" section
-      // and the neighbor-highlight logic both work for live data.
-      attachRelations(nodes, links);
-      enrichMuseumGraph({ nodes, links });
-      setLiveGraph({ nodes, links });
+      // Curated graph first. Asking for Yale LUX links makes the backend query
+      // a remote endpoint before it answers (≈20 s against 0.5 s without), so
+      // the links follow in a second request instead of holding up the page.
+      applyLiveResponse(await fetchKgGraph(API_BASE, token, { includeLux: 'none', signal: ctrl.signal }));
     } catch (err) {
+      if (ctrl.signal.aborted && !timedOut) return; // superseded by a newer load
       const msg = err instanceof Error ? err.message : '';
-      // Prod API (api.heritagegraph.xyz) historically 404'd /kg/graph/ while
-      // devenv served it — usually NEXT_PUBLIC_API_URL points at the wrong host.
-      if (/\b404\b/.test(msg)) {
+      if (timedOut) {
+        setLiveError('timeout');
+      } else if (/\b404\b/.test(msg)) {
+        // Usually NEXT_PUBLIC_API_URL points at a host that does not serve
+        // /kg/graph/. That is for operators, not visitors, so it goes here.
+        console.error(`heritage-museum: ${API_BASE}/api/v1/cidoc/kg/graph/ returned 404. Check NEXT_PUBLIC_API_URL (baked in at build time).`);
         setLiveError('notfound');
       } else {
+        console.error('heritage-museum: live graph failed to load', err);
         setLiveError('live');
       }
       // Stay in 'live' mode so a Retry click is intuitive — the user sees the
-      // error banner and the toggle button switches back to demo if they want.
+      // error banner and can switch back to the illustrated collection.
+      return;
     } finally {
-      setLiveLoading(false);
+      window.clearTimeout(timer);
+      if (liveAbortRef.current === ctrl) setLiveLoading(false);
     }
-  }, [session]);
+
+    // Background: merge Yale LUX links only if they add anything.
+    fetchKgGraph(API_BASE, token, { includeLux: 'linked', signal: ctrl.signal })
+      .then((resp) => {
+        if ((resp.counts.luxNodes ?? 0) > 0 && liveAbortRef.current === ctrl) applyLiveResponse(resp);
+      })
+      .catch(() => {
+        /* the curated graph is already showing; LUX links are optional */
+      });
+  }, [session, applyLiveResponse]);
+
+  useEffect(() => () => liveAbortRef.current?.abort(), []);
 
   const toggleDataSource = useCallback(() => {
     if (dataSource === 'demo') {
@@ -362,28 +421,37 @@ export function HeritageMindMapClient() {
         const token = (session as any)?.accessToken as string | undefined;
         const resp = await fetchKgNeighborhood(API_BASE, node.id, token, { includeLux: 'linked' });
         const add = kgNeighborhoodToGraph(node.id, resp);
+        // Count against the graph as it stands now, so the message matches what changes.
+        const base = liveGraph ?? { nodes: [], links: [] };
+        const nodeIds = new Set(base.nodes.map((n) => n.id));
+        const newNodes = add.nodes.filter((n) => !nodeIds.has(n.id));
+        const idOf = (x: string | GraphNode) => (typeof x === 'string' ? x : x.id);
+        const linkKey = (l: GraphLink) => `${idOf(l.source)}→${idOf(l.target)}→${l.predicate}`;
+        const seenLinks = new Set(base.links.map(linkKey));
+        const newLinks = add.links.filter((l) => !seenLinks.has(linkKey(l)));
+        if (!newNodes.length && !newLinks.length) {
+          toast(t('expand.none', { name: node.label }));
+          return;
+        }
         setLiveGraph((prev) => {
-          const base = prev ?? { nodes: [], links: [] };
-          const nodeIds = new Set(base.nodes.map((n) => n.id));
-          const newNodes = add.nodes.filter((n) => !nodeIds.has(n.id));
-          const idOf = (x: string | GraphNode) => (typeof x === 'string' ? x : x.id);
-          const linkKey = (l: GraphLink) => `${idOf(l.source)}→${idOf(l.target)}→${l.predicate}`;
-          const seenLinks = new Set(base.links.map(linkKey));
-          const newLinks = add.links.filter((l) => !seenLinks.has(linkKey(l)));
-          if (!newNodes.length && !newLinks.length) return prev; // nothing new
-          const nodes = [...base.nodes, ...newNodes];
-          const links = [...base.links, ...newLinks];
+          const current = prev ?? { nodes: [], links: [] };
+          const have = new Set(current.nodes.map((n) => n.id));
+          const haveLinks = new Set(current.links.map(linkKey));
+          const nodes = [...current.nodes, ...newNodes.filter((n) => !have.has(n.id))];
+          const links = [...current.links, ...newLinks.filter((l) => !haveLinks.has(linkKey(l)))];
           attachRelations(nodes, links);
           enrichMuseumGraph({ nodes, links });
           return { nodes, links };
         });
-      } catch {
-        /* expansion is best-effort; ignore transient failures */
+        toast.success(t('expand.added', { count: newNodes.length, name: node.label }));
+      } catch (err) {
+        console.error('heritage-museum: expand failed', err);
+        toast.error(t('expand.failed', { name: node.label }));
       } finally {
         setExpanding(false);
       }
     },
-    [dataSource, session],
+    [dataSource, session, liveGraph, t],
   );
 
   const showAllCategories = useCallback(() => setActiveCats(new Set(ALL_CATS)), []);
@@ -421,10 +489,14 @@ export function HeritageMindMapClient() {
     };
   }, [fullGraph, activeTypes, activeCats, searchQuery]);
 
-  // Deep-link: ?node=<iri> after graph is available.
+  // Deep-link: ?node=<iri>, honoured once per data source when its graph first
+  // arrives. It used to re-run on every URL change, and the URL changes on every
+  // view switch, so switching views re-opened the phone's story sheet unasked.
+  const deepLinkedRef = useRef(new Set<DataSource>());
   useEffect(() => {
     const nodeParam = searchParams.get('node');
-    if (!nodeParam || !fullGraph) return;
+    if (!nodeParam || !fullGraph || deepLinkedRef.current.has(dataSource)) return;
+    deepLinkedRef.current.add(dataSource);
     const decoded = decodeURIComponent(nodeParam);
     const match = fullGraph.nodes.find((n) => n.id === decoded);
     if (match) {
@@ -432,7 +504,7 @@ export function HeritageMindMapClient() {
       setPanelOpen(true);
       urlSyncedRef.current = true;
     }
-  }, [searchParams, fullGraph]);
+  }, [searchParams, fullGraph, dataSource]);
 
   // Sync museum state → URL for citable figure links.
   useEffect(() => {
@@ -480,14 +552,17 @@ export function HeritageMindMapClient() {
   );
 
   // ── Handlers ──────────────────────────────────────────────────────────────
-  const handleNodeSelect = useCallback((node: GraphNode) => {
-    let deselecting = false;
-    setSelectedNode((prev) => {
-      deselecting = prev?.id === node.id;
-      return deselecting ? null : node;
-    });
-    setPanelOpen(!deselecting);
-  }, []);
+  // Clicking the selected node again deselects it. Decided from the rendered
+  // selection, not inside a state updater: React may run updaters later, so a
+  // flag set there is not reliably readable on the next line.
+  const handleNodeSelect = useCallback(
+    (node: GraphNode) => {
+      const deselecting = selectedNode?.id === node.id;
+      setSelectedNode(deselecting ? null : node);
+      setPanelOpen(!deselecting);
+    },
+    [selectedNode],
+  );
 
   const handleRelatedNodeClick = useCallback(
     (id: string) => {
@@ -515,8 +590,16 @@ export function HeritageMindMapClient() {
     });
   }, []);
 
+  // Changing view never opens the phone's story sheet by itself; it opens when
+  // the visitor picks something in the new view.
+  const changeView = useCallback((mode: ViewMode) => {
+    setPanelOpen(false);
+    setViewMode(mode);
+  }, []);
+
   const switchToXR = useCallback((node?: GraphNode) => {
     if (node) setSelectedNode(node);
+    setPanelOpen(false);
     setViewMode('xr');
   }, []);
 
@@ -551,16 +634,21 @@ export function HeritageMindMapClient() {
     return counts;
   }, [fullGraph]);
 
-  const errorMessage =
-    error === 'unconfigured'
-      ? 'Live data source is not configured (set NEXT_PUBLIC_API_URL to your public API origin, e.g. https://devapi.heritagegraph.xyz).'
-      : error === 'notfound'
-        ? `Knowledge graph API not found at ${API_BASE}/api/v1/cidoc/kg/graph/. For the Dokploy devenv app set NEXT_PUBLIC_API_URL=https://devapi.heritagegraph.xyz and rebuild the frontend (it is baked at build time).`
-        : error === 'live'
+  // Visitor-facing only. Configuration detail for operators goes to the console
+  // where the failure is caught (see loadLiveData).
+  const messageFor = (e: string | null) =>
+    e === 'unconfigured' || e === 'notfound'
+      ? t('errors.liveUnavailable')
+      : e === 'timeout'
+        ? t('errors.liveTimeout')
+        : e === 'live'
           ? t('errors.liveLoad')
-          : error === 'demo'
+          : e === 'demo'
             ? t('errors.demoLoad')
             : null;
+  const errorMessage = messageFor(error);
+  // A missing or misconfigured API will not fix itself on retry.
+  const liveRetryable = liveError === 'timeout' || liveError === 'live';
 
   const sparseLive =
     dataSource === 'live' && !liveLoading && !liveError && liveGraph && liveGraph.nodes.length < 20;
@@ -617,7 +705,7 @@ export function HeritageMindMapClient() {
             size="sm"
             variant="outline"
             className="h-7 text-xs"
-            onClick={() => setViewMode('map')}
+            onClick={() => changeView('map')}
           >
             {t('storiesLiveHintMap')}
           </Button>
@@ -626,7 +714,7 @@ export function HeritageMindMapClient() {
             size="sm"
             variant="outline"
             className="h-7 text-xs"
-            onClick={() => setViewMode('2d')}
+            onClick={() => changeView('2d')}
           >
             {t('storiesLiveHintGraph')}
           </Button>
@@ -655,7 +743,11 @@ export function HeritageMindMapClient() {
             columns exceeded the width, which cost ~70px of vertical chrome for
             nothing. As a two-column grid the controls sit beside the title on
             wide screens and the masthead is only as tall as the title block. */}
-        <div className="grid gap-x-6 gap-y-3 @3xl/main:grid-cols-[minmax(0,1fr)_auto] @3xl/main:items-start">
+        {/* The title column has a floor and the tools column may shrink (its
+            items wrap). With `auto` the tools took their full one-line width,
+            and at ~1200px in Map/Connections they squeezed the title to one
+            word per line and ran the search box over the heading. */}
+        <div className="grid gap-x-6 gap-y-3 @3xl/main:grid-cols-[minmax(18rem,1fr)_minmax(0,auto)] @3xl/main:items-start">
           <div className="min-w-0">
             <h1 className="font-serif text-2xl leading-tight text-foreground sm:text-3xl">
               {t('title')}
@@ -681,7 +773,7 @@ export function HeritageMindMapClient() {
             />
             <MuseumToolbar
               viewMode={viewMode}
-              onViewModeChange={(mode) => (mode === 'xr' ? switchToXR() : setViewMode(mode))}
+              onViewModeChange={(mode) => (mode === 'xr' ? switchToXR() : changeView(mode))}
               dataSource={dataSource}
               liveLoading={liveLoading}
               onToggleDataSource={toggleDataSource}
@@ -704,17 +796,32 @@ export function HeritageMindMapClient() {
           aria-live="polite"
         >
           <span aria-hidden="true">⚠</span>
-          <span>{t('errors.liveLoad')}</span>
-          <Button
-            onClick={retryLiveData}
-            disabled={liveLoading}
-            variant="outline"
-            size="sm"
-            className="ml-auto h-7 text-xs"
-            type="button"
-          >
-            {liveLoading ? t('errors.retrying') : t('errors.retry')}
-          </Button>
+          <span>{messageFor(liveError)}</span>
+          <span className="ml-auto flex items-center gap-2">
+            {liveRetryable && (
+              <Button
+                onClick={retryLiveData}
+                disabled={liveLoading}
+                variant="outline"
+                size="sm"
+                className="h-7 text-xs"
+                type="button"
+              >
+                {liveLoading ? t('errors.retrying') : t('errors.retry')}
+              </Button>
+            )}
+            {dataSource === 'live' && (
+              <Button
+                onClick={toggleDataSource}
+                variant="outline"
+                size="sm"
+                className="h-7 text-xs"
+                type="button"
+              >
+                {t('errors.showDemo')}
+              </Button>
+            )}
+          </span>
           <Button
             onClick={() => setLiveError(null)}
             variant="ghost"
@@ -730,7 +837,12 @@ export function HeritageMindMapClient() {
 
       {/* ── 2D / Map modes ── */}
       {(viewMode === '2d' || viewMode === 'map') && (
-        <div className="flex min-h-0 flex-1 flex-col">
+        <div
+          id={MUSEUM_VIEW_PANEL_ID}
+          role="tabpanel"
+          aria-label={viewMode === 'map' ? t('views.map') : t('views.graph')}
+          className="flex min-h-0 flex-1 flex-col"
+        >
 
           {/* Grid: graph | story on row 1; timeline pinned to workspace footer (row 2) */}
           <div
@@ -756,16 +868,23 @@ export function HeritageMindMapClient() {
                     <p className="text-foreground text-sm font-medium">{t('errors.loadTitle')}</p>
                     <p className="text-muted-foreground text-xs">{errorMessage}</p>
                     {dataSource === 'live' && (
-                      <Button
-                        onClick={retryLiveData}
-                        disabled={liveLoading}
-                        variant="outline"
-                        size="sm"
-                        className="mt-2 text-xs"
-                        type="button"
-                      >
-                        {liveLoading ? t('errors.retrying') : t('errors.retry')}
-                      </Button>
+                      <div className="flex flex-wrap justify-center gap-2 pt-2">
+                        {liveRetryable && (
+                          <Button
+                            onClick={retryLiveData}
+                            disabled={liveLoading}
+                            variant="outline"
+                            size="sm"
+                            className="text-xs"
+                            type="button"
+                          >
+                            {liveLoading ? t('errors.retrying') : t('errors.retry')}
+                          </Button>
+                        )}
+                        <Button onClick={toggleDataSource} variant="outline" size="sm" className="text-xs" type="button">
+                          {t('errors.showDemo')}
+                        </Button>
+                      </div>
                     )}
                   </div>
                 </div>
@@ -824,7 +943,7 @@ export function HeritageMindMapClient() {
               {viewMode === '2d' && !loading && !error && !selectedNode && nodeCount > 0 && (
                 <div className="absolute bottom-4 left-1/2 -translate-x-1/2 pointer-events-none">
                   <div className="text-xs text-muted-foreground bg-card/90 backdrop-blur-sm rounded-full px-4 py-2 border border-border flex items-center gap-2 shadow-sm">
-                    <span className="animate-bounce inline-block">👆</span>
+                    <span className="inline-block motion-safe:animate-bounce" aria-hidden="true">👆</span>
                     {t('hints.graph')} ·{' '}
                     <button
                       className="pointer-events-auto text-primary hover:underline underline-offset-2"
@@ -848,9 +967,9 @@ export function HeritageMindMapClient() {
                       variant="outline"
                       className="text-xs gap-1.5"
                       type="button"
-                      title="Pull this node's connected entities from the knowledge graph"
+                      title={t('expand.title')}
                     >
-                      {expanding ? 'Expanding…' : '+ Expand'}
+                      {expanding ? t('expand.loading') : t('expand.action')}
                     </Button>
                   )}
                   <Button onClick={() => switchToXR(selectedNode)} size="sm" variant="secondary" className="text-xs gap-1.5">
@@ -862,7 +981,7 @@ export function HeritageMindMapClient() {
               {/* Live data badge */}
               {dataSource === 'live' && !loading && (
                 <Badge className="absolute top-3 left-3 gap-1.5 text-[10px] font-semibold shadow-sm">
-                  <span className="w-1.5 h-1.5 rounded-full bg-primary animate-pulse" aria-hidden />
+                  <span className="w-1.5 h-1.5 rounded-full bg-primary motion-safe:animate-pulse" aria-hidden />
                   {t('liveBadge')}
                 </Badge>
               )}
@@ -907,7 +1026,7 @@ export function HeritageMindMapClient() {
 
       {/* ── XR Mode ── */}
       {viewMode === 'xr' && (
-        <div className="flex min-h-0 flex-1 flex-col">
+        <div id={MUSEUM_VIEW_PANEL_ID} role="tabpanel" aria-label={t('views.xr')} className="flex min-h-0 flex-1 flex-col">
           {/* No Heritage Explorer rail in Stories.
               It showed the same entities as the grid beside it, in thumbnails
               too small to identify, with a third search field of its own — so
@@ -948,7 +1067,7 @@ export function HeritageMindMapClient() {
                   </Button>
                   {dataSource === 'live' && !loading ? (
                     <Badge className="gap-1.5 text-[10px] font-semibold shadow-sm">
-                      <span className="h-1.5 w-1.5 animate-pulse rounded-full bg-primary" aria-hidden />
+                      <span className="h-1.5 w-1.5 motion-safe:animate-pulse rounded-full bg-primary" aria-hidden />
                       {t('liveBadge')}
                     </Badge>
                   ) : null}
@@ -959,16 +1078,20 @@ export function HeritageMindMapClient() {
         </div>
       )}
 
-      {/* Mobile story drawer (Connections / Map) */}
-      {(viewMode === '2d' || viewMode === 'map') && panelOpen && selectedNode && (
-        <div className="lg:hidden fixed inset-0 z-50 flex flex-col">
-          <div className="flex-1 bg-background/60 backdrop-blur-sm" onClick={() => setPanelOpen(false)} />
-          <div className="bg-card border-t border-border h-3/4 rounded-t-2xl overflow-hidden flex flex-col relative">
-            <div className="flex items-center justify-center px-5 py-3 border-b border-border flex-shrink-0">
-              <div className="w-10 h-1 rounded-full bg-muted" />
-              <Button onClick={() => setPanelOpen(false)} className="absolute right-5" variant="ghost" size="icon" aria-label={t('errors.dismiss')}><IconX className="w-4 h-4" /></Button>
-            </div>
-            <div className="flex-1 overflow-hidden">
+      {/* Phone story sheet (Connections / Map). A real dialog: focus moves in
+          and back, Escape and the backdrop close it, and the page behind is
+          inert while it is open. Below `lg` only; wider screens have the sidebar. */}
+      <Sheet
+        open={!sidebarLayout && (viewMode === '2d' || viewMode === 'map') && panelOpen && Boolean(selectedNode)}
+        onOpenChange={setPanelOpen}
+      >
+        <SheetContent side="bottom" className="flex h-3/4 flex-col gap-0 overflow-hidden rounded-t-2xl p-0">
+          <SheetTitle className="sr-only">{selectedNode?.label ?? t('title')}</SheetTitle>
+          <div className="flex flex-shrink-0 justify-center border-b border-border py-3" aria-hidden="true">
+            <div className="h-1 w-10 rounded-full bg-muted" />
+          </div>
+          <div className="flex-1 overflow-hidden">
+            {selectedNode && (
               <StoryPanel
                 node={selectedNode}
                 graphData={fullGraph ?? EMPTY}
@@ -980,10 +1103,10 @@ export function HeritageMindMapClient() {
                 viewMode={viewMode}
                 onBrowseStories={() => switchToXR()}
               />
-            </div>
+            )}
           </div>
-        </div>
-      )}
+        </SheetContent>
+      </Sheet>
     </div>
   );
 }

@@ -479,7 +479,10 @@
       "loadTitle": "Unable to load heritage data",
       "retry": "Retry",
       "retrying": "Retrying…",
-      "dismiss": "Dismiss error"
+      "dismiss": "Dismiss error",
+      "liveUnavailable": "The live knowledge graph isn’t available right now. The illustrated collection still works.",
+      "liveTimeout": "The live knowledge graph is taking too long to answer. Try again in a moment.",
+      "showDemo": "Show the illustrated collection"
     },
     "empty": {
       "filtersTitle": "No heritage nodes match your filters",
@@ -590,6 +593,14 @@
       "narrate": "Listen to story narration",
       "narrateShort": "Narrate",
       "stop": "Stop"
+    },
+    "expand": {
+      "action": "Show connected records",
+      "loading": "Loading connections…",
+      "title": "Add the records connected to this one from the knowledge graph",
+      "none": "No further connected records for {name}.",
+      "added": "Added {count, plural, one {# record} other {# records}} connected to {name}.",
+      "failed": "Couldn’t load connections for {name}. Try again."
     }
   },
   "landing": {

@@ -79,17 +79,24 @@ export function FilterBar({
 
   return (
     <div className="flex flex-wrap items-center gap-2" role="search" aria-label={t('regionLabel')}>
-      <div className="relative min-w-0 flex-1 sm:w-64 sm:flex-none">
+      {/* Full row on phones: as one flex item among four it shrank to an icon-wide
+          box with no visible placeholder. */}
+      <div className="relative min-w-0 basis-full sm:w-64 sm:flex-none sm:basis-auto">
         <IconSearch
           className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground"
           aria-hidden
         />
+        {/* The browser's own clear control is hidden; the button below is the
+            one clear action, so there are not two ✕ side by side. */}
         <Input
           type="search"
           value={searchQuery}
           onChange={(e) => onSearchChange(e.target.value)}
+          onKeyDown={(e) => {
+            if (e.key === 'Escape' && searchQuery) onSearchChange('');
+          }}
           placeholder={t('searchPlaceholder')}
-          className="h-9 rounded-full bg-background/80 pl-9 pr-8"
+          className="h-9 rounded-full bg-background/80 pl-9 pr-8 [&::-webkit-search-cancel-button]:appearance-none"
           aria-label={t('searchAria')}
         />
         {searchQuery ? (

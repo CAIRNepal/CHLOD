@@ -62,6 +62,10 @@ export function WelcomeDialog() {
   // NOTE: the /preview/* clause is temporary — those routes exist only for
   // Phase 2 review and are removed once a direction is chosen.
   const suppressed = pathname === '/' || pathname.startsWith('/preview/');
+  // Never offer "open the page you are on": on /heritage-museum that step was
+  // the focused primary action and did nothing.
+  const steps = STEPS.filter((s) => s.href !== pathname);
+  const getStartedRef = React.useRef<HTMLButtonElement>(null);
 
   React.useEffect(() => {
     if (suppressed) return;
@@ -88,7 +92,13 @@ export function WelcomeDialog() {
 
   return (
     <Dialog open={open} onOpenChange={dismiss}>
-      <DialogContent className="sm:max-w-lg">
+      <DialogContent
+        className="sm:max-w-lg"
+        onOpenAutoFocus={(e) => {
+          e.preventDefault();
+          getStartedRef.current?.focus();
+        }}
+      >
         <DialogHeader>
           <DialogTitle className="text-xl">Welcome to HeritageGraph 🏛️</DialogTitle>
           <DialogDescription>
@@ -100,7 +110,7 @@ export function WelcomeDialog() {
         </DialogHeader>
 
         <ul className="mt-2 flex flex-col gap-3">
-          {STEPS.map((s) => {
+          {steps.map((s) => {
             const Icon = s.icon;
             return (
               <li
@@ -114,11 +124,12 @@ export function WelcomeDialog() {
                   <p className="font-medium leading-tight">{s.title}</p>
                   <p className="text-sm text-muted-foreground">{s.body}</p>
                 </div>
-                <Link href={s.href} onClick={() => dismiss(false)}>
-                  <Button size="sm" variant="outline">
+                {/* One interactive element, not a button inside a link. */}
+                <Button asChild size="sm" variant="outline">
+                  <Link href={s.href} onClick={() => dismiss(false)}>
                     {s.cta}
-                  </Button>
-                </Link>
+                  </Link>
+                </Button>
               </li>
             );
           })}
@@ -128,7 +139,9 @@ export function WelcomeDialog() {
           <span className="inline-flex items-center gap-1 text-xs text-muted-foreground">
             <IconSearch className="h-3.5 w-3.5" /> Tip: ⌘K opens search anywhere
           </span>
-          <Button onClick={() => dismiss(false)}>Get started</Button>
+          <Button ref={getStartedRef} onClick={() => dismiss(false)}>
+            Get started
+          </Button>
         </div>
       </DialogContent>
     </Dialog>

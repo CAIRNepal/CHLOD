@@ -261,8 +261,12 @@ function StorytellingOverlay({
         </div>
       </div>
 
-      <p className="mt-3 text-center text-[11px] text-muted-foreground">
-        {reducedMotion ? t('storyHintManual') : t('storyHintAuto')}
+      {/* Sits over the photograph, so it gets its own surface; bare muted text
+          over an arbitrary image had no dependable contrast and was unreadable. */}
+      <p className="mt-3 text-center text-[11px]">
+        <span className="inline-block rounded-full bg-card/90 px-3 py-1 text-muted-foreground backdrop-blur-sm">
+          {reducedMotion ? t('storyHintManual') : t('storyHintAuto')}
+        </span>
       </p>
     </div>
   );
@@ -341,16 +345,28 @@ function GalleryCard({
 
   return (
     <div className="group relative flex flex-col overflow-hidden rounded-2xl border border-border bg-card transition-all hover:border-primary/40 hover:shadow-md focus-within:border-primary/40">
+      {/* The whole card is the button — photograph AND caption — so the name a
+          visitor reads is what they can click, and the button's accessible name
+          is the place, not the overlay. It used to wrap the photograph only:
+          clicking the name did nothing, and a screen reader heard
+          "Explore →, button" forty-six times. */}
       <button
         type="button"
         onClick={() => onSelect(node)}
-        className="block w-full text-left focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-ring"
+        className="flex w-full flex-col text-left focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-ring"
       >
-        <span className="relative block overflow-hidden" style={{ aspectRatio: '4/3' }}>
+        <span className="relative block w-full overflow-hidden" style={{ aspectRatio: '4/3' }}>
           {visual ? (
-            <span
-              className="absolute inset-0 transition-transform duration-700 group-hover:scale-105 motion-reduce:transition-none motion-reduce:group-hover:scale-100"
-              style={{ background: `url(${heroImage}) center/cover no-repeat` }}
+            // An <img>, not a CSS background, so the browser loads it only as
+            // it nears the viewport instead of all at once. alt="" because the
+            // caption below already names it.
+            // eslint-disable-next-line @next/next/no-img-element
+            <img
+              src={heroImage}
+              alt=""
+              loading="lazy"
+              decoding="async"
+              className="absolute inset-0 h-full w-full object-cover transition-transform duration-700 group-hover:scale-105 motion-reduce:transition-none motion-reduce:group-hover:scale-100"
             />
           ) : (
             /* A deliberate absence, not a broken card: the glyph, the type and
@@ -373,32 +389,37 @@ function GalleryCard({
             <NodeGlyph nodeType={node.nodeType} size={17} color="#fff" />
           </span>
 
-          <span className="absolute inset-0 flex items-center justify-center opacity-0 transition-opacity group-hover:opacity-100 group-focus-within:opacity-100 motion-reduce:transition-none">
+          <span
+            aria-hidden="true"
+            className="absolute inset-0 flex items-center justify-center opacity-0 transition-opacity group-hover:opacity-100 group-focus-within:opacity-100 motion-reduce:transition-none"
+          >
             <span className="rounded-full border border-border bg-card/85 px-4 py-2 text-xs text-foreground backdrop-blur-sm">
               {t('explore')} →
             </span>
           </span>
         </span>
+
+        {/* Caption plate — solid surface, token ink, no gradient anywhere near
+            the photograph. Spans, not paragraphs: it is inside a button. */}
+        <span className="flex flex-col gap-1 border-t border-border px-3 py-2.5">
+          <span className="text-sm font-semibold leading-tight text-foreground">{node.label}</span>
+          <span className="flex items-center gap-1.5 text-xs text-muted-foreground">
+            <NodeGlyph nodeType={node.nodeType} size={13} aria-hidden />
+            {cfg.label}
+          </span>
+        </span>
       </button>
 
-      {/* The credit sits over the foot of the image, outside the button. */}
+      {/* The credit sits over the top of the image, outside the button (an <a>
+          inside a <button> is invalid). Out of the Tab order here; the record's
+          own view carries the same credit. */}
       {credit ? (
         <div className="pointer-events-none absolute inset-x-0 top-0 flex justify-end p-2 opacity-0 transition-opacity group-hover:opacity-100 group-focus-within:opacity-100 motion-reduce:transition-none">
           <div className="pointer-events-auto max-w-full rounded-md bg-black/65 px-2 py-1 backdrop-blur-sm">
-            <ImageAttribution credit={credit} variant="onImage" />
+            <ImageAttribution credit={credit} variant="onImage" focusable={false} />
           </div>
         </div>
       ) : null}
-
-      {/* Caption plate — solid surface, token ink, no gradient anywhere near
-          the photograph. */}
-      <div className="flex flex-col gap-1 border-t border-border px-3 py-2.5">
-        <p className="text-sm font-semibold leading-tight text-foreground">{node.label}</p>
-        <p className="flex items-center gap-1.5 text-xs text-muted-foreground">
-          <NodeGlyph nodeType={node.nodeType} size={13} aria-hidden />
-          {cfg.label}
-        </p>
-      </div>
     </div>
   );
 }

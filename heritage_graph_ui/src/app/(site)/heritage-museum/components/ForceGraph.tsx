@@ -13,6 +13,14 @@ import {
 import { hasUnescoStatement } from '@/lib/unesco/status';
 import { nodeIconInner } from '../node-icons';
 
+
+/** True when the link has `id` at either end; links hold ids or, after d3 runs, node objects. */
+function linkTouches(link: GraphLink, id: string | null): boolean {
+  if (!id) return false;
+  const end = (x: string | GraphNode) => (typeof x === 'string' ? x : x.id);
+  return end(link.source) === id || end(link.target) === id;
+}
+
 interface ForceGraphProps {
   data: GraphData;
   selectedId: string | null;
@@ -91,6 +99,9 @@ export function ForceGraph({
   const graphAriaLabel = t('graphAriaLabel');
   const svgRef = useRef<SVGSVGElement>(null);
   const simulationRef = useRef<d3.Simulation<GraphNode, GraphLink> | null>(null);
+  // Read by the data join, which does not re-run on selection changes.
+  const selectedIdRef = useRef<string | null>(selectedId);
+  selectedIdRef.current = selectedId;
 
   // Persistent node-position cache so filter toggles don't reset layout.
   const nodePosCacheRef = useRef<Map<string, { x: number; y: number }>>(new Map());
@@ -302,6 +313,7 @@ export function ForceGraph({
       .attr('stroke-width', 2.5);
     const labelMerged = labelEnter.merge(labelSel);
     labelMerged.text((d) => RELATION_LABELS[d.predicate] || d.predicate.replace(/_/g, ' '));
+    labelMerged.attr('display', (d) => (linkTouches(d, selectedIdRef.current) ? null : 'none'));
 
     // ── Data-join: node groups ──
     const nodesG = svg.select<SVGGElement>('.hm-nodes');
@@ -484,12 +496,20 @@ export function ForceGraph({
     // Cleanup happens via the simulation reference on unmount.
   }, [data, annotatedLinks, handleClick]);
 
-  // Update selection ring opacity without re-simulation
+  // Update selection ring opacity and relation labels without re-simulation.
+  // Labels show only on the selected node's edges: drawn on every edge at
+  // once they overprinted each other and the node names, and the graph read
+  // as noise. The lines alone still show that things connect.
   useEffect(() => {
     if (!svgRef.current) return;
-    d3.select(svgRef.current)
+    const svg = d3.select(svgRef.current);
+    svg
       .selectAll<SVGCircleElement, GraphNode>('.hm-selection-ring')
       .attr('opacity', (d) => (d.id === selectedId ? 1 : 0));
+    svg
+      .select('.hm-link-labels')
+      .selectAll<SVGTextElement, GraphLink>('text')
+      .attr('display', (d) => (linkTouches(d, selectedId) ? null : 'none'));
   }, [selectedId]);
 
   // Dim non-highlighted nodes (neighbour highlight)
