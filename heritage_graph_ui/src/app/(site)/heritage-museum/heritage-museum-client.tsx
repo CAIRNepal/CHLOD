@@ -1,84 +1,38 @@
 'use client';
 
-import { useEffect, useState, useCallback, useMemo, useRef } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useSession } from 'next-auth/react';
 import { useTranslations } from 'next-intl';
 import { useRouter, useSearchParams } from 'next/navigation';
-import dynamic from 'next/dynamic';
 import Link from 'next/link';
 import { IconX } from '@tabler/icons-react';
 import { toast } from 'sonner';
 
 import { Button } from '@/components/ui/button';
-import { Badge } from '@/components/ui/badge';
 import { Sheet, SheetContent, SheetTitle } from '@/components/ui/sheet';
 import { getPublicApiUrl, isPublicApiUrlConfigured } from '@/lib/api-base';
+import { enrichKgNodeForMuseum, enrichMuseumGraph, collapseClusterDuplicates } from '@/lib/heritage-museum/museum-graph';
+import { fetchKgGraph, fetchKgNeighborhood, rdfTypeToNodeType, type KgGraphResponse, type KgNeighborhoodResponse } from '@/lib/kg-graph';
+import { datasetMetaFromKgResponse, downloadJson, type DatasetMeta } from '@/lib/provenance';
+
 import {
   fetchHeritageDemoCorpus,
   NODE_TYPE_CONFIG,
-  HG_CATEGORY_CONFIG,
-  type NodeType,
-  type HgCategory,
-  type GraphNode,
+  type CorpusProvenance,
   type GraphData,
   type GraphLink,
-  type CorpusProvenance,
+  type GraphNode,
+  type HgCategory,
 } from './heritage-data';
-import {
-  fetchKgGraph,
-  fetchKgNeighborhood,
-  rdfTypeToNodeType,
-  type KgGraphResponse,
-  type KgNeighborhoodResponse,
-} from '@/lib/kg-graph';
-import { FilterBar } from './components/FilterBar';
-import { StoryPanel } from './components/StoryPanel';
 import { MandalaLoader } from './components/MandalaLoader';
-import { TimelineStrip } from './components/TimelineStrip';
-import { GraphLegend } from './components/GraphLegend';
-import {
-  MUSEUM_VIEW_PANEL_ID,
-  MuseumToolbar,
-  type MuseumDataSource,
-  type MuseumViewMode,
-} from './components/museum-toolbar';
-import {
-  datasetMetaFromKgResponse,
-  downloadJson,
-  type DatasetMeta,
-} from '@/lib/provenance';
-import {
-  capGraphForRender,
-  collapseClusterDuplicates,
-  enrichKgNodeForMuseum,
-  enrichMuseumGraph,
-} from '@/lib/heritage-museum/museum-graph';
-import { buildTimelineLayout } from '@/lib/heritage-museum/timeline-layout';
-import { cn } from '@/lib/utils';
+import { CollectionRail } from './components/exhibit/CollectionRail';
+import { ContextColumn, type LensKind } from './components/exhibit/ContextColumn';
+import { ExhibitView } from './components/exhibit/ExhibitView';
+import { connectionsOf } from './components/exhibit/exhibit-utils';
+import { MuseumLens } from './components/exhibit/MuseumLens';
+import { RailControls } from './components/exhibit/RailControls';
+import type { MuseumDataSource } from './components/museum-types';
 import { exportVisibleGraphPayload } from './utils/exportGraph';
-
-const API_BASE = getPublicApiUrl();
-/** Give up on the live graph after this long and say so, rather than spin forever. */
-const LIVE_TIMEOUT_MS = 20_000;
-/** The story panel is a sidebar from this width up and a bottom sheet below it (Tailwind `lg`). */
-const SIDEBAR_QUERY = '(min-width: 1024px)';
-
-// ── View / data mode types ─────────────────────────────────────────────────────
-type ViewMode = MuseumViewMode;
-type DataSource = MuseumDataSource;
-type LiveError = 'unconfigured' | 'notfound' | 'timeout' | 'live';
-
-function useSidebarLayout(): boolean {
-  const [wide, setWide] = useState(true);
-  useEffect(() => {
-    const mql = window.matchMedia(SIDEBAR_QUERY);
-    const sync = () => setWide(mql.matches);
-    sync();
-    mql.addEventListener('change', sync);
-    return () => mql.removeEventListener('change', sync);
-  }, []);
-  return wide;
-}
 
 // ── Live Knowledge Graph → museum graph conversion ────────────────────────────
 //
@@ -219,80 +173,98 @@ function attachRelations(nodes: GraphNode[], links: GraphLink[]): void {
   }
 }
 
-// ── Dynamic imports ────────────────────────────────────────────────────────────
-const ALL_TYPES = new Set(Object.keys(NODE_TYPE_CONFIG) as NodeType[]);
-const ALL_CATS  = new Set(Object.keys(HG_CATEGORY_CONFIG) as HgCategory[]);
+// ══════════════════════════════════════════════════════════════════════════════
+type DataSource = MuseumDataSource;
+type LiveError = 'unconfigured' | 'notfound' | 'timeout' | 'live';
+
+const API_BASE = getPublicApiUrl();
+/** Give up on the live graph after this long and say so, rather than spin forever. */
+const LIVE_TIMEOUT_MS = 20_000;
+/** The context column sits beside the exhibit from this width; below it, under it. */
+const WIDE_QUERY = '(min-width: 1280px)';
+/** The collection rail is a column from this width; below it, a sheet. */
+const RAIL_QUERY = '(min-width: 1024px)';
 const EMPTY: GraphData = { nodes: [], links: [] };
 
-const ForceGraph = dynamic(
-  () => import('./components/ForceGraph').then((m) => m.ForceGraph),
-  { ssr: false, loading: () => <div className="absolute inset-0 flex items-center justify-center"><MandalaLoader /></div> },
-);
-const ImmersiveScene = dynamic(
-  () => import('./components/xr/ImmersiveScene').then((m) => m.ImmersiveScene),
-  { ssr: false },
-);
-const MapView = dynamic(
-  () => import('./components/MapView').then((m) => m.MapView),
-  { ssr: false, loading: () => <div className="absolute inset-0 flex items-center justify-center"><MandalaLoader /></div> },
-);
+/** Lens ↔ `?view=`. Old links used 2d (graph) and map; xr (stories) is now the default page. */
+const VIEW_FOR_LENS: Record<LensKind, string> = { map: 'map', graph: '2d', timeline: 'timeline' };
+const LENS_FOR_VIEW: Record<string, LensKind> = { map: 'map', '2d': 'graph', timeline: 'timeline' };
 
-// ══════════════════════════════════════════════════════════════════════════════
+function useMedia(query: string): boolean {
+  const [match, setMatch] = useState(true);
+  useEffect(() => {
+    const mql = window.matchMedia(query);
+    const sync = () => setMatch(mql.matches);
+    sync();
+    mql.addEventListener('change', sync);
+    return () => mql.removeEventListener('change', sync);
+  }, [query]);
+  return match;
+}
+
+/**
+ * The Heritage Museum: one exhibit page.
+ *
+ * It used to be three modes — Stories, Map, Connections — and switching lost
+ * the reader's place. Now the record stays in the middle, the collection is a
+ * list beside it, and its place, date and connections sit alongside; the full
+ * map, the timeline and a focused graph open as overlays when wanted.
+ */
 export function HeritageMindMapClient() {
   const { data: session } = useSession();
   const t = useTranslations('heritageMuseum');
+  const tx = useTranslations('heritageMuseum.exhibit');
   const router = useRouter();
   const searchParams = useSearchParams();
   const bootstrappedRef = useRef(false);
-  const urlSyncedRef = useRef(false);
+  const wide = useMedia(WIDE_QUERY);
+  const railColumn = useMedia(RAIL_QUERY);
 
   // ── Demo data ──────────────────────────────────────────────────────────────
-  const [demoGraph,   setDemoGraph]   = useState<GraphData | null>(null);
-  const [demoProv,    setDemoProv]    = useState<CorpusProvenance | null>(null);
+  const [demoGraph, setDemoGraph] = useState<GraphData | null>(null);
+  const [demoProv, setDemoProv] = useState<CorpusProvenance | null>(null);
   const [demoLoading, setDemoLoading] = useState(true);
-  const [demoError,   setDemoError]   = useState<string | null>(null);
+  const [demoError, setDemoError] = useState<string | null>(null);
 
   // ── Live data ──────────────────────────────────────────────────────────────
-  const [liveGraph,   setLiveGraph]   = useState<GraphData | null>(null);
+  const [liveGraph, setLiveGraph] = useState<GraphData | null>(null);
   const [liveLoading, setLiveLoading] = useState(false);
-  const [liveError,   setLiveError]   = useState<LiveError | null>(null);
+  const [liveError, setLiveError] = useState<LiveError | null>(null);
   const [datasetMeta, setDatasetMeta] = useState<DatasetMeta | null>(null);
   const liveAbortRef = useRef<AbortController | null>(null);
-  const sidebarLayout = useSidebarLayout();
 
   // ── UI state ───────────────────────────────────────────────────────────────
-  const [dataSource,   setDataSource]   = useState<DataSource>('demo');
-  // Stories-first: a museum opens on stories, not a force graph.
-  const [viewMode,     setViewMode]     = useState<ViewMode>('xr');
-  const [selectedNode, setSelectedNode] = useState<GraphNode | null>(null);
-  const [activeTypes,  setActiveTypes]  = useState<Set<NodeType>>(ALL_TYPES);
-  const [activeCats,   setActiveCats]   = useState<Set<HgCategory>>(ALL_CATS);
-  const [searchQuery,  setSearchQuery]  = useState('');
-  const [panelOpen,    setPanelOpen]    = useState(false);
-  const [expanding,    setExpanding]    = useState(false);
+  const [dataSource, setDataSource] = useState<DataSource>('demo');
+  const [selectedId, setSelectedId] = useState<string | null>(null);
+  const [kind, setKind] = useState<HgCategory | null>(null);
+  const [searchQuery, setSearchQuery] = useState('');
+  const [lens, setLens] = useState<LensKind | null>(null);
+  const [railOpen, setRailOpen] = useState(false);
+  const [expanding, setExpanding] = useState(false);
+  const exhibitScrollRef = useRef<HTMLDivElement>(null);
 
   // ── Load demo data once ────────────────────────────────────────────────────
   useEffect(() => {
     fetchHeritageDemoCorpus()
       .then(({ graph, provenance }) => {
         setDemoGraph(graph);
-        setDemoProv(provenance ? {
-          retrieved: provenance.retrieved,
-          generatedBy: provenance.generatedBy,
-          imageSource: provenance.imageSource,
-          note: provenance.note,
-        } : null);
+        setDemoProv(
+          provenance
+            ? { retrieved: provenance.retrieved, generatedBy: provenance.generatedBy, imageSource: provenance.imageSource, note: provenance.note }
+            : null,
+        );
         setDemoLoading(false);
       })
-      .catch(() => { setDemoError('demo'); setDemoLoading(false); });
+      .catch(() => {
+        setDemoError('demo');
+        setDemoLoading(false);
+      });
   }, []);
 
   // ── Load live data on demand ───────────────────────────────────────────────
   const applyLiveResponse = useCallback((resp: KgGraphResponse) => {
     const { nodes, links } = kgToGraphData(resp);
     setDatasetMeta(datasetMetaFromKgResponse(resp, API_BASE));
-    // Populate node.relations so the StoryPanel "Connections" section
-    // and the neighbor-highlight logic both work for live data.
     attachRelations(nodes, links);
     enrichMuseumGraph({ nodes, links });
     setLiveGraph({ nodes, links });
@@ -328,16 +300,12 @@ export function HeritageMindMapClient() {
       if (timedOut) {
         setLiveError('timeout');
       } else if (/\b404\b/.test(msg)) {
-        // Usually NEXT_PUBLIC_API_URL points at a host that does not serve
-        // /kg/graph/. That is for operators, not visitors, so it goes here.
         console.error(`heritage-museum: ${API_BASE}/api/v1/cidoc/kg/graph/ returned 404. Check NEXT_PUBLIC_API_URL (baked in at build time).`);
         setLiveError('notfound');
       } else {
         console.error('heritage-museum: live graph failed to load', err);
         setLiveError('live');
       }
-      // Stay in 'live' mode so a Retry click is intuitive — the user sees the
-      // error banner and can switch back to the illustrated collection.
       return;
     } finally {
       window.clearTimeout(timer);
@@ -363,55 +331,41 @@ export function HeritageMindMapClient() {
         return;
       }
       setDataSource('live');
-      if (!liveGraph) loadLiveData();
+      if (!liveGraph) void loadLiveData();
     } else {
       setDataSource('demo');
+      setLiveError(null);
     }
-    setSelectedNode(null);
+    setSelectedId(null);
+    setLens(null);
   }, [dataSource, liveGraph, loadLiveData]);
 
   const retryLiveData = useCallback(() => {
     setLiveError(null);
-    loadLiveData();
+    void loadLiveData();
   }, [loadLiveData]);
 
-  // Default to live reviewed KG when API is configured (Nature-rigor honesty).
+  // ── Bootstrap from the URL ─────────────────────────────────────────────────
   useEffect(() => {
     if (bootstrappedRef.current) return;
     bootstrappedRef.current = true;
-    const viewParam = searchParams.get('view');
-    if (viewParam === '2d' || viewParam === 'map' || viewParam === 'xr') {
-      setViewMode(viewParam);
-    }
-    // Default to the frozen corpus, and switch to the live knowledge graph only
-    // when the URL asks for it.
-    //
-    // This used to auto-switch to live whenever an API base was configured,
-    // which meant the museum's own front door depended on the backend being
-    // reachable: anyone arriving from the entry page hit "Could not reach the
-    // HeritageGraph API" and an empty canvas. The demo corpus is self-contained
-    // and always renders, so it is the honest default; the toolbar's Live KG
-    // control switches over deliberately.
+    const view = searchParams.get('view');
+    if (view && LENS_FOR_VIEW[view]) setLens(LENS_FOR_VIEW[view]);
+    const node = searchParams.get('node');
+    if (node) setSelectedId(decodeURIComponent(node));
+    // The illustrated corpus is self-contained and always renders, so it is the
+    // default; the live graph loads only when the URL or the visitor asks.
     if (searchParams.get('source') === 'live' && API_BASE && isPublicApiUrlConfigured()) {
       setDataSource('live');
       void loadLiveData();
     }
   }, [searchParams, loadLiveData]);
 
-  const switchToLive = useCallback(() => {
-    if (!API_BASE || !isPublicApiUrlConfigured()) {
-      setLiveError('unconfigured');
-      return;
-    }
-    setDataSource('live');
-    setSelectedNode(null);
-    if (!liveGraph) void loadLiveData();
-  }, [liveGraph, loadLiveData]);
-
   // ── Click-to-expand (live KG only) ─────────────────────────────────────────
-  // Pull a node's neighbourhood from Oxigraph and merge any new typed entities +
-  // real edges into the live graph, so large graphs grow on demand instead of
-  // loading everything up front.
+  const fullGraph = dataSource === 'live' ? liveGraph : demoGraph;
+  const loading = dataSource === 'live' ? liveLoading && !liveGraph : demoLoading;
+  const error = dataSource === 'live' ? liveError : demoError;
+
   const expandNode = useCallback(
     async (node: GraphNode) => {
       if (dataSource !== 'live' || !API_BASE) return;
@@ -421,8 +375,7 @@ export function HeritageMindMapClient() {
         const token = (session as any)?.accessToken as string | undefined;
         const resp = await fetchKgNeighborhood(API_BASE, node.id, token, { includeLux: 'linked' });
         const add = kgNeighborhoodToGraph(node.id, resp);
-        // Count against the graph as it stands now, so the message matches what changes.
-        const base = liveGraph ?? { nodes: [], links: [] };
+        const base = liveGraph ?? EMPTY;
         const nodeIds = new Set(base.nodes.map((n) => n.id));
         const newNodes = add.nodes.filter((n) => !nodeIds.has(n.id));
         const idOf = (x: string | GraphNode) => (typeof x === 'string' ? x : x.id);
@@ -434,7 +387,7 @@ export function HeritageMindMapClient() {
           return;
         }
         setLiveGraph((prev) => {
-          const current = prev ?? { nodes: [], links: [] };
+          const current = prev ?? EMPTY;
           const have = new Set(current.nodes.map((n) => n.id));
           const haveLinks = new Set(current.links.map(linkKey));
           const nodes = [...current.nodes, ...newNodes.filter((n) => !have.has(n.id))];
@@ -454,188 +407,87 @@ export function HeritageMindMapClient() {
     [dataSource, session, liveGraph, t],
   );
 
-  const showAllCategories = useCallback(() => setActiveCats(new Set(ALL_CATS)), []);
-  const resetFilters      = useCallback(() => {
-    setActiveCats(new Set(ALL_CATS));
-    setActiveTypes(new Set(ALL_TYPES));
-    setSearchQuery('');
+  // ── The collection, as listed ──────────────────────────────────────────────
+  const visibleNodes = useMemo<GraphNode[]>(() => {
+    if (!fullGraph) return [];
+    const q = searchQuery.trim().toLowerCase();
+    return fullGraph.nodes
+      .filter((n) => {
+        if (kind && n.hgCategory !== kind) return false;
+        if (!q) return true;
+        return (
+          n.label.toLowerCase().includes(q) ||
+          (n.description ?? '').toLowerCase().includes(q) ||
+          (NODE_TYPE_CONFIG[n.nodeType]?.label ?? '').toLowerCase().includes(q) ||
+          Boolean(n.tags?.some((tag) => tag.toLowerCase().includes(q)))
+        );
+      })
+      .sort((a, b) => a.label.localeCompare(b.label));
+  }, [fullGraph, kind, searchQuery]);
+
+  // The open record: the one asked for, else the first listed record that has
+  // a photograph, so the page never opens on an empty exhibit.
+  const selectedNode = useMemo<GraphNode | null>(() => {
+    if (!fullGraph?.nodes.length) return null;
+    const asked = selectedId ? fullGraph.nodes.find((n) => n.id === selectedId) : undefined;
+    if (asked) return asked;
+    const sorted = [...fullGraph.nodes].sort((a, b) => a.label.localeCompare(b.label));
+    return sorted.find((n) => n.imageUrl || n.images?.length) ?? sorted[0];
+  }, [fullGraph, selectedId]);
+
+  const connections = useMemo(
+    () => (selectedNode && fullGraph ? connectionsOf(selectedNode, fullGraph) : []),
+    [selectedNode, fullGraph],
+  );
+
+  const select = useCallback((node: GraphNode) => {
+    setSelectedId(node.id);
+    setRailOpen(false);
+    exhibitScrollRef.current?.scrollTo({ top: 0 });
   }, []);
 
-  // ── Active graph (demo vs live) ────────────────────────────────────────────
-  const fullGraph = dataSource === 'live' ? liveGraph : demoGraph;
-  const loading   = dataSource === 'live' ? liveLoading : demoLoading;
-  const error     = dataSource === 'live' ? liveError   : demoError;
+  const index = selectedNode ? visibleNodes.findIndex((n) => n.id === selectedNode.id) : -1;
+  const prev = index > 0 ? visibleNodes[index - 1] : null;
+  const next = index >= 0 && index < visibleNodes.length - 1 ? visibleNodes[index + 1] : null;
 
-  // ── Filtered graph (type + category + search) ──────────────────────────────
-  const filteredGraph = useMemo<GraphData | null>(() => {
-    if (!fullGraph) return null;
-    const q = searchQuery.toLowerCase();
-    const visible = fullGraph.nodes.filter((n) => {
-      if (!activeTypes.has(n.nodeType)) return false;
-      if (!activeCats.has(n.hgCategory as HgCategory)) return false;
-      if (!q) return true;
-      return (
-        n.label.toLowerCase().includes(q) ||
-        n.description.toLowerCase().includes(q) ||
-        n.tags?.some((t) => t.toLowerCase().includes(q))
-      );
-    });
-    const ids = new Set(visible.map((n) => n.id));
-    return {
-      nodes: visible,
-      links: fullGraph.links.filter(
-        (l) => ids.has(l.source as string) && ids.has(l.target as string),
-      ),
+  // ←/→ step through the list when focus is not in a field or the list itself.
+  useEffect(() => {
+    const onKey = (e: KeyboardEvent) => {
+      if (lens || railOpen || e.defaultPrevented || e.altKey || e.metaKey || e.ctrlKey) return;
+      const el = e.target as HTMLElement;
+      if (el.closest('input, textarea, select, [contenteditable="true"], [role="dialog"], ul')) return;
+      if (e.key === 'ArrowRight' && next) select(next);
+      if (e.key === 'ArrowLeft' && prev) select(prev);
     };
-  }, [fullGraph, activeTypes, activeCats, searchQuery]);
+    window.addEventListener('keydown', onKey);
+    return () => window.removeEventListener('keydown', onKey);
+  }, [lens, railOpen, next, prev, select]);
 
-  // Deep-link: ?node=<iri>, honoured once per data source when its graph first
-  // arrives. It used to re-run on every URL change, and the URL changes on every
-  // view switch, so switching views re-opened the phone's story sheet unasked.
-  const deepLinkedRef = useRef(new Set<DataSource>());
+  // ── State → URL, for citable links ─────────────────────────────────────────
   useEffect(() => {
-    const nodeParam = searchParams.get('node');
-    if (!nodeParam || !fullGraph || deepLinkedRef.current.has(dataSource)) return;
-    deepLinkedRef.current.add(dataSource);
-    const decoded = decodeURIComponent(nodeParam);
-    const match = fullGraph.nodes.find((n) => n.id === decoded);
-    if (match) {
-      setSelectedNode(match);
-      setPanelOpen(true);
-      urlSyncedRef.current = true;
-    }
-  }, [searchParams, fullGraph, dataSource]);
-
-  // Sync museum state → URL for citable figure links.
-  useEffect(() => {
-    if (!bootstrappedRef.current) return;
+    if (!bootstrappedRef.current || !selectedNode) return;
     const p = new URLSearchParams();
     p.set('source', dataSource);
-    // Default view is Stories (xr); only persist non-default views in the URL.
-    if (viewMode !== 'xr') p.set('view', viewMode);
-    if (selectedNode) p.set('node', selectedNode.id);
-    const next = `/heritage-museum?${p.toString()}`;
-    const current = `/heritage-museum?${searchParams.toString()}`;
-    if (next !== current) {
-      router.replace(next, { scroll: false });
-    }
-  }, [dataSource, viewMode, selectedNode, router, searchParams]);
+    p.set('node', selectedNode.id);
+    if (lens) p.set('view', VIEW_FOR_LENS[lens]);
+    const target = `/heritage-museum?${p.toString()}`;
+    if (target !== `/heritage-museum?${searchParams.toString()}`) router.replace(target, { scroll: false });
+  }, [dataSource, selectedNode, lens, router, searchParams]);
 
   const handleExportJson = useCallback(() => {
-    if (!filteredGraph) return;
+    if (!fullGraph) return;
+    const ids = new Set(visibleNodes.map((n) => n.id));
+    const graph = {
+      nodes: visibleNodes,
+      links: fullGraph.links.filter((l) => ids.has(typeof l.source === 'string' ? l.source : l.source.id) && ids.has(typeof l.target === 'string' ? l.target : l.target.id)),
+    };
     downloadJson(
       `heritagegraph-museum-${dataSource}-${new Date().toISOString().slice(0, 10)}.json`,
-      exportVisibleGraphPayload(filteredGraph, datasetMeta, dataSource),
+      exportVisibleGraphPayload(graph, datasetMeta, dataSource),
     );
-  }, [filteredGraph, datasetMeta, dataSource]);
+  }, [fullGraph, visibleNodes, datasetMeta, dataSource]);
 
-  // ── Neighbour highlight ────────────────────────────────────────────────────
-  // Important: read links from `fullGraph`, not `filteredGraph`. D3's
-  // forceLink() mutates `link.source` / `link.target` from string IDs to the
-  // GraphNode objects after the simulation runs — so comparing those to a
-  // string ID always returns false. `fullGraph` is the immutable source.
-  const highlightedIds = useMemo<Set<string>>(() => {
-    if (!selectedNode || !fullGraph) return new Set();
-    const ids = new Set<string>([selectedNode.id]);
-    for (const l of fullGraph.links) {
-      const src = typeof l.source === 'string' ? l.source : (l.source as GraphNode).id;
-      const tgt = typeof l.target === 'string' ? l.target : (l.target as GraphNode).id;
-      if (src === selectedNode.id) ids.add(tgt);
-      if (tgt === selectedNode.id) ids.add(src);
-    }
-    return ids;
-  }, [selectedNode, fullGraph]);
-
-  const renderedGraph = useMemo(
-    () => capGraphForRender(filteredGraph ?? EMPTY, undefined, highlightedIds),
-    [filteredGraph, highlightedIds],
-  );
-
-  // ── Handlers ──────────────────────────────────────────────────────────────
-  // Clicking the selected node again deselects it. Decided from the rendered
-  // selection, not inside a state updater: React may run updaters later, so a
-  // flag set there is not reliably readable on the next line.
-  const handleNodeSelect = useCallback(
-    (node: GraphNode) => {
-      const deselecting = selectedNode?.id === node.id;
-      setSelectedNode(deselecting ? null : node);
-      setPanelOpen(!deselecting);
-    },
-    [selectedNode],
-  );
-
-  const handleRelatedNodeClick = useCallback(
-    (id: string) => {
-      const n = fullGraph?.nodes.find((n) => n.id === id);
-      if (n) handleNodeSelect(n);
-    },
-    [fullGraph, handleNodeSelect],
-  );
-
-  const toggleType = useCallback((type: NodeType) => {
-    setActiveTypes((prev) => {
-      const next = new Set(prev);
-      if (next.has(type)) { if (next.size > 1) next.delete(type); }
-      else next.add(type);
-      return next;
-    });
-  }, []);
-
-  const toggleCategory = useCallback((cat: HgCategory) => {
-    setActiveCats((prev) => {
-      const next = new Set(prev);
-      if (next.has(cat)) { if (next.size > 1) next.delete(cat); }
-      else next.add(cat);
-      return next;
-    });
-  }, []);
-
-  // Changing view never opens the phone's story sheet by itself; it opens when
-  // the visitor picks something in the new view.
-  const changeView = useCallback((mode: ViewMode) => {
-    setPanelOpen(false);
-    setViewMode(mode);
-  }, []);
-
-  const switchToXR = useCallback((node?: GraphNode) => {
-    if (node) setSelectedNode(node);
-    setPanelOpen(false);
-    setViewMode('xr');
-  }, []);
-
-  const nodeCount = filteredGraph?.nodes.length ?? 0;
-  const linkCount = filteredGraph?.links.length ?? 0;
-
-  const timelineLayout = useMemo(
-    () => (filteredGraph ? buildTimelineLayout(filteredGraph.nodes) : null),
-    [filteredGraph],
-  );
-  // Only show the timeline when enough of the filtered set has dates — otherwise
-  // the band mostly apologises for undated records and steals vertical space.
-  const datedShare =
-    filteredGraph && filteredGraph.nodes.length > 0 && timelineLayout
-      ? timelineLayout.datedCount / filteredGraph.nodes.length
-      : 0;
-  const showTimeline = Boolean(timelineLayout) && datedShare >= 0.25;
-
-  const typeCounts = useMemo<Record<string, number>>(() => {
-    const counts: Record<string, number> = {};
-    for (const n of fullGraph?.nodes ?? []) {
-      counts[n.nodeType] = (counts[n.nodeType] || 0) + 1;
-    }
-    return counts;
-  }, [fullGraph]);
-
-  const categoryCounts = useMemo<Record<string, number>>(() => {
-    const counts: Record<string, number> = {};
-    for (const n of fullGraph?.nodes ?? []) {
-      if (n.hgCategory) counts[n.hgCategory] = (counts[n.hgCategory] || 0) + 1;
-    }
-    return counts;
-  }, [fullGraph]);
-
-  // Visitor-facing only. Configuration detail for operators goes to the console
-  // where the failure is caught (see loadLiveData).
+  // Visitor-facing only; configuration detail goes to the console in loadLiveData.
   const messageFor = (e: string | null) =>
     e === 'unconfigured' || e === 'notfound'
       ? t('errors.liveUnavailable')
@@ -646,467 +498,164 @@ export function HeritageMindMapClient() {
           : e === 'demo'
             ? t('errors.demoLoad')
             : null;
-  const errorMessage = messageFor(error);
-  // A missing or misconfigured API will not fix itself on retry.
   const liveRetryable = liveError === 'timeout' || liveError === 'live';
+  const sparseLive = dataSource === 'live' && !liveLoading && !liveError && liveGraph && liveGraph.nodes.length < 20;
 
-  const sparseLive =
-    dataSource === 'live' && !liveLoading && !liveError && liveGraph && liveGraph.nodes.length < 20;
+  const rail = (
+    <CollectionRail
+      allNodes={fullGraph?.nodes ?? []}
+      visibleNodes={visibleNodes}
+      selectedId={selectedNode?.id ?? null}
+      onSelect={select}
+      searchQuery={searchQuery}
+      onSearchChange={setSearchQuery}
+      kind={kind}
+      onKindChange={setKind}
+      showTitle={railColumn}
+      controls={
+        <RailControls
+          dataSource={dataSource}
+          demoCount={demoGraph?.nodes.length ?? 0}
+          liveLoading={liveLoading}
+          onSwitchSource={toggleDataSource}
+          provenance={dataSource === 'demo' ? demoProv : null}
+          liveApiBase={dataSource === 'live' ? API_BASE : null}
+          datasetMeta={dataSource === 'live' ? datasetMeta : null}
+          onExportJson={dataSource === 'live' ? handleExportJson : undefined}
+        />
+      }
+    />
+  );
+
+  const context =
+    selectedNode && fullGraph ? (
+      <ContextColumn
+        node={selectedNode}
+        allNodes={fullGraph.nodes}
+        connections={connections}
+        onSelect={select}
+        onOpenLens={setLens}
+        showProvenance={dataSource === 'live'}
+      />
+    ) : null;
 
   return (
     <div className="flex h-full min-h-0 flex-1 flex-col overflow-hidden bg-background text-foreground">
-
-      {/* Demo corpus: describe what the visitor is looking at and link the
-          provenance, rather than warning them off it. The amber alert styling
-          framed the only fully illustrated corpus as untrustworthy. */}
-      {dataSource === 'demo' ? (
-        <div
-          className="flex-shrink-0 flex flex-wrap items-center gap-2 px-4 py-2 border-b border-border bg-muted/40 text-xs text-muted-foreground z-20"
-          role="status"
-        >
-          <span>{t('demoBanner', { count: demoGraph?.nodes.length ?? 0 })}</span>
-          <Link href="/methods" className="text-primary underline underline-offset-2">
-            {t('methods.fullMethodsPage')}
-          </Link>
-          <Button type="button" size="sm" variant="outline" className="ml-auto h-7 text-xs" onClick={switchToLive}>
-            {t('demoBannerAction')}
-          </Button>
-        </div>
-      ) : null}
-
-      {sparseLive ? (
-        <div
-          className="flex-shrink-0 px-4 py-2 border-b border-border bg-muted/40 text-xs text-muted-foreground z-20"
-          role="status"
-        >
-          {t('sparseLive', { count: liveGraph.nodes.length })}{' '}
-          <Link href="/contribute/entity" className="text-primary underline underline-offset-2">
-            {t('sparseLiveContribute')}
-          </Link>
-          {' · '}
-          <Link href="/methods" className="text-primary underline underline-offset-2">
-            {t('methods.fullMethodsPage')}
-          </Link>
-        </div>
-      ) : null}
-
-      {dataSource === 'live' &&
-      viewMode === 'xr' &&
-      !liveLoading &&
-      liveGraph &&
-      liveGraph.nodes.length > 0 ? (
-        <div
-          className="flex-shrink-0 flex flex-wrap items-center gap-2 px-4 py-2 border-b border-border bg-muted/30 text-xs text-muted-foreground z-20"
-          role="status"
-        >
-          <span>{t('storiesLiveHint', { count: liveGraph.nodes.length })}</span>
-          <Button
-            type="button"
-            size="sm"
-            variant="outline"
-            className="h-7 text-xs"
-            onClick={() => changeView('map')}
-          >
-            {t('storiesLiveHintMap')}
-          </Button>
-          <Button
-            type="button"
-            size="sm"
-            variant="outline"
-            className="h-7 text-xs"
-            onClick={() => changeView('2d')}
-          >
-            {t('storiesLiveHintGraph')}
-          </Button>
-        </div>
-      ) : null}
-
-      {/* ── Title, then tools ──
-          The default view rendered ZERO h1-h6 elements: the page a visitor
-          landed on had no document outline, which fails WCAG 1.3.1 and 2.4.6
-          and is the first thing any audit tool reports. It also asked the
-          visitor to operate a search field and seven filters before telling
-          them what they were looking at, because the only title-like text sat
-          below the controls. This is the root of the heading hierarchy every
-          other heading on the page now hangs from. */}
-      {/* ── Masthead: title, then tools, in ONE band ──
-          Five full-width bars used to stack before any content — global nav,
-          disclosure, toolbar, search, filter chips — putting the first card at
-          482px, and the only title-like text sat BELOW the controls, so a
-          visitor operated a search field and seven filters before being told
-          what they were looking at.
-          Two bands now: the disclosure bar above, and this. Title left, tools
-          right, so the title is still first in reading order. */}
-      <div className="flex-shrink-0 border-b border-border px-4 py-3 md:px-6">
-        {/* Grid, not a wrapping flex row.
-            With `flex-wrap` the controls dropped BELOW the lede once the two
-            columns exceeded the width, which cost ~70px of vertical chrome for
-            nothing. As a two-column grid the controls sit beside the title on
-            wide screens and the masthead is only as tall as the title block. */}
-        {/* The title column has a floor and the tools column may shrink (its
-            items wrap). With `auto` the tools took their full one-line width,
-            and at ~1200px in Map/Connections they squeezed the title to one
-            word per line and ran the search box over the heading. */}
-        <div className="grid gap-x-6 gap-y-3 @3xl/main:grid-cols-[minmax(18rem,1fr)_minmax(0,auto)] @3xl/main:items-start">
-          <div className="min-w-0">
-            <h1 className="font-serif text-2xl leading-tight text-foreground sm:text-3xl">
-              {t('title')}
-            </h1>
-            <p className="mt-1 max-w-[58ch] text-sm leading-relaxed text-muted-foreground">
-              {t('pageLede')}
-            </p>
-          </div>
-
-          <div className="flex min-w-0 flex-wrap items-center gap-2 @3xl/main:justify-end">
-            <FilterBar
-              searchQuery={searchQuery}
-              onSearchChange={setSearchQuery}
-              activeCategoryFilter={activeCats}
-              onCategoryToggle={toggleCategory}
-              onShowAllCategories={showAllCategories}
-              categoryCounts={categoryCounts}
-              totalNodes={fullGraph?.nodes.length}
-              visibleNodes={filteredGraph?.nodes.length}
-              withMediaCount={
-                filteredGraph?.nodes.filter((n) => n.imageUrl || n.images?.length).length
-              }
-            />
-            <MuseumToolbar
-              viewMode={viewMode}
-              onViewModeChange={(mode) => (mode === 'xr' ? switchToXR() : changeView(mode))}
-              dataSource={dataSource}
-              liveLoading={liveLoading}
-              onToggleDataSource={toggleDataSource}
-              nodeCount={nodeCount}
-              linkCount={linkCount}
-              showStats={!loading}
-              provenance={dataSource === 'demo' ? demoProv : null}
-              liveApiBase={dataSource === 'live' ? API_BASE : null}
-              datasetMeta={dataSource === 'live' ? datasetMeta : null}
-              onExportJson={dataSource === 'live' ? handleExportJson : undefined}
-            />
-          </div>
-        </div>
-      </div>
-
       {liveError && (
-        <div
-          className="flex-shrink-0 flex items-center gap-2 px-4 py-2 bg-destructive/10 border-b border-destructive/20 text-destructive text-xs z-20"
-          role="alert"
-          aria-live="polite"
-        >
+        <div className="z-20 flex flex-shrink-0 flex-wrap items-center gap-2 border-b border-destructive/20 bg-destructive/10 px-4 py-2 text-xs text-destructive" role="alert">
           <span aria-hidden="true">⚠</span>
           <span>{messageFor(liveError)}</span>
           <span className="ml-auto flex items-center gap-2">
             {liveRetryable && (
-              <Button
-                onClick={retryLiveData}
-                disabled={liveLoading}
-                variant="outline"
-                size="sm"
-                className="h-7 text-xs"
-                type="button"
-              >
+              <Button onClick={retryLiveData} disabled={liveLoading} variant="outline" size="sm" className="h-7 text-xs" type="button">
                 {liveLoading ? t('errors.retrying') : t('errors.retry')}
               </Button>
             )}
             {dataSource === 'live' && (
-              <Button
-                onClick={toggleDataSource}
-                variant="outline"
-                size="sm"
-                className="h-7 text-xs"
-                type="button"
-              >
+              <Button onClick={toggleDataSource} variant="outline" size="sm" className="h-7 text-xs" type="button">
                 {t('errors.showDemo')}
               </Button>
             )}
+            <Button onClick={() => setLiveError(null)} variant="ghost" size="icon" className="size-7" aria-label={t('errors.dismiss')} type="button">
+              <IconX className="size-4" />
+            </Button>
           </span>
-          <Button
-            onClick={() => setLiveError(null)}
-            variant="ghost"
-            size="icon"
-            className="h-7 w-7 shrink-0"
-            aria-label={t('errors.dismiss')}
-            type="button"
-          >
-            <IconX className="w-4 h-4" />
-          </Button>
         </div>
       )}
 
-      {/* ── 2D / Map modes ── */}
-      {(viewMode === '2d' || viewMode === 'map') && (
-        <div
-          id={MUSEUM_VIEW_PANEL_ID}
-          role="tabpanel"
-          aria-label={viewMode === 'map' ? t('views.map') : t('views.graph')}
-          className="flex min-h-0 flex-1 flex-col"
-        >
-
-          {/* Grid: graph | story on row 1; timeline pinned to workspace footer (row 2) */}
-          <div
-            className={cn(
-              'grid min-h-0 flex-1',
-              viewMode === '2d'
-                ? showTimeline
-                  ? 'grid-cols-1 grid-rows-[minmax(0,1fr)_minmax(11rem,28vh)] lg:grid-cols-[minmax(0,1fr)_24rem]'
-                  : 'grid-cols-1 grid-rows-[minmax(0,1fr)] lg:grid-cols-[minmax(0,1fr)_24rem]'
-                // Map mode: single row. The story panel must be the right COLUMN
-                // (lg) — not an implicit stacked row — or it steals the map's
-                // height and collapses it to a thin strip.
-                : 'grid-cols-1 grid-rows-[minmax(0,1fr)] lg:grid-cols-[minmax(0,1fr)_24rem]',
-            )}
-          >
-            {/* Graph / Map canvas */}
-            <div className="relative min-h-0 min-w-0">
-              {loading && <div className="absolute inset-0"><MandalaLoader /></div>}
-              {!loading && error && (
-                <div className="absolute inset-0 flex items-center justify-center" role="alert">
-                  <div className="text-center space-y-3 p-8 max-w-md">
-                    <p className="text-4xl" aria-hidden="true">⚠️</p>
-                    <p className="text-foreground text-sm font-medium">{t('errors.loadTitle')}</p>
-                    <p className="text-muted-foreground text-xs">{errorMessage}</p>
-                    {dataSource === 'live' && (
-                      <div className="flex flex-wrap justify-center gap-2 pt-2">
-                        {liveRetryable && (
-                          <Button
-                            onClick={retryLiveData}
-                            disabled={liveLoading}
-                            variant="outline"
-                            size="sm"
-                            className="text-xs"
-                            type="button"
-                          >
-                            {liveLoading ? t('errors.retrying') : t('errors.retry')}
-                          </Button>
-                        )}
-                        <Button onClick={toggleDataSource} variant="outline" size="sm" className="text-xs" type="button">
-                          {t('errors.showDemo')}
-                        </Button>
-                      </div>
-                    )}
-                  </div>
-                </div>
-              )}
-
-              {/* Empty-state for filter-driven zero results */}
-              {!loading && !error && fullGraph && nodeCount === 0 && fullGraph.nodes.length > 0 && (
-                <div className="absolute inset-0 flex items-center justify-center" role="status">
-                  <div className="text-center space-y-3 p-8 max-w-md">
-                    <p className="text-4xl" aria-hidden="true">🔭</p>
-                    <p className="text-foreground text-sm font-medium">{t('empty.filtersTitle')}</p>
-                    <p className="text-muted-foreground text-xs">{t('empty.filtersBody', { total: fullGraph.nodes.length })}</p>
-                    <Button onClick={resetFilters} type="button" variant="outline" size="sm" className="mt-2 text-xs">
-                      {t('empty.resetFilters')}
-                    </Button>
-                  </div>
-                </div>
-              )}
-
-              {/* Force graph */}
-              {viewMode === '2d' && !loading && !error && nodeCount > 0 && (
-                <div className="absolute inset-0">
-                  <ForceGraph
-                    data={renderedGraph.graph}
-                    selectedId={selectedNode?.id ?? null}
-                    onNodeSelect={handleNodeSelect}
-                    highlightedIds={highlightedIds}
-                  />
-                </div>
-              )}
-
-              {viewMode === '2d' && !loading && !error && renderedGraph.omitted > 0 && (
-                <div
-                  className="absolute top-3 left-1/2 -translate-x-1/2 max-w-[min(30rem,90%)] rounded-full border border-border bg-card/90 px-3 py-1.5 text-center text-xs text-muted-foreground shadow-sm backdrop-blur-sm"
-                  role="status"
-                >
-                  {t('graphCapped', {
-                    shown: renderedGraph.graph.nodes.length,
-                    total: renderedGraph.total,
-                  })}
-                </div>
-              )}
-
-              {/* Map */}
-              {viewMode === 'map' && !loading && !error && nodeCount > 0 && (
-                <div className="absolute inset-0">
-                  <MapView
-                    nodes={filteredGraph?.nodes ?? []}
-                    selectedId={selectedNode?.id ?? null}
-                    onNodeSelect={handleNodeSelect}
-                  />
-                </div>
-              )}
-
-              {/* Hint */}
-              {viewMode === '2d' && !loading && !error && !selectedNode && nodeCount > 0 && (
-                <div className="absolute bottom-4 left-1/2 -translate-x-1/2 pointer-events-none">
-                  <div className="text-xs text-muted-foreground bg-card/90 backdrop-blur-sm rounded-full px-4 py-2 border border-border flex items-center gap-2 shadow-sm">
-                    <span className="inline-block motion-safe:animate-bounce" aria-hidden="true">👆</span>
-                    {t('hints.graph')} ·{' '}
-                    <button
-                      className="pointer-events-auto text-primary hover:underline underline-offset-2"
-                      onClick={() => switchToXR()}
-                      type="button"
-                    >
-                      {t('switchToXr')}
-                    </button>
-                  </div>
-                </div>
-              )}
-
-              {/* View in XR + (live) expand-neighbours buttons */}
-              {viewMode === '2d' && !loading && !error && selectedNode && (
-                <div className="absolute top-3 right-3 flex gap-2">
-                  {dataSource === 'live' && (
-                    <Button
-                      onClick={() => expandNode(selectedNode)}
-                      disabled={expanding}
-                      size="sm"
-                      variant="outline"
-                      className="text-xs gap-1.5"
-                      type="button"
-                      title={t('expand.title')}
-                    >
-                      {expanding ? t('expand.loading') : t('expand.action')}
-                    </Button>
-                  )}
-                  <Button onClick={() => switchToXR(selectedNode)} size="sm" variant="secondary" className="text-xs gap-1.5">
-                    {t('viewInXr')}
-                  </Button>
-                </div>
-              )}
-
-              {/* Live data badge */}
-              {dataSource === 'live' && !loading && (
-                <Badge className="absolute top-3 left-3 gap-1.5 text-[10px] font-semibold shadow-sm">
-                  <span className="w-1.5 h-1.5 rounded-full bg-primary motion-safe:animate-pulse" aria-hidden />
-                  {t('liveBadge')}
-                </Badge>
-              )}
-
-              {/* Legend (Connections only) */}
-              {viewMode === '2d' && !loading && !error && nodeCount > 0 && (
-                <GraphLegend
-                  typeCounts={typeCounts}
-                  activeTypes={activeTypes}
-                  onTypeClick={toggleType}
-                />
-              )}
-            </div>
-
-            {/* Desktop story sidebar — isolated vertical scroll */}
-            <div className="hidden min-h-0 overflow-hidden border-l border-border bg-card/80 backdrop-blur-md lg:block">
-              <StoryPanel
-                node={selectedNode}
-                graphData={fullGraph ?? EMPTY}
-                onRelatedNodeClick={handleRelatedNodeClick}
-                dataSource={dataSource}
-                viewMode={viewMode}
-                onBrowseStories={() => switchToXR()}
-              />
-            </div>
-
-            {/* Timeline: footer band when dated nodes exist (2D only).
-                Gated on showTimeline so an undated corpus gets no empty band —
-                a header and an apology occupy the same space as real content. */}
-            {viewMode === '2d' && !loading && !error && showTimeline && (
-              <div className="flex min-h-[11rem] max-h-[28vh] flex-shrink-0 flex-col overflow-hidden border-t border-border bg-background lg:col-span-2">
-                <TimelineStrip
-                  nodes={filteredGraph?.nodes ?? []}
-                  selectedId={selectedNode?.id ?? null}
-                  onSelect={handleNodeSelect}
-                />
-              </div>
-            )}
-          </div>
+      {sparseLive ? (
+        <div className="z-20 flex-shrink-0 border-b border-border bg-muted/40 px-4 py-2 text-xs text-muted-foreground" role="status">
+          {t('sparseLive', { count: liveGraph.nodes.length })}{' '}
+          <Link href="/contribute/entity" className="text-primary underline underline-offset-2">
+            {t('sparseLiveContribute')}
+          </Link>
         </div>
-      )}
+      ) : null}
 
-      {/* ── XR Mode ── */}
-      {viewMode === 'xr' && (
-        <div id={MUSEUM_VIEW_PANEL_ID} role="tabpanel" aria-label={t('views.xr')} className="flex min-h-0 flex-1 flex-col">
-          {/* No Heritage Explorer rail in Stories.
-              It showed the same entities as the grid beside it, in thumbnails
-              too small to identify, with a third search field of its own — so
-              the page offered two presentations of one list competing for
-              attention, and three inputs a visitor could not tell apart. A rail
-              earns its place only when it drives and reflects a selection the
-              stage cannot show, which is true in Connections and not here. */}
-          <div className="relative flex min-h-0 flex-1">
-            <div className="relative min-w-0 flex-1">
-              {loading ? (
+      <div className="grid min-h-0 flex-1 grid-cols-1 lg:grid-cols-[300px_minmax(0,1fr)] xl:grid-cols-[300px_minmax(0,1fr)_330px]">
+        {railColumn ? <aside aria-label={tx('browseCollection')} className="min-h-0 border-r border-border">{rail}</aside> : null}
+
+        <div ref={exhibitScrollRef} className="min-h-0 overflow-auto">
+          {!railColumn ? (
+            <div className="sticky top-0 z-10 flex items-center justify-between gap-3 border-b border-border bg-background px-4 py-2.5">
+              <h1 className="font-serif text-xl leading-tight">{t('title')}</h1>
+              <Button type="button" variant="outline" size="sm" onClick={() => setRailOpen(true)}>
+                {tx('browseCollection')}
+              </Button>
+            </div>
+          ) : null}
+
+          <div className="px-4 pt-5 pb-12 sm:px-6 lg:px-[clamp(1.25rem,3vw,2.75rem)] lg:pt-7">
+            {loading ? (
+              <div className="grid min-h-[50vh] place-items-center">
                 <MandalaLoader />
-              ) : (
-                <ImmersiveScene
-                  node={selectedNode}
-                  allNodes={filteredGraph?.nodes ?? []}
-                  onSelect={handleNodeSelect}
-                  dataSource={dataSource}
-                  onClearFilters={
-                    nodeCount === 0 && (fullGraph?.nodes.length ?? 0) > 0
-                      ? resetFilters
-                      : undefined
-                  }
-                />
-              )}
-              {selectedNode ? (
-                <div className="absolute left-3 top-3 z-30 flex flex-wrap items-center gap-2">
-                  <Button
-                    onClick={() => {
-                      setSelectedNode(null);
-                      setPanelOpen(false);
-                    }}
-                    type="button"
-                    variant="secondary"
-                    size="sm"
-                    className="text-xs shadow-sm"
-                  >
-                    {t('backToGallery')}
-                  </Button>
-                  {dataSource === 'live' && !loading ? (
-                    <Badge className="gap-1.5 text-[10px] font-semibold shadow-sm">
-                      <span className="h-1.5 w-1.5 motion-safe:animate-pulse rounded-full bg-primary" aria-hidden />
-                      {t('liveBadge')}
-                    </Badge>
+              </div>
+            ) : error && !fullGraph ? (
+              <div className="grid min-h-[50vh] place-items-center" role="alert">
+                <div className="grid max-w-md justify-items-center gap-3 p-8 text-center">
+                  <p className="text-sm font-medium text-foreground">{t('errors.loadTitle')}</p>
+                  <p className="text-xs text-muted-foreground">{messageFor(error)}</p>
+                  {dataSource === 'live' ? (
+                    <div className="flex flex-wrap justify-center gap-2 pt-1">
+                      {liveRetryable ? (
+                        <Button onClick={retryLiveData} disabled={liveLoading} variant="outline" size="sm" type="button">
+                          {liveLoading ? t('errors.retrying') : t('errors.retry')}
+                        </Button>
+                      ) : null}
+                      <Button onClick={toggleDataSource} variant="outline" size="sm" type="button">
+                        {t('errors.showDemo')}
+                      </Button>
+                    </div>
                   ) : null}
                 </div>
-              ) : null}
-            </div>
+              </div>
+            ) : selectedNode && fullGraph ? (
+              <>
+                <ExhibitView
+                  node={selectedNode}
+                  connections={connections}
+                  dataSource={dataSource}
+                  onPrev={prev ? () => select(prev) : undefined}
+                  onNext={next ? () => select(next) : undefined}
+                  onExpand={dataSource === 'live' ? () => void expandNode(selectedNode) : undefined}
+                  expanding={expanding}
+                />
+                {!wide ? (
+                  <aside aria-label={tx('where')} className="grid gap-3.5 pt-8 sm:grid-cols-2 lg:grid-cols-3 [&>section:last-child]:sm:col-span-2 lg:[&>section:last-child]:col-span-1">
+                    {context}
+                  </aside>
+                ) : null}
+              </>
+            ) : null}
           </div>
         </div>
-      )}
 
-      {/* Phone story sheet (Connections / Map). A real dialog: focus moves in
-          and back, Escape and the backdrop close it, and the page behind is
-          inert while it is open. Below `lg` only; wider screens have the sidebar. */}
-      <Sheet
-        open={!sidebarLayout && (viewMode === '2d' || viewMode === 'map') && panelOpen && Boolean(selectedNode)}
-        onOpenChange={setPanelOpen}
-      >
-        <SheetContent side="bottom" className="flex h-3/4 flex-col gap-0 overflow-hidden rounded-t-2xl p-0">
-          <SheetTitle className="sr-only">{selectedNode?.label ?? t('title')}</SheetTitle>
-          <div className="flex flex-shrink-0 justify-center border-b border-border py-3" aria-hidden="true">
-            <div className="h-1 w-10 rounded-full bg-muted" />
-          </div>
-          <div className="flex-1 overflow-hidden">
-            {selectedNode && (
-              <StoryPanel
-                node={selectedNode}
-                graphData={fullGraph ?? EMPTY}
-                onRelatedNodeClick={(id) => {
-                  handleRelatedNodeClick(id);
-                  setPanelOpen(true);
-                }}
-                dataSource={dataSource}
-                viewMode={viewMode}
-                onBrowseStories={() => switchToXR()}
-              />
-            )}
-          </div>
-        </SheetContent>
-      </Sheet>
+        {wide ? (
+          <aside aria-label={tx('where')} className="grid min-h-0 content-start gap-3.5 overflow-auto border-l border-border p-[18px]">
+            {context}
+          </aside>
+        ) : null}
+      </div>
+
+      {!railColumn ? (
+        <Sheet open={railOpen} onOpenChange={setRailOpen}>
+          <SheetContent side="left" className="w-[min(22rem,92vw)] gap-0 p-0">
+            <SheetTitle className="sr-only">{tx('browseCollection')}</SheetTitle>
+            {rail}
+          </SheetContent>
+        </Sheet>
+      ) : null}
+
+      {selectedNode && fullGraph ? (
+        <MuseumLens
+          kind={lens}
+          onClose={() => setLens(null)}
+          node={selectedNode}
+          graph={fullGraph}
+          visibleNodes={visibleNodes}
+          onSelect={select}
+        />
+      ) : null}
     </div>
   );
 }

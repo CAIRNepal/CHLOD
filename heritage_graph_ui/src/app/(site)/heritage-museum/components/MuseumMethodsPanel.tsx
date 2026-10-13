@@ -14,7 +14,7 @@ import {
   sparqlForPublicSubgraph,
   copyToClipboard,
 } from '@/lib/provenance';
-import type { MuseumCorpusProvenance, MuseumDataSource } from './museum-toolbar';
+import type { MuseumCorpusProvenance, MuseumDataSource } from './museum-types';
 
 interface MuseumMethodsPanelProps {
   dataSource: MuseumDataSource;
