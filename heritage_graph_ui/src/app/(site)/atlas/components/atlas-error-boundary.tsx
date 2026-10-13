@@ -60,14 +60,14 @@ function AtlasErrorFallback({
       className="flex min-h-[280px] flex-1 flex-col items-center justify-center gap-4 p-6 text-center"
     >
       <div className="max-w-md space-y-2">
-        <h2 className="text-lg font-semibold text-foreground">{t('globeLoadErrorTitle')}</h2>
-        <p className="text-sm text-muted-foreground">{t('globeLoadErrorHint')}</p>
+        <h2 className="text-lg font-semibold text-foreground">{t('loadErrorTitle')}</h2>
+        <p className="text-sm text-muted-foreground">{t('loadErrorHint')}</p>
         {(process.env.NODE_ENV === 'development' || atlasShowProdErrorDetail()) && error?.message ?
           <p className="break-all font-mono text-xs text-destructive">{error.message}</p>
         : null}
       </div>
       <Button type="button" variant="secondary" onClick={onRetry}>
-        {t('globeLoadErrorRetry')}
+        {t('loadErrorRetry')}
       </Button>
     </div>
   );

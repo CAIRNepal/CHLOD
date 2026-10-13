@@ -354,7 +354,7 @@ Live fetch pulls paginated CIDOC list endpoints under `/api/v1/cidoc/...` plus a
 5. **Graph panel:** uses filtered entities and ontology edges from the same corpus.
 6. **Search / entity panel:** should list contributed names.
 
-**Important:** Persons without lat/lon appear in graph/search but **not** on the Cesium globe. For globe testing, contribute a **Location** or **Structure** with coordinates:
+**Important:** Persons without lat/lon appear in graph/search but **not** on the Atlas map. For map testing, contribute a **Location** or **Structure** with coordinates:
 
 ```json
 {

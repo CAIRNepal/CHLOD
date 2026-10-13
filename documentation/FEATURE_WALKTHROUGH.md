@@ -39,7 +39,7 @@ Every feature below sits on the same foundation, so it's worth stating once.
 | Toasts / feedback | **Sonner** | 2.0 | Lightweight notifications (`toast.success/error`). |
 | Animation | **Framer Motion** | 12.x | Step transitions in forms, story-panel motion. |
 | Graph rendering | **Cytoscape.js** & **D3** | 3.33 / 7.9 | Two tools for two jobs — see §2 and §4. |
-| 3D | **Three.js** & **Cesium + Resium** | 0.184 / 1.123 | 360° panoramas vs. a 3D globe — see §4 and §5. |
+| 3D / maps | **Three.js** & **Leaflet** | 0.184 / 1.9 | 360° panoramas (§4) and the map of Nepal (§5). |
 
 ### Cross-cutting patterns (the same everywhere)
 
@@ -48,7 +48,7 @@ Every feature below sits on the same foundation, so it's worth stating once.
   [OntologyProvider](../heritage_graph_ui/src/lib/ontology/OntologyProvider.tsx)) and into a
   visualization config (`tools/gen_heritage_viz_config.py` → `heritage-viz-config`) that
   drives node colors, icons, and relation labels. **One schema → forms *and* visualizations.**
-- **Heavy/visual surfaces are `dynamic(..., { ssr: false })`.** Cytoscape, Cesium, and the
+- **Heavy/visual surfaces are `dynamic(..., { ssr: false })`.** Cytoscape, Leaflet, and the
   Three.js panorama never run on the server and never block first paint — they load as a lazy
   client island with a loading fallback.
 - **API calls carry the Bearer token.** `process.env.NEXT_PUBLIC_API_URL` + `Authorization:
@@ -68,7 +68,7 @@ Every feature below sits on the same foundation, so it's worth stating once.
 | 2 | **Graph View** (global) | `/graphview` | Cytoscape.js | REST: all CIDOC types + accepted assertions | The whole knowledge graph as an explorable network |
 | 3 | **Entity Neighborhood** | `/knowledge/<domain>/view/<id>/graph` | D3 | KG neighborhood endpoint | One entity and everything connected to it |
 | 4 | **Heritage Museum** | `/heritage-museum` | D3 + Leaflet + Three.js + Web Speech | Demo corpus / live toggle | Guided, story-driven tour of the graph (360° only for genuine equirectangular imagery) |
-| 5 | **Atlas** | `/atlas` | Cesium + Resium | Demo corpus / live toggle | Heritage placed in space *and* time on a 3D Earth |
+| 5 | **Atlas** | `/atlas` | Leaflet + baked relief | Demo corpus / live toggle | Where the collection is, with distances, altitude and periods |
 
 ---
 
@@ -312,78 +312,25 @@ fetchInstanceGraphData(API_BASE, token) ──► same REST-built graph as /grap
 
 ---
 
-## 5. Atlas — heritage in space *and* time (3D globe)
+## 5. Atlas — where the collection is
 
-**Code:** [atlas/](<../heritage_graph_ui/src/app/(dashboard)/atlas/>) ·
-globe [components/globe.tsx](<../heritage_graph_ui/src/app/(dashboard)/atlas/components/globe.tsx>) ·
-store [hooks/use-atlas-store.ts](<../heritage_graph_ui/src/app/(dashboard)/atlas/hooks/use-atlas-store.ts>)
+**Code:** [atlas/](<../heritage_graph_ui/src/app/(site)/atlas/>) ·
+map [components/AtlasMap.tsx](<../heritage_graph_ui/src/app/(site)/atlas/components/AtlasMap.tsx>) ·
+model [lib/heritage-atlas/atlas-model.ts](<../heritage_graph_ui/src/lib/heritage-atlas/atlas-model.ts>)
 
 ### Stack
-**CesiumJS** 1.123 (open-source 3D-geospatial engine) via **Resium** 1.18 (React bindings) ·
-**Zustand** store for camera/filters/timeline/FX · generated ontology colors. Data: **demo
-corpus by default**, **live KG projection on demand** (`use-atlas-data-source` →
-`fetchKgGraph(/api/v1/cidoc/kg/graph/)` → `hydrateAtlasFromKgGraph` — the same authoritative
-endpoint as the Heritage Museum).
+**Leaflet** over two baked shaded-relief images of Nepal and the Kathmandu Valley (SRTM-derived,
+`tools/bake_atlas_relief.py`), with an optional OpenStreetMap Streets layer. Data comes from the
+same loader as the museum (`useHeritageCollection`): the illustrated demo corpus by default, the
+live graph from `/api/v1/cidoc/kg/graph/` on request.
 
 ### What the audience sees
-A photorealistic, spinnable **3D Earth** with heritage entities pinned at their real
-coordinates; a **timeline** filters by era, a **city-jump bar** flies the camera to a place, a
-**spotlight** highlights selected entities, and clicking a pin opens an **entity panel** with
-provenance.
-
-### How it works
-- **Cesium assets** (workers, widgets, terrain) are copied into `public/` at build time
-  (`copy-cesium-assets.mjs`, wired into `predev`/`prebuild`/`postinstall`); a
-  `cesium-assets-gate` confirms they're present before the globe renders. The
-  `cesium-base-url` side-effect import runs **before** Cesium resolves its worker URLs.
-- **Rendering** — Resium's `<Viewer>` + `<Entity>` + camera controllers; pins are colored by
-  **ontology class** (`colorForOntologyClass`), with distance-based label scaling so the globe
-  stays readable.
-- **Temporal dimension** — `atlas-time-extents.ts` + `temporalGlobeAlpha` /
-  `entityExistedAtYear` fade entities in and out as you **scrub the timeline** — heritage
-  appears and disappears across history.
-- **State** — a single **Zustand** store holds camera handles, active filters, the timeline
-  year, FX presets, and the demo/live load token; selectors use `useShallow` to avoid
-  re-renders.
-- **Polish** — reduced-motion support (`atlasPrefersReducedMotion`), keyboard shortcuts
-  (`use-atlas-shortcuts`), fullscreen, an error boundary, optional sound + telemetry.
-
-### Data flow
-```
-demo corpus (ATLAS_DUMMY_ENTITIES) ──► default globe
-                  │  user requests "live" (or ?source=live)
-                  ▼
-fetchKgGraph(/api/v1/cidoc/kg/graph/?scope=reviewed&include_lux=linked)
-                  │   one call — Oxigraph projection + enrich_museum_graph_nodes
-                  ▼   (server-side WKT coords, narrative, media, edge provenance)
-hydrateAtlasFromKgGraph ──► entities (IRI ids, coord tiers verified/inherited/
-                  │          gazetteer/unmapped) + assertion-backed edges +
-                  │          sources/agents derived from PROV-O edge provenance
-                  ▼
-Zustand store ──► Cesium <Entity> pins (colored by class, faded by year)
-```
-
-Live mode shares `lib/kg-geo.ts` (location-edge coordinate propagation) with the Museum,
-caches the projection in `sessionStorage` for 5 minutes, syncs `source`/`selected`/`panel`/
-`year` to the URL for shareable views, and offers signed-in curators a **Reviewed/All**
-scope toggle. No synthetic assertions: the provenance and sources tabs show real citations,
-confidence scores, asserters, and temporal scope from the knowledge graph.
-
-### Why this stack
-- **Cesium over a 2D map (Mapbox/Leaflet)** — heritage is global and *temporal*; a true 3D
-  globe with a **time dimension** shows *where* **and** *when*, which a flat map can't.
-- **Cesium is open-source and self-hostable** — assets ship in our own `public/`, no
-  proprietary map dependency or per-tile billing.
-- **Resium** keeps the imperative Cesium API declarative and React-friendly.
-- **Zustand** — the globe has lots of fast-changing UI state (camera, year, filters); a tiny
-  store keeps that fluid without Redux ceremony.
-
-### Talking points
-- "Two dimensions the network graph can't show: **geography and time**."
-- "Scrub the timeline and watch sites appear across centuries — the demo's 'wow' moment."
-- "Fully open-source 3D; assets are self-hosted, nothing proprietary."
-
----
+A map of Nepal with every located record, clustered where they crowd together. Picking a place
+draws dashed lines to the places it connects to, labelled with distances, and shows its altitude,
+period, what is at it and what is within 15 km. Colour switches between kind and period; a
+period bar filters by era; a guided tour steps through places in date order; a short list of
+facts (valley share, oldest, highest, lowest, where nothing is recorded yet) opens the place it
+names.
 
 ## Suggested demo flow (≈ 6 minutes)
 
@@ -395,11 +342,11 @@ confidence scores, asserters, and temporal scope from the knowledge graph.
 3. **Entity Neighborhood** (0.5 min) — from one entity's page, open its `/graph` to show the
    live SPARQL-backed drill-down.
 4. **Heritage Museum** (1.5 min) — open `/heritage-museum`, let a **story beat** play, let the
-   **narration** speak, then follow **View on globe** into the Atlas. "Same data, public
+   **narration** speak, then follow **View in the Atlas**. "Same data, public
    storytelling — all in the browser." (Skip the 360° panorama unless the entity on screen has
    a genuine equirectangular image; the button is hidden otherwise.)
-5. **Atlas** (1.5 min) — open `/atlas`, fly to a city, **scrub the timeline** across eras.
-   Close on the 3D globe.
+5. **Atlas** (1.5 min) — open `/atlas`, pick a place to see its connections drawn across Nepal,
+   then filter by period.
 
 > Tip: both Atlas and the Museum default to the **demo corpus**, so the demo always looks
 > great. Flip the **live toggle** only if you want to show real contributed data.
@@ -415,10 +362,10 @@ confidence scores, asserters, and temporal scope from the knowledge graph.
 | Neighborhood | **D3** | client | KG neighborhood (SPARQL) | Bounded query → answered best by the graph store |
 | Heritage Museum | **D3** + **Leaflet** + **Three.js** | React state (17 `useState`; no store) | demo / live toggle | Bespoke visuals + in-browser 360°, zero server render cost |
 | Narration | **Web Speech API** | — | story beats | Built into the browser; no external TTS |
-| Atlas | **Cesium** + **Resium** | **Zustand** | demo / live toggle | Open-source 3D globe with a real time dimension |
+| Atlas | **Leaflet** + baked relief | React state | demo / live toggle | Light map of Nepal that states distances, altitude and periods |
 
 **Recurring engineering decisions, in one line each:**
-- **SSR-off dynamic imports** for Cytoscape / Cesium / Three.js → heavy code never blocks first
+- **SSR-off dynamic imports** for Cytoscape / Leaflet / Three.js → heavy code never blocks first
   paint.
 - **Ontology-registry codegen** → forms *and* visualization colors/labels come from one source.
 - **Demo-first, live-on-demand** → reliable demos, real data one click away.

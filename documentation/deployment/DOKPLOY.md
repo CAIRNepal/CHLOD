@@ -134,27 +134,13 @@ If the secret is not set, the workflow skips the POST (no failure) so you can re
 
 To disable after the database is healthy, set `MIGRATION_AUTO_REPAIR=0` (or remove it) in Dokploy and redeploy.
 
-## Heritage Atlas (Cesium 3D globe)
+## Heritage Atlas
 
-The **`frontend`** Dockerfile runs **`npm run build`**, which runs **`prebuild`** and copies **`node_modules/cesium/…`** into **`public/cesium/`** (workers, WASM, Assets). Never replace that with bare **`next build`** without **`copy-cesium-assets`** or the atlas will fail at runtime.
+The atlas is a Leaflet map of Nepal over two baked shaded-relief images and an elevation grid in **`heritage_graph_ui/public/atlas/`** (regenerate with **`python tools/bake_atlas_relief.py`**). Nothing is copied at build time and no tile server is needed for the default view.
 
-**Verify after deploy:**
+The optional **Streets** layer (and the museum map) use OpenStreetMap tiles by default. For production traffic set **`NEXT_PUBLIC_MAP_TILE_URL`** (and **`NEXT_PUBLIC_MAP_TILE_ATTRIBUTION`**) to a keyed provider; its host is added to the CSP automatically.
 
-- From a browser or shell: **`GET https://<your-app-host>/cesium/Assets/approximateTerrainHeights.json`** should return **HTTP 200** (JSON). **`404`/HTML from the SPA** usually means **`public/cesium`** never made it into the image or the path is not routed to the frontend.
-- In **`heritage_graph_ui`**, you can smoke-check locally: **`npm run verify:cesium-public`** (checks `public/cesium` layout after copy).
-
-If **`approximateTerrainHeights.json`** is **200** but the globe still errors, open **DevTools → Console** on **`/atlas`** and watch for Content Security Policy (CSP) reports: Cesium expects workers (often **`blob:`**) and WASM. If your Dokploy ingress, CDN, or a security middleware injects CSP, widen it responsibly. Typical ingredients (adapt to your security model; tighten `default-src`/hosts as needed):
-
-```
-script-src 'self' 'wasm-unsafe-eval' 'unsafe-eval' blob: https:
-worker-src 'self' blob:
-connect-src 'self' https://server.arcgisonline.com ...
-img-src 'self' data: blob: https:
-```
-
-Imagery tiles use **`https://server.arcgisonline.com/...`**; include that host in **`connect-src`**/**`img-src`** if you constrain those directives.
-
-**Operator-only UI:** Set **`NEXT_PUBLIC_ATLAS_SHOW_ERROR_DETAIL=true`** on the **`frontend`** service to show **`AtlasErrorBoundary`** exception text after a hard failure (helps distinguish WebGL vs. script errors vs. CSP). Leave unset for normal deployments.
+**Operator-only UI:** Set **`NEXT_PUBLIC_ATLAS_SHOW_ERROR_DETAIL=true`** on the **`frontend`** service to show **`AtlasErrorBoundary`** exception text after a hard failure. Leave unset for normal deployments.
 
 ## More help
 
