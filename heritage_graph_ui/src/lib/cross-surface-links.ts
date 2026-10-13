@@ -1,14 +1,13 @@
 /**
- * Deep links between the three exploration surfaces: Heritage Museum, Atlas and
- * the knowledge pages.
+ * Deep links between the exploration surfaces: Heritage Museum, Atlas and the
+ * knowledge pages.
  *
- * The Museum and Atlas both hydrate live mode from `GET /api/v1/cidoc/kg/graph/`
- * and both keep the response's node id verbatim, so a node id is a shared
- * identifier *in live mode only*. Demo mode uses two unrelated corpora
- * (`src/data/heritage-demo.json` vs `src/data/atlas-dummy.ts`), where the ids do
- * not correspond and a cross-link would silently select nothing.
+ * The Museum and the Atlas load the same collection (useHeritageCollection):
+ * the illustrated demo corpus or the live graph from
+ * `GET /api/v1/cidoc/kg/graph/`, both keeping node ids verbatim. So a node id
+ * is a shared identifier in either source, and links carry the source along.
  *
- * Both surfaces already read their selection from the query string — Atlas via
+ * Both surfaces read their selection from the query string — Atlas via
  * `?selected=`, the Museum via `?node=` — so linking needs no new plumbing. The
  * param names differ, which is why they are centralised here rather than
  * hand-built at each call site.
@@ -17,26 +16,16 @@
 export type CrossSurfaceDataSource = 'demo' | 'live';
 
 /**
- * Atlas globe focused on `nodeId`, or `null` when a link would not resolve.
- *
- * Atlas applies `?selected=` only if the id is present in its loaded corpus, so
- * this returns a link only for live mode. Callers should additionally require
- * coordinates: Atlas is place-first, and an entity it cannot place is an entity
- * the user would arrive to find unselected.
+ * Atlas focused on `nodeId`. Callers should require coordinates: the Atlas is
+ * place-first, and a record it cannot place opens on its default instead.
  */
-export function atlasHrefForNode(
-  nodeId: string,
-  dataSource: CrossSurfaceDataSource,
-): string | null {
-  if (dataSource !== 'live' || !nodeId) return null;
-  return `/atlas?source=live&selected=${encodeURIComponent(nodeId)}`;
+export function atlasHrefForNode(nodeId: string, dataSource: CrossSurfaceDataSource): string | null {
+  if (!nodeId) return null;
+  return `/atlas?source=${dataSource}&selected=${encodeURIComponent(nodeId)}`;
 }
 
-/** Museum story view focused on `nodeId`, or `null` when it would not resolve. */
-export function museumStoryHrefForNode(
-  nodeId: string,
-  dataSource: CrossSurfaceDataSource,
-): string | null {
-  if (dataSource !== 'live' || !nodeId) return null;
-  return `/heritage-museum?source=live&view=xr&node=${encodeURIComponent(nodeId)}`;
+/** Museum focused on `nodeId`. */
+export function museumStoryHrefForNode(nodeId: string, dataSource: CrossSurfaceDataSource): string | null {
+  if (!nodeId) return null;
+  return `/heritage-museum?source=${dataSource}&node=${encodeURIComponent(nodeId)}`;
 }

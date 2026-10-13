@@ -14,24 +14,3 @@ export function AtlasShellLoading() {
     </div>
   );
 }
-
-export function AtlasGlobeLoading() {
-  const t = useTranslations('Atlas');
-  return (
-    <div
-      className="absolute inset-0 flex items-center justify-center bg-background text-muted-foreground text-sm"
-      role="status"
-    >
-      {t('loadingGlobe')}
-    </div>
-  );
-}
-
-export function AtlasGraphLoading() {
-  const t = useTranslations('Atlas');
-  return (
-    <div className="absolute inset-0 flex items-center justify-center bg-background text-muted-foreground text-sm" role="status">
-      {t('loadingGraph')}
-    </div>
-  );
-}

@@ -406,3 +406,44 @@
   background: transparent !important;
   border: none !important;
 }
+
+/* ── Heritage Atlas map (components/AtlasMap.tsx) ──
+   Leaflet draws SVG paths and tooltips; these give them the app's tokens so
+   the map follows the theme without colours in the component. Marker fills
+   are the ontology's node colours, passed as data. */
+.atlas-map { background: var(--muted); font-family: var(--font-sans); }
+.atlas-map .leaflet-control-attribution { background: color-mix(in srgb, var(--card) 88%, transparent); color: var(--muted-foreground); font-size: 10.5px; }
+.atlas-map .leaflet-control-attribution a { color: var(--primary); }
+.atlas-map .leaflet-bar a { background: var(--card); color: var(--foreground); border-color: var(--border); }
+.atlas-shroud { fill: var(--background); fill-opacity: 0.62; }
+.atlas-border { fill: none; stroke: var(--foreground); stroke-opacity: 0.55; stroke-width: 1.4; }
+.atlas-dot { stroke: var(--card); stroke-width: 2; cursor: pointer; }
+.atlas-dot.is-selected { stroke: var(--foreground); stroke-width: 2.5; }
+.atlas-ring { fill: none; stroke: var(--primary); stroke-width: 2.5; }
+.atlas-link { fill: none; stroke: var(--primary); stroke-width: 2; stroke-dasharray: 5 4; opacity: 0.85; }
+.atlas-cluster { display: grid; place-items: center; border-radius: 9999px; background: var(--primary); color: var(--primary-foreground); border: 2.5px solid var(--card); font: 600 13px/1 var(--font-sans); cursor: pointer; box-shadow: 0 1px 3px rgb(0 0 0 / 0.2); }
+.atlas-cluster.is-selected { border-color: var(--foreground); }
+.leaflet-tooltip.atlas-label,
+.leaflet-tooltip.atlas-link-label { background: transparent; border: 0; box-shadow: none; padding: 0; color: var(--foreground); font: 500 12px/1.2 var(--font-sans); text-shadow: 0 0 3px var(--card), 0 0 3px var(--card), 0 0 6px var(--card); }
+.leaflet-tooltip.atlas-label::before,
+.leaflet-tooltip.atlas-link-label::before { display: none; }
+.leaflet-tooltip.atlas-label.is-selected { font-weight: 600; font-size: 13.5px; }
+.leaflet-tooltip.atlas-link-label { color: var(--primary); font-size: 11px; }
+.dark .atlas-relief { filter: invert(1) hue-rotate(180deg) brightness(0.85) contrast(0.95); }
+.dark .atlas-streets { filter: invert(1) hue-rotate(180deg) brightness(0.95) contrast(0.9); }
+/* Atlas "colour by period": ordered dark-to-light by hue family so periods read as time. */
+:root {
+  --atlas-era-early: #8a6a1a;
+  --atlas-era-licchavi: #26584a;
+  --atlas-era-transitional: #6b8f7a;
+  --atlas-era-malla: #945072;
+  --atlas-era-shah: #476a83;
+  --atlas-era-undated: #9aa29c;
+}
+/* Atlas: a cluster of records on one spot opens this list. */
+.atlas-pick-popup .leaflet-popup-content-wrapper { background: var(--card); color: var(--foreground); border-radius: 10px; }
+.atlas-pick-popup .leaflet-popup-tip { background: var(--card); }
+.atlas-pick-popup .leaflet-popup-content { margin: 8px; }
+.atlas-pick { display: grid; gap: 2px; min-width: 12rem; }
+.atlas-pick button { text-align: left; font: 500 13px/1.3 var(--font-sans); color: var(--foreground); background: none; border: 0; border-radius: 6px; padding: 6px 8px; cursor: pointer; }
+.atlas-pick button:hover, .atlas-pick button:focus-visible { background: var(--muted); }

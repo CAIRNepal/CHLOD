@@ -5,7 +5,7 @@ import { useEffect, useState } from 'react';
 /**
  * Reactive `prefers-reduced-motion` hook.
  *
- * Unlike the one-shot read in `lib/atlas-motion.ts`, this subscribes to the
+ * This subscribes to the
  * media query so components re-render if the user toggles the OS setting while
  * the page is open. SSR-safe: returns `false` until mounted on the client.
  *
