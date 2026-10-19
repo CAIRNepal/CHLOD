@@ -67,16 +67,21 @@ export function NavKnowledgebase({
 
   return (
     <SidebarGroup>
-      <SidebarGroupLabel className="text-xs font-semibold uppercase tracking-wider text-sidebar-foreground/60">
+      <SidebarGroupLabel className="font-mono text-[0.68rem] font-normal uppercase tracking-[0.14em] text-sidebar-foreground/55">
         {sectionTitle}
       </SidebarGroupLabel>
       <SidebarGroupContent className="flex flex-col gap-1">
         <SidebarMenu>
           <SidebarMenuItem>
-            <SidebarMenuButton asChild tooltip={hubTitle} isActive={hubActive}>
+            <SidebarMenuButton
+              asChild
+              tooltip={hubTitle}
+              isActive={hubActive}
+              className="rounded-full data-[active=true]:bg-foreground/10 hover:bg-foreground/[0.06]"
+            >
               <Link
                 href={hubUrl}
-                className="flex w-full items-center gap-2.5 rounded-lg text-sm transition-all duration-200 hover:translate-x-0.5"
+                className="flex w-full items-center gap-2.5 text-sm transition-all duration-200 hover:translate-x-0.5"
               >
                 {HubIcon ? (
                   <HubIcon
@@ -101,7 +106,7 @@ export function NavKnowledgebase({
               type="button"
               onClick={toggleBrowse}
               aria-expanded={open}
-              className="flex w-full cursor-pointer items-center gap-2.5 text-sm"
+              className="flex w-full cursor-pointer items-center gap-2.5 rounded-full text-sm hover:bg-foreground/[0.06]"
             >
               <IconChevronDown
                 className={cn(
@@ -119,7 +124,12 @@ export function NavKnowledgebase({
                 const ItemIcon = item.icon;
                 return (
                   <SidebarMenuItem key={item.url}>
-                    <SidebarMenuButton asChild tooltip={item.title} isActive={isActive}>
+                    <SidebarMenuButton
+                      asChild
+                      tooltip={item.title}
+                      isActive={isActive}
+                      className="rounded-r-full data-[active=true]:bg-foreground/10 hover:bg-foreground/[0.06]"
+                    >
                       <Link
                         href={item.url}
                         className="ml-1 flex w-full items-center gap-2.5 border-l border-border/60 pl-3 text-sm transition-all duration-200 hover:translate-x-0.5"
