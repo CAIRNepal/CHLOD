@@ -1631,18 +1631,37 @@
       "steps": {
         "record": {
           "title": "Someone records it",
-          "desc": "A festival date, a shrine, the guthi that holds the land."
+          "desc": "A festival date, a shrine, the guthi that holds the land.",
+          "tags": [
+            "Festivals",
+            "Shrines",
+            "Guthis",
+            "Photographs"
+          ]
         },
         "check": {
           "title": "Someone checks it",
-          "desc": "A reviewer reads the source and puts their name to it."
+          "desc": "A reviewer reads the source and puts their name to it.",
+          "tags": [
+            "Named reviewer",
+            "Source cited",
+            "Provenance"
+          ]
         },
         "connect": {
           "title": "It joins the graph",
-          "desc": "Linked to everything it touches, and open to follow."
+          "desc": "Linked to everything it touches, and open to follow.",
+          "tags": [
+            "Linked data",
+            "CIDOC-CRM",
+            "Open licence"
+          ]
         }
       },
-      "cta": "How the record is built"
+      "cta": "How the record is built",
+      "label": "// How it works",
+      "headingLines": "Written down, checked, connected",
+      "backdropOf": "Background photograph: {name}"
     },
     "photoCreditLine": "Photographs from Wikimedia Commons, each under its own licence.",
     "photoCreditLink": "Credits and licences",
