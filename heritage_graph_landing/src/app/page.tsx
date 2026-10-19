@@ -273,20 +273,40 @@ export default function DiscoveryLandingPage() {
       <div className="min-h-screen bg-background text-foreground">
         <PublicSiteHeader variant="marketing" />
 
-        <div className="border-b border-border bg-muted/40 dark:bg-muted/20">
-          <div className="mx-auto max-w-3xl px-4 py-8 sm:py-10">
-            <form onSubmit={handleSearch} className="relative">
+        {/* The search band: a display line and the field in strong glass, over a
+            faint wash so the glass has something to sit on. */}
+        <div className="relative isolate overflow-hidden border-b border-border">
+          <div
+            aria-hidden="true"
+            className="pointer-events-none absolute inset-0 -z-10 bg-[radial-gradient(60rem_22rem_at_50%_0%,color-mix(in_oklab,var(--primary)_14%,transparent),transparent_70%)]"
+          />
+          <div className="mx-auto max-w-3xl px-4 pt-12 pb-10 sm:pt-16">
+            <h1 className="animate-blur-rise text-center font-display text-5xl leading-[0.9] tracking-[-0.04em] text-foreground sm:text-6xl">
+              Search the collections
+            </h1>
+            <p
+              className="animate-blur-rise mx-auto mt-4 max-w-xl text-center text-sm font-light text-muted-foreground sm:text-base"
+              style={{ animationDelay: '150ms' }}
+            >
+              Monuments, festivals, deities and the people who keep them, each record traceable to a
+              source.
+            </p>
+            <form
+              onSubmit={handleSearch}
+              className="animate-blur-rise relative mt-8"
+              style={{ animationDelay: '300ms' }}
+            >
               <input
                 type="search"
                 value={query}
                 onChange={(e) => setQuery(e.target.value)}
                 placeholder="Search monuments, festivals, persons, deities…"
-                className="h-14 w-full rounded-full border border-border bg-card pr-14 pl-5 text-base text-foreground shadow-sm outline-none ring-primary/20 transition-shadow focus:border-primary focus:ring-2 dark:bg-card"
+                className="liquid-glass-strong h-14 w-full rounded-full border-0 pr-14 pl-5 text-base text-foreground outline-none placeholder:text-muted-foreground focus-visible:ring-2 focus-visible:ring-ring"
                 aria-label="Search collections"
               />
               <button
                 type="submit"
-                className="absolute right-2 top-1/2 flex h-10 w-10 -translate-y-1/2 items-center justify-center rounded-full bg-primary text-primary-foreground hover:opacity-90"
+                className="absolute right-2 top-1/2 flex h-10 w-10 -translate-y-1/2 items-center justify-center rounded-full bg-cta text-cta-foreground hover:opacity-90"
                 aria-label="Submit search"
               >
                 <Search className="h-5 w-5" />
@@ -306,7 +326,7 @@ export default function DiscoveryLandingPage() {
             {advancedOpen && (
               <p
                 id="search-tips"
-                className="mt-4 rounded-lg border border-dashed border-border bg-card/80 p-4 text-sm text-muted-foreground"
+                className="liquid-glass mt-4 rounded-[1.25rem] p-4 text-sm text-muted-foreground"
               >
                 <strong className="text-foreground">Search tips:</strong> Search
                 runs across names, descriptions, notes, and location fields for the
@@ -387,10 +407,10 @@ export default function DiscoveryLandingPage() {
 
           <div className="mb-4 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
             <div>
-              <h1 className="text-lg font-semibold text-foreground sm:text-xl">
+              <h2 className="font-display text-2xl leading-tight text-foreground sm:text-3xl">
                 {loading ? '…' : sorted.length}{' '}
                 {meta?.label ?? 'Entity'} results
-              </h1>
+              </h2>
               <p className="mt-1 max-w-2xl text-sm text-muted-foreground">
                 {meta?.description}{' '}
                 {appliedQuery.trim()

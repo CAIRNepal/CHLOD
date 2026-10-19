@@ -6,7 +6,7 @@ import { useEffect, useState } from 'react';
 import { cn } from '@/lib/utils';
 
 const defaultBtn =
-  'inline-flex h-9 w-9 items-center justify-center rounded-lg border border-border bg-card text-foreground hover:bg-muted transition-colors';
+  'inline-flex h-9 w-9 items-center justify-center rounded-full text-foreground/75 hover:bg-foreground/[0.06] hover:text-foreground transition-colors focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring';
 
 export function ThemeToggle({ className }: { className?: string }) {
   const { theme, setTheme, resolvedTheme } = useTheme();
@@ -18,7 +18,7 @@ export function ThemeToggle({ className }: { className?: string }) {
     return (
       <span
         className={cn(
-          'inline-flex h-9 w-9 items-center justify-center rounded-lg border border-border',
+          'inline-flex h-9 w-9 items-center justify-center rounded-full',
           className
         )}
       />

@@ -124,7 +124,7 @@ export default function PublicRecordViewPage() {
               <p className="text-xs font-medium uppercase tracking-wide text-muted-foreground">
                 {resource.replace(/-/g, ' ')}
               </p>
-              <h1 className="mt-1 font-[family-name:var(--font-display)] text-2xl font-semibold text-foreground sm:text-3xl">
+              <h1 className="mt-1 font-display text-3xl leading-tight text-foreground sm:text-4xl">
                 {title}
               </h1>
               <div className="mt-3 flex flex-wrap gap-2">
