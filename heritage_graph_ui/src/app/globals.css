@@ -95,7 +95,7 @@
      Contrast: #f1f4f0 on #121815 is 16.2:1. */
   --cta: #121815;
   --cta-foreground: #f1f4f0;
-  --font-sans: Poppins, ui-sans-serif, sans-serif, system-ui;
+  --font-sans: Barlow, ui-sans-serif, sans-serif, system-ui;
   --font-serif: Fraunces, ui-serif, serif;
   --font-mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
   --radius: 0.625rem;
@@ -193,7 +193,7 @@
   /* #050606 on #ffffff: 20.3:1. */
   --cta: #ffffff;
   --cta-foreground: #050606;
-  --font-sans: Poppins, ui-sans-serif, sans-serif, system-ui;
+  --font-sans: Barlow, ui-sans-serif, sans-serif, system-ui;
   --font-serif: Fraunces, ui-serif, serif;
   --font-mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
   --radius: 0.625rem;
@@ -322,7 +322,7 @@
   }
 
   /*
-   * Nepali typography. Poppins and Fraunces have no Devanagari coverage, so
+   * Nepali typography. Barlow, Fraunces and Instrument Serif have no Devanagari coverage, so
    * ne.json strings fell back to an arbitrary system face. Rebinding the two
    * font tokens for Nepali means every existing `font-sans` / `font-serif`
    * utility resolves to a real Devanagari face with no per-component change.
@@ -334,6 +334,7 @@
   body:lang(ne) {
     --font-sans: var(--font-devanagari);
     --font-serif: var(--font-devanagari-serif);
+    --font-display: var(--font-devanagari-serif);
     /* Devanagari sits on a taller em box; a little more leading keeps matras
        and the shirorekha from clipping in tight UI rows. */
     line-height: 1.7;
