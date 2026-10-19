@@ -1652,7 +1652,23 @@
       "cta": "Open the Heritage Museum"
     },
     "heroPause": "Pause",
-    "heroPlay": "Play"
+    "heroPlay": "Play",
+    "hero": {
+      "badgeChip": "CAIR-Nepal",
+      "badge": "An open, sourced record of Nepal's cultural heritage",
+      "headline": "Nepal's living heritage, connected",
+      "ctaMuseum": "Explore the museum",
+      "ctaHow": "How it works",
+      "stats": {
+        "zones": "Monument zones, inscribed together in {year} as one World Heritage property",
+        "lumbini": "The year Lumbini, birthplace of the Buddha, was inscribed"
+      },
+      "photoControls": "Photograph controls"
+    },
+    "trust": {
+      "label": "Built on open sources, each one credited",
+      "linkLabel": "How these sources are used"
+    }
   },
   "entityRecord": {
     "descriptionHeading": "Description",

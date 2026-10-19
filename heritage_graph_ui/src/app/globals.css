@@ -237,6 +237,19 @@
   }
 }
 
+/* The hero photograph's slow push-in. Long enough that it is felt rather than
+   watched; it ends well before the next frame arrives. Top-level rather than in
+   @theme: Tailwind keeps @theme keyframes only when an --animate-* token uses
+   them, and this one is used through an arbitrary `animate-[…]` value. */
+@keyframes hero-drift {
+  from {
+    transform: scale(1);
+  }
+  to {
+    transform: scale(1.08) translate3d(-1%, -0.6%, 0);
+  }
+}
+
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);

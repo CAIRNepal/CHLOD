@@ -15,14 +15,17 @@ export const metadata = {
 /**
  * The public entry experience.
  *
- * `-mx-4 -my-4 md:-mx-6` cancels the dashboard main's padding so full-bleed
- * photography reaches the edge — the same technique the museum route uses.
+ * `-mx-4 -mb-4 md:-mx-6` cancels the main's padding so full-bleed photography
+ * reaches the edge — the same technique the museum route uses. The top margin
+ * cancels the padding AND the 3.5rem sticky bar, so the hero starts at the top
+ * of the window and the bar floats over the photograph instead of sitting on a
+ * strip of page background above it.
  *
  * The dashboard that previously lived here now sits at /dashboard, unchanged.
  */
 export default function HomePage() {
   return (
-    <div className="-mx-4 -my-4 md:-mx-6">
+    <div className="-mx-4 -mt-[4.5rem] -mb-4 md:-mx-6">
       <UnescoEntry />
     </div>
   );
