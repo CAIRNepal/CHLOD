@@ -47,18 +47,20 @@ export function NextSteps() {
           <TiltCard key={key} max={1.4}>
             <Link
               href={href}
-              className="group flex h-full flex-col justify-between gap-6 rounded-xl border border-border bg-card p-6 shadow-sm transition-shadow duration-500 hover:shadow-xl focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-ring sm:p-8"
+              className="liquid-glass group flex h-full flex-col justify-between gap-6 rounded-[1.25rem] p-6 transition-colors duration-500 hover:bg-foreground/[0.03] focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-ring sm:p-8"
             >
               <div>
-                <Icon className="size-6 text-primary" aria-hidden="true" />
-                <h3 className="mt-4 font-serif text-2xl leading-tight text-balance">
+                <span className="liquid-glass flex size-11 items-center justify-center rounded-[0.75rem]">
+                  <Icon className="size-5 text-foreground" aria-hidden="true" />
+                </span>
+                <h3 className="mt-5 font-display text-3xl leading-none tracking-[-1px] text-balance md:text-4xl">
                   {t(`${key}.title`)}
                 </h3>
                 <p className="mt-3 max-w-[42ch] text-sm leading-relaxed text-muted-foreground">
                   {t(`${key}.desc`)}
                 </p>
               </div>
-              <span className="inline-flex items-center gap-1.5 text-sm font-medium text-primary">
+              <span className="inline-flex w-fit items-center gap-1.5 rounded-full bg-cta px-4 py-2 text-sm font-medium text-cta-foreground">
                 {t(`${key}.cta`)}
                 <IconArrowUpRight
                   className="size-4 transition-transform duration-300 group-hover:translate-x-0.5 group-hover:-translate-y-0.5 motion-reduce:transition-none motion-reduce:group-hover:translate-x-0 motion-reduce:group-hover:translate-y-0"

@@ -36,7 +36,6 @@ import { useTranslations } from 'next-intl';
 import { motion } from 'framer-motion';
 import { IconArrowDown, IconArrowRight, IconArrowUpRight } from '@tabler/icons-react';
 
-import { Button } from '@/components/ui/button';
 import { revealOnScroll, wideColumn } from '@/lib/design';
 import { useReveal } from '@/lib/use-reveal';
 import { LUMBINI } from '@/lib/unesco/ground-truth';
@@ -163,7 +162,7 @@ export function UnescoEntry() {
             <motion.div {...reveal} variants={revealOnScroll}>
               <h2
                 id="intro-heading"
-                className="mx-auto max-w-[22ch] font-serif text-3xl leading-[1.1] text-balance sm:text-4xl"
+                className="mx-auto max-w-[18ch] font-display text-4xl leading-[0.95] text-balance sm:text-6xl"
               >
                 {t('introTitle')}
               </h2>
@@ -233,7 +232,7 @@ export function UnescoEntry() {
               <Eyebrow>{t('culturalHeading')}</Eyebrow>
               <h2
                 id="lumbini-heading"
-                className="mt-2 max-w-[22ch] font-serif text-3xl leading-tight text-balance sm:text-4xl"
+                className="mt-3 max-w-[18ch] font-display text-4xl leading-[0.95] text-balance sm:text-5xl"
               >
                 {t('properties.lumbini')}
               </h2>
@@ -243,12 +242,16 @@ export function UnescoEntry() {
               <p className="mt-4 text-sm text-muted-foreground">
                 {t('inscribedYear', { year: LUMBINI.yearInscribed })}
               </p>
-              <Button asChild className="mt-6">
-                <Link href={museumHref('lumbini')}>
-                  {t('openInMuseum')}
-                  <IconArrowRight className="size-4" aria-hidden="true" />
-                </Link>
-              </Button>
+              <Link
+                href={museumHref('lumbini')}
+                className="liquid-glass-strong group mt-7 inline-flex items-center gap-2 rounded-full px-5 py-2.5 text-sm font-medium text-foreground focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring"
+              >
+                {t('openInMuseum')}
+                <IconArrowRight
+                  className="size-4 transition-transform duration-300 group-hover:translate-x-0.5 motion-reduce:transition-none"
+                  aria-hidden="true"
+                />
+              </Link>
             </div>
           </div>
 

@@ -217,7 +217,7 @@ export function GraphBoundaryNote() {
           <div>
             <h2
               id="graph-boundary-heading"
-              className="font-serif text-2xl leading-tight text-balance"
+              className="font-display text-3xl leading-tight text-balance sm:text-4xl"
             >
               {t('graphBoundaryHeading')}
             </h2>
@@ -225,13 +225,13 @@ export function GraphBoundaryNote() {
               {t('graphBoundaryBody')}
             </p>
             <div className="mt-5 flex flex-wrap gap-3">
-              <Button asChild variant="default">
+              <Button asChild variant="default" className="rounded-full">
                 <Link href="/heritage-museum">
                   <IconTopologyStar3 className="size-4" aria-hidden="true" />
                   {t('exploreGraph')}
                 </Link>
               </Button>
-              <Button asChild variant="outline">
+              <Button asChild variant="ghost" className="liquid-glass rounded-full">
                 <Link href="/atlas">
                   <IconMap2 className="size-4" aria-hidden="true" />
                   {t('openInAtlas')}
