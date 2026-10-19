@@ -1,5 +1,6 @@
 'use client';
 
+import { useState } from 'react';
 import Link from 'next/link';
 import { useTranslations } from 'next-intl';
 import { motion } from 'framer-motion';
@@ -11,6 +12,7 @@ import {
   IconTopologyStar3,
 } from '@tabler/icons-react';
 
+import { BlurText, PinnedRail } from '@/components/motion';
 import { Button } from '@/components/ui/button';
 import {
   editorialStagger,
@@ -80,7 +82,13 @@ export function ZoneCard({
       variants={revealOnScroll}
       className={cn(
         'group flex flex-col gap-3',
-        layout === 'band' && 'w-[78vw] shrink-0 snap-start sm:w-[52vw] lg:w-[30rem]',
+        // In the pinned rail a card is sized against the screen's HEIGHT too:
+        // the stage is exactly one viewport tall and also holds the heading
+        // and the note under it (which carries the "one property, not seven
+        // sites" framing, so it cannot be dropped). 28rem is that header, the
+        // bar and the caption; the photograph is 3:4 of the card's width.
+        layout === 'band' &&
+          'w-[78vw] shrink-0 snap-start sm:w-[52vw] lg:w-[min(30rem,calc((100svh-28rem)*1.333))]',
       )}
     >
       {/* The photograph is a link; its credit is NOT inside that link. The
@@ -116,7 +124,7 @@ export function ZoneCard({
           <span className="font-mono text-xs tabular-nums text-muted-foreground">
             {String(index + 1).padStart(2, '0')}
           </span>
-          <Heading className="font-serif text-xl leading-tight text-balance">{name}</Heading>
+          <Heading className="font-display text-2xl leading-tight text-balance">{name}</Heading>
         </div>
         {zone.descriptor ? (
           <p className="max-w-[46ch] text-sm leading-relaxed text-muted-foreground">
@@ -278,6 +286,77 @@ export function ValleyFacts({ className }: { className?: string }) {
         <p className="text-sm leading-relaxed text-muted-foreground">{t('dangerListing')}</p>
       </div>
     </dl>
+  );
+}
+
+/* ── The seven zones as a pinned horizontal rail ────────────────────────── */
+
+/**
+ * The readable index of the seven zones, walked sideways as the page scrolls.
+ *
+ * Seven photographs in a three-column grid made the reader scroll past a wall
+ * of images to reach anything else. Pinned, the section holds still and the
+ * row of places passes through it — one gesture, seven places, then the page
+ * moves on. The counter under the heading changes only when the reached place
+ * changes (never per frame).
+ *
+ * The grid is still what renders on the server, on phones and under reduced
+ * motion (see `PinnedRail`), and it is the same cards, so nothing is lost. The
+ * `CardWeb` filaments that used to join the grid are not drawn here: they are
+ * positioned from card rectangles, and cannot follow cards sliding inside a
+ * transformed track.
+ */
+export function ZoneRail() {
+  const t = useTranslations('unescoEntry');
+  const zones = KATHMANDU_VALLEY.monumentZones ?? [];
+  const [reached, setReached] = useState(0);
+  const pad = (n: number) => String(n).padStart(2, '0');
+
+  return (
+    <PinnedRail
+      aria-labelledby="zones-heading"
+      count={zones.length}
+      onIndexChange={setReached}
+      staticClassName={`${wideColumn} mt-10 grid grid-cols-1 gap-x-12 gap-y-14 @xl/main:grid-cols-2 @4xl/main:grid-cols-3`}
+      header={(mode) => (
+        <div className={wideColumn}>
+          <div className="flex flex-wrap items-end justify-between gap-x-10 gap-y-4">
+            <div>
+              <Eyebrow>{t('inscribedYear', { year: KATHMANDU_VALLEY.yearInscribed })}</Eyebrow>
+              <BlurText
+                as="h2"
+                id="zones-heading"
+                text={t('zonesHeadingPlain')}
+                className="mt-3 max-w-[18ch] font-display text-4xl leading-[0.95] text-balance sm:text-5xl"
+              />
+              <p className="mt-4 max-w-[64ch] leading-relaxed text-muted-foreground">
+                {t('zonesPlainNote')}
+              </p>
+            </div>
+            {mode === 'pinned' && zones[reached] ? (
+              <p
+                aria-hidden="true"
+                className="font-mono text-xs tracking-[0.14em] tabular-nums uppercase text-muted-foreground"
+              >
+                {pad(reached + 1)} / {pad(zones.length)} · {t(`zones.${zones[reached].key}`)}
+              </p>
+            ) : null}
+          </div>
+        </div>
+      )}
+    >
+      {(mode) =>
+        zones.map((zone, i) => (
+          <ZoneCard
+            key={zone.key}
+            zone={zone}
+            index={i}
+            layout={mode === 'pinned' ? 'band' : 'grid'}
+            headingLevel={3}
+          />
+        ))
+      }
+    </PinnedRail>
   );
 }
 

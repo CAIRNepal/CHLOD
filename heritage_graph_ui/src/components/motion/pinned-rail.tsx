@@ -49,7 +49,7 @@ interface PinnedRailProps {
   /** Render the items for the current mode; cards size themselves differently. */
   children: (mode: RailMode) => ReactNode;
   /** Above the track inside the pinned frame, and above the grid when static. */
-  header?: ReactNode;
+  header?: ReactNode | ((mode: RailMode) => ReactNode);
   /** Called only when the reached item changes. */
   onIndexChange?: (index: number) => void;
   /** Classes for the static grid. */
@@ -146,10 +146,12 @@ export function PinnedRail({
     [mode, distance, gutter],
   );
 
+  const head = typeof header === 'function' ? header(mode) : header;
+
   if (mode === 'static') {
     return (
       <section aria-labelledby={labelledBy} className={className}>
-        {header}
+        {head}
         <div className={staticClassName}>{children('static')}</div>
       </section>
     );
@@ -168,7 +170,7 @@ export function PinnedRail({
         className="sticky top-0 flex h-svh flex-col justify-center gap-8 overflow-clip"
         style={{ paddingTop: BAR_HEIGHT }}
       >
-        {header}
+        {head}
         <div
           ref={trackRef}
           onFocus={onFocus}

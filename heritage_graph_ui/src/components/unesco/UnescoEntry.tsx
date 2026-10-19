@@ -39,17 +39,16 @@ import { IconArrowDown, IconArrowRight, IconArrowUpRight } from '@tabler/icons-r
 import { Button } from '@/components/ui/button';
 import { revealOnScroll, wideColumn } from '@/lib/design';
 import { useReveal } from '@/lib/use-reveal';
-import { KATHMANDU_VALLEY, LUMBINI } from '@/lib/unesco/ground-truth';
+import { LUMBINI } from '@/lib/unesco/ground-truth';
 import { museumHref } from '@/lib/unesco/graph-bindings';
 
 import { Eyebrow, OpeningGround } from '@/components/editorial';
 import { BlurText, Reveal } from '@/components/motion';
-import { GraphBoundaryNote, PropertyPhotograph, ZoneCollection } from './entry-sections';
+import { GraphBoundaryNote, PropertyPhotograph, ZoneRail } from './entry-sections';
 import { Constellation } from './Constellation';
 import { HeroPhotographs } from './HeroPhotographs';
 import { HeroStats } from './HeroStats';
 import { TrustBar } from './TrustBar';
-import { CardWeb } from './CardWeb';
 import { NextSteps } from './NextSteps';
 import { AmbientWash, LiveBackdrop } from './depth';
 import { HowItWorks } from './HowItWorks';
@@ -190,27 +189,9 @@ export function UnescoEntry() {
       {/* ── 3. What the platform actually does ── */}
       <HowItWorks />
 
-      {/* ── 4. The seven zones, as the readable index ── */}
-      <section aria-labelledby="zones-heading">
-        <motion.div {...reveal} variants={revealOnScroll} className={`${wideColumn} mb-8`}>
-          <Eyebrow>{t('inscribedYear', { year: KATHMANDU_VALLEY.yearInscribed })}</Eyebrow>
-          <h2
-            id="zones-heading"
-            className="mt-2 font-serif text-3xl leading-tight text-balance sm:text-4xl"
-          >
-            {t('zonesHeadingPlain')}
-          </h2>
-          <p className="mt-4 max-w-[64ch] leading-relaxed text-muted-foreground">
-            {t('zonesPlainNote')}
-          </p>
-        </motion.div>
-
-        <div className={wideColumn}>
-          <CardWeb>
-            <ZoneCollection layout="grid" headingLevel={3} />
-          </CardWeb>
-        </div>
-      </section>
+      {/* ── 4. The seven zones, as the readable index ──
+          Pinned: the section holds and the row of places passes through it. */}
+      <ZoneRail />
 
       {/* ── 5. Two doors out ── */}
       <NextSteps />
