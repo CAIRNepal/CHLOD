@@ -76,6 +76,25 @@
   --medal-bronze: #8f6440;
   --medal-bronze-soft: #eddfd2;
   --medal-bronze-on-soft: #5f4020;
+  /* ── Liquid glass ──
+     A panel is a near-invisible fill, a backdrop blur, and a stroke that is
+     bright at the top and bottom edges and gone at the sides — so it reads as a
+     pane of glass catching light rather than as a box. In light mode the fill
+     has to carry more opacity than in dark: a 1% white fill over pale paper is
+     indistinguishable from no panel at all, and the stroke has to be ink, not
+     white, or it disappears into the page. */
+  --glass-fill: rgb(255 255 255 / 0.42);
+  --glass-fill-strong: rgb(255 255 255 / 0.62);
+  --glass-stroke-strong: rgb(18 24 21 / 0.22);
+  --glass-stroke-mid: rgb(18 24 21 / 0.08);
+  --glass-highlight: rgb(255 255 255 / 0.75);
+  --glass-shadow: 0 1px 2px rgb(18 24 21 / 0.06), 0 8px 24px -12px rgb(18 24 21 / 0.18);
+  /* The solid call-to-action. Separate from --primary on purpose: in dark mode
+     it is white, and --primary drives every inline link in the workspace —
+     turning that white would make links indistinguishable from body text.
+     Contrast: #f1f4f0 on #121815 is 16.2:1. */
+  --cta: #121815;
+  --cta-foreground: #f1f4f0;
   --font-sans: Poppins, ui-sans-serif, sans-serif, system-ui;
   --font-serif: Fraunces, ui-serif, serif;
   --font-mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
@@ -98,42 +117,56 @@
   --spacing: 0.25rem;
 }
 
+/*
+ * Dark is the default theme (see SessionProvider) and is near-black rather than
+ * the deep green it used to be: liquid glass only reads as glass over a ground
+ * dark enough that a 1% white fill and a white edge stroke register. The
+ * neutrals carry no hue so photographs keep their own colour; the verdigris
+ * stays in --primary, --ring and the charts, which is where it means something.
+ *
+ * Status, chart and medal tokens are unchanged — they were contrast-checked
+ * against foreground pairs, not against the page, and their soft fills sit on
+ * their own backgrounds. Contrast of the retuned neutrals:
+ *   --foreground on --background   18.4:1
+ *   --muted-foreground on --card    8.2:1
+ *   --muted-foreground on --muted   7.5:1
+ */
 .dark {
-  --background: #0e1512;
-  --foreground: #e4eae6;
-  --card: #161f1b;
-  --card-foreground: #e4eae6;
-  --popover: #1b2521;
-  --popover-foreground: #e4eae6;
+  --background: #050606;
+  --foreground: #f2f4f3;
+  --card: #0b0d0d;
+  --card-foreground: #f2f4f3;
+  --popover: #101313;
+  --popover-foreground: #f2f4f3;
   --primary: #8ec8ae;
   --primary-foreground: #0e1512;
   /* Contrast vs #ffffff: from 18.0:1, to 10.2:1 (both pass WCAG AA). */
-  --hero-from: #0a100d;
-  --hero-to: #1e4034;
+  --hero-from: #050606;
+  --hero-to: #17322a;
   --hero-foreground: #ffffff;
-  --secondary: #1d2723;
-  --secondary-foreground: #e4eae6;
-  --muted: #1d2723;
-  --muted-foreground: #9aa8a1;
+  --secondary: #151918;
+  --secondary-foreground: #f2f4f3;
+  --muted: #151918;
+  --muted-foreground: #a2aaa6;
   --accent: #8ec8ae;
   --accent-foreground: #0e1512;
   --destructive: #e2705f;
   --destructive-foreground: #160c0a;
-  --border: #2a3831;
-  --input: #35443c;
+  --border: #222827;
+  --input: #2b3230;
   --ring: #8ec8ae;
   --chart-1: #74b79c;
   --chart-2: #b7c0ba;
   --chart-3: #6f98bd;
   --chart-4: #d3b46a;
   --chart-5: #c88fa4;
-  --sidebar: #111a16;
-  --sidebar-foreground: #e4eae6;
+  --sidebar: #070909;
+  --sidebar-foreground: #f2f4f3;
   --sidebar-primary: #8ec8ae;
   --sidebar-primary-foreground: #0e1512;
-  --sidebar-accent: #1d2723;
-  --sidebar-accent-foreground: #e4eae6;
-  --sidebar-border: #2a3831;
+  --sidebar-accent: #151918;
+  --sidebar-accent-foreground: #f2f4f3;
+  --sidebar-border: #1a1f1e;
   --sidebar-ring: #8ec8ae;
   --node-glyph: #f4f7f2;
   --warning: #d9b463;
@@ -151,6 +184,15 @@
   --medal-bronze: #c08a5c;
   --medal-bronze-soft: #33251a;
   --medal-bronze-on-soft: #eccdb0;
+  --glass-fill: rgb(255 255 255 / 0.01);
+  --glass-fill-strong: rgb(255 255 255 / 0.04);
+  --glass-stroke-strong: rgb(255 255 255 / 0.45);
+  --glass-stroke-mid: rgb(255 255 255 / 0.15);
+  --glass-highlight: rgb(255 255 255 / 0.1);
+  --glass-shadow: 4px 4px 4px rgb(0 0 0 / 0.05);
+  /* #050606 on #ffffff: 20.3:1. */
+  --cta: #ffffff;
+  --cta-foreground: #050606;
   --font-sans: Poppins, ui-sans-serif, sans-serif, system-ui;
   --font-serif: Fraunces, ui-serif, serif;
   --font-mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
@@ -171,6 +213,30 @@
   --shadow-2xl: 0 1px 3px 0px hsl(0 0% 0% / 0.25);
 }
 
+/*
+ * The one entrance in the system: out of focus, transparent and slightly low,
+ * into place. Every reveal on the site uses it, so a page reads as one motion
+ * rather than a dozen. `both` holds the start frame through any delay, which is
+ * what lets a word stagger work with nothing but `animation-delay`.
+ */
+@theme {
+  --animate-blur-rise: blur-rise 0.8s cubic-bezier(0.22, 1, 0.36, 1) both;
+  --ease-glass: cubic-bezier(0.22, 1, 0.36, 1);
+
+  @keyframes blur-rise {
+    from {
+      opacity: 0;
+      filter: blur(10px);
+      transform: translateY(var(--rise, 20px));
+    }
+    to {
+      opacity: 1;
+      filter: blur(0);
+      transform: none;
+    }
+  }
+}
+
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
@@ -183,6 +249,8 @@
   --color-hero-from: var(--hero-from);
   --color-hero-to: var(--hero-to);
   --color-hero-foreground: var(--hero-foreground);
+  --color-cta: var(--cta);
+  --color-cta-foreground: var(--cta-foreground);
   --color-secondary: var(--secondary);
   --color-secondary-foreground: var(--secondary-foreground);
   --color-muted: var(--muted);
@@ -399,4 +467,167 @@
 .hm-map-marker.leaflet-div-icon {
   background: transparent !important;
   border: none !important;
+}
+
+/* ══════════════════════════════════════════════════════════════════════════
+   Liquid glass
+
+   Two strengths of the same material. `liquid-glass` is for things that sit on
+   a photograph and must not compete with it — the nav pill, badges, tags;
+   `liquid-glass-strong` blurs hard enough to carry body text over anything.
+
+   The edge is a ::before ring, not a border: a border is one colour all the way
+   round, and glass is bright where it faces the light and invisible side-on.
+   The ring is the element's own box with its content box masked out
+   (`mask-composite: exclude`), so it follows any radius without an image.
+
+   No `overflow: hidden`, which the reference used: it clips focus outlines and
+   the active-link rule under the nav. The ring needs a positioned host, but
+   setting `position: relative` unconditionally would override `absolute` /
+   `fixed` / `sticky` on the same element depending on utility order — so it
+   only applies when none of those is present.
+   ══════════════════════════════════════════════════════════════════════════ */
+@utility liquid-glass {
+  isolation: isolate;
+  background-color: var(--glass-fill);
+  background-blend-mode: luminosity;
+  -webkit-backdrop-filter: blur(4px) saturate(1.15);
+  backdrop-filter: blur(4px) saturate(1.15);
+  box-shadow: inset 0 1px 1px var(--glass-highlight);
+
+  &:where(:not(.absolute, .fixed, .sticky)) {
+    position: relative;
+  }
+  &::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    z-index: -1;
+    padding: 1.4px;
+    border-radius: inherit;
+    background: linear-gradient(
+      180deg,
+      var(--glass-stroke-strong) 0%,
+      var(--glass-stroke-mid) 20%,
+      transparent 40%,
+      transparent 60%,
+      var(--glass-stroke-mid) 80%,
+      var(--glass-stroke-strong) 100%
+    );
+    -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+    -webkit-mask-composite: xor;
+    mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+    mask-composite: exclude;
+    pointer-events: none;
+  }
+}
+
+@utility liquid-glass-strong {
+  isolation: isolate;
+  background-color: var(--glass-fill-strong);
+  background-blend-mode: luminosity;
+  -webkit-backdrop-filter: blur(50px) saturate(1.2);
+  backdrop-filter: blur(50px) saturate(1.2);
+  box-shadow: var(--glass-shadow), inset 0 1px 1px var(--glass-highlight);
+
+  &:where(:not(.absolute, .fixed, .sticky)) {
+    position: relative;
+  }
+  &::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    z-index: -1;
+    padding: 1.4px;
+    border-radius: inherit;
+    background: linear-gradient(
+      180deg,
+      color-mix(in srgb, var(--glass-stroke-strong) 110%, transparent) 0%,
+      color-mix(in srgb, var(--glass-stroke-mid) 130%, transparent) 20%,
+      transparent 40%,
+      transparent 60%,
+      color-mix(in srgb, var(--glass-stroke-mid) 130%, transparent) 80%,
+      color-mix(in srgb, var(--glass-stroke-strong) 110%, transparent) 100%
+    );
+    -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+    -webkit-mask-composite: xor;
+    mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+    mask-composite: exclude;
+    pointer-events: none;
+  }
+}
+
+/* Without backdrop-filter a 1% fill is no panel at all, and text set on it
+   lands straight on the photograph. Fall back to the opaque card surface. */
+@supports not ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) {
+  .liquid-glass,
+  .liquid-glass-strong {
+    background-color: color-mix(in srgb, var(--card) 92%, transparent);
+  }
+}
+
+/*
+ * Display type. Instrument Serif, italic, set tight — the cinematic register
+ * the headlines use. A utility rather than a theme font key so the italic and
+ * the tracking travel with the family and cannot be half-applied.
+ */
+@utility font-display {
+  font-family: var(--font-display), var(--font-serif), ui-serif, serif;
+  font-style: italic;
+  font-weight: 400;
+  letter-spacing: -0.035em;
+}
+
+/* ══════════════════════════════════════════════════════════════════════════
+   Reveal states, driven from src/components/motion.
+
+   `data-reveal` is a block that rises in as one; `data-reveal-text` is a line
+   whose words rise in one after another. Kept as two attributes so a block can
+   contain a headline without either one's state leaking into the other.
+
+   The server always renders `static`, which is fully visible — so content never
+   depends on JavaScript, an observer firing, or a motion preference the server
+   cannot know. After mount, something below the fold is `armed` (held at the
+   start frame) and becomes `play` when it scrolls into view. Something already
+   on screen at mount is left `static`: animating it would mean hiding text the
+   reader is already looking at.
+   ══════════════════════════════════════════════════════════════════════════ */
+@layer components {
+  [data-reveal='armed'],
+  [data-reveal-text='armed'] [data-reveal-word] {
+    opacity: 0;
+  }
+  [data-reveal='play'],
+  [data-reveal-text='play'] [data-reveal-word] {
+    animation: var(--animate-blur-rise);
+    animation-delay: calc(var(--reveal-delay, 0ms) + var(--i, 0) * var(--reveal-stagger, 100ms));
+  }
+  [data-reveal-word] {
+    display: inline-block;
+    white-space: pre;
+  }
+}
+
+/* Unlayered so they win over any utility, whatever its specificity. */
+@media (prefers-reduced-motion: reduce) {
+  .animate-blur-rise,
+  [data-reveal],
+  [data-reveal-word] {
+    animation: none !important;
+    opacity: 1 !important;
+    filter: none !important;
+    transform: none !important;
+  }
+}
+
+/*
+ * Devanagari has no italic and is built on a headline stroke (shirorekha) that
+ * negative tracking breaks apart, and its matras need more leading than a Latin
+ * display line. Unlayered for the same reason as above: `leading-[0.9]` on a
+ * heading is a utility, and only an unlayered rule reliably beats it.
+ */
+body:lang(ne) .font-display {
+  font-style: normal;
+  letter-spacing: 0;
+  line-height: 1.3;
 }
