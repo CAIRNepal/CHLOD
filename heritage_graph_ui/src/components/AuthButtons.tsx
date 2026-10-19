@@ -97,14 +97,20 @@ export default function AuthSection() {
   const tierInfo = tierConfig[userTier];
 
   if (!session) {
-    // Outline, not the filled primary. As a solid green button this was the
+    // Quiet, not the filled primary. As a solid green button this was the
     // heaviest element in the top bar on every page — including the museum and
     // the entry page, which are meant to work fully signed out. Signing in is
-    // available, not the point.
+    // available, not the point; inside the glass control pill it is a plain
+    // label, and Contribute is the bar's one solid button.
     return (
-      <Button variant="outline" size="sm" className="shrink-0" onClick={() => signIn('google')}>
-        <span className="hidden @[52rem]/header:inline">{tAuth('signInWithGoogle')}</span>
-        <span className="@[52rem]/header:hidden">{tAuth('signIn')}</span>
+      <Button
+        variant="ghost"
+        size="sm"
+        className="shrink-0 rounded-full px-3 text-foreground/80 hover:bg-foreground/[0.06] hover:text-foreground"
+        onClick={() => signIn('google')}
+      >
+        <span className="hidden @[84rem]/header:inline">{tAuth('signInWithGoogle')}</span>
+        <span className="@[84rem]/header:hidden">{tAuth('signIn')}</span>
       </Button>
     );
   }
@@ -140,13 +146,13 @@ export default function AuthSection() {
       )}
       <DropdownMenu>
       <DropdownMenuTrigger asChild>
-        <Button variant="ghost" size="sm" className="gap-2 px-2">
+        <Button variant="ghost" size="sm" className="gap-2 rounded-full px-2 hover:bg-foreground/[0.06]">
           <SimpleRankAvatar
             src={userImage}
             tier={userTier}
             size="sm"
           />
-          <div className="hidden sm:flex flex-col items-start">
+          <div className="hidden @[84rem]/header:flex flex-col items-start">
             <span className="truncate max-w-[120px] text-sm font-medium leading-tight">
               {userName}
             </span>

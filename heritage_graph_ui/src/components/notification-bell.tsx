@@ -147,7 +147,7 @@ export function NotificationBell() {
   return (
     <Popover>
       <PopoverTrigger asChild>
-        <Button variant="ghost" size="icon" className="relative overflow-visible">
+        <Button variant="ghost" size="icon" className="relative overflow-visible rounded-full hover:bg-foreground/[0.06]">
           <Bell className="h-5 w-5" />
           {unreadCount > 0 ?
             <span className="pointer-events-none absolute -right-1 -top-1 flex h-[18px] min-w-[18px] items-center justify-center rounded-full bg-destructive px-1 text-[10px] font-bold text-destructive-foreground ring-2 ring-background">
