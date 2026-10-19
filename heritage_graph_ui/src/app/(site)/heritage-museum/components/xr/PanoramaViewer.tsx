@@ -13,6 +13,10 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { isEquirectangular } from '@/lib/heritage-museum/panorama-support';
 import {
+  isWikimediaFilePath,
+  resolveWikimediaDirectUrl,
+} from '@/lib/heritage-museum/wikimedia-texture';
+import {
   xrChip,
   xrGlassPanel,
   xrSubtlePanel,
@@ -30,41 +34,6 @@ interface PanoramaViewerProps {
   node: GraphNode;
   reducedMotion?: boolean;
   onClose: () => void;
-}
-
-function isWikimediaFilePath(url: string): boolean {
-  return /\/Special:FilePath\//.test(url);
-}
-
-function extractWikimediaFileTitle(url: string): string | null {
-  const m = /\/Special:FilePath\/([^?#]+)/.exec(url);
-  if (!m) return null;
-  return `File:${decodeURIComponent(m[1])}`;
-}
-
-async function resolveWikimediaDirectUrl(originalUrl: string): Promise<string | null> {
-  const title = extractWikimediaFileTitle(originalUrl);
-  if (!title) return null;
-  const api = new URL('https://en.wikipedia.org/w/api.php');
-  api.searchParams.set('action', 'query');
-  api.searchParams.set('format', 'json');
-  api.searchParams.set('prop', 'imageinfo');
-  api.searchParams.set('iiprop', 'url');
-  api.searchParams.set('redirects', '1');
-  api.searchParams.set('origin', '*');
-  api.searchParams.set('titles', title);
-
-  const res = await fetch(api.toString(), { method: 'GET' });
-  if (!res.ok) return null;
-  const json = (await res.json()) as {
-    query?: { pages?: Record<string, { imageinfo?: Array<{ url?: string }> }> };
-  };
-  const pages = json.query?.pages ?? {};
-  for (const p of Object.values(pages)) {
-    const url = p.imageinfo?.[0]?.url;
-    if (typeof url === 'string' && url.startsWith('https://')) return url;
-  }
-  return null;
 }
 
 function PanoramaStory({

@@ -540,7 +540,23 @@
       "creditsLabel": "Image credit",
       "pause": "Pause",
       "play": "Play",
-      "unsourcedBeat": "Unsourced — demonstration text"
+      "unsourcedBeat": "Unsourced — demonstration text",
+      "street": {
+        "viewLabel": "Gallery view",
+        "viewGrid": "Grid",
+        "viewStreet": "Street (3D)",
+        "unavailableWebgl": "The 3D street needs WebGL 2, which this browser does not offer.",
+        "unavailableMotion": "The 3D street is off because your device asks for reduced motion.",
+        "region": "3D street of exhibits",
+        "hint": "Scroll, drag or use the arrow keys to walk. Enter opens the exhibit in front of you.",
+        "loading": "Building the street…",
+        "position": "{current} of {total}",
+        "open": "Open record",
+        "prev": "Previous exhibit",
+        "next": "Next exhibit",
+        "credits": "Credits for what you can see ({count})",
+        "exhibits": "Exhibits in this street"
+      }
     },
     "panel": {
       "emptyTitle": "Pick a place or story",
@@ -1631,18 +1647,37 @@
       "steps": {
         "record": {
           "title": "Someone records it",
-          "desc": "A festival date, a shrine, the guthi that holds the land."
+          "desc": "A festival date, a shrine, the guthi that holds the land.",
+          "tags": [
+            "Festivals",
+            "Shrines",
+            "Guthis",
+            "Photographs"
+          ]
         },
         "check": {
           "title": "Someone checks it",
-          "desc": "A reviewer reads the source and puts their name to it."
+          "desc": "A reviewer reads the source and puts their name to it.",
+          "tags": [
+            "Named reviewer",
+            "Source cited",
+            "Provenance"
+          ]
         },
         "connect": {
           "title": "It joins the graph",
-          "desc": "Linked to everything it touches, and open to follow."
+          "desc": "Linked to everything it touches, and open to follow.",
+          "tags": [
+            "Linked data",
+            "CIDOC-CRM",
+            "Open licence"
+          ]
         }
       },
-      "cta": "How the record is built"
+      "cta": "How the record is built",
+      "label": "// How it works",
+      "headingLines": "Written down, checked, connected",
+      "backdropOf": "Background photograph: {name}"
     },
     "photoCreditLine": "Photographs from Wikimedia Commons, each under its own licence.",
     "photoCreditLink": "Credits and licences",
@@ -1652,7 +1687,23 @@
       "cta": "Open the Heritage Museum"
     },
     "heroPause": "Pause",
-    "heroPlay": "Play"
+    "heroPlay": "Play",
+    "hero": {
+      "badgeChip": "CAIR-Nepal",
+      "badge": "An open, sourced record of Nepal's cultural heritage",
+      "headline": "Nepal's living heritage, connected",
+      "ctaMuseum": "Explore the museum",
+      "ctaHow": "How it works",
+      "stats": {
+        "zones": "Monument zones, inscribed together in {year} as one World Heritage property",
+        "lumbini": "The year Lumbini, birthplace of the Buddha, was inscribed"
+      },
+      "photoControls": "Photograph controls"
+    },
+    "trust": {
+      "label": "Built on open sources, each one credited",
+      "linkLabel": "How these sources are used"
+    }
   },
   "entityRecord": {
     "descriptionHeading": "Description",

@@ -5,7 +5,9 @@ import type { ReactNode } from 'react';
 
 export function Providers({ children }: { children: ReactNode }) {
   return (
-    <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
+    // Dark by default, as in the main app: the glass reads best on near-black.
+    // A stored choice still wins, and System stays available.
+    <ThemeProvider attribute="class" defaultTheme="dark" enableSystem>
       {children}
     </ThemeProvider>
   );

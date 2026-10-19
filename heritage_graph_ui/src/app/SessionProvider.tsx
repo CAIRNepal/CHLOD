@@ -8,7 +8,11 @@ import { AuthSessionMonitor } from '@/components/auth-session-monitor';
 
 export default function NextAuthSessionProvider({ children }: { children: ReactNode }) {
   return (
-    <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
+    // Dark by default: the entry page and the museum are built around
+    // photographs on a near-black ground, and the glass surfaces read best
+    // there. `enableSystem` stays, so the toggle still offers System and
+    // Light, and a stored choice always wins over the default.
+    <ThemeProvider attribute="class" defaultTheme="dark" enableSystem>
       {/*
         reducedMotion="user" makes every Framer animation in the app honour the
         OS setting, rather than relying on each component to remember. Transform

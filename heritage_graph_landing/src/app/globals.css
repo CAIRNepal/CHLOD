@@ -3,26 +3,40 @@
 
 @custom-variant dark (&:is(.dark *));
 
+/*
+ * Same palette and glass vocabulary as heritage_graph_ui (spec 008), so
+ * following a link from this discovery app into the main app does not feel
+ * like changing product. The values are copied from that app's globals.css —
+ * change them there first, then here.
+ */
 :root {
-  --background: #f7f9fb;
-  --foreground: #0b1220;
-  --card: #ffffff;
-  --card-foreground: #0b1220;
-  --popover: #ffffff;
-  --popover-foreground: #0b1220;
-  --primary: #1e4e8c;
-  --primary-foreground: #f7fbff;
-  --secondary: #e3ebf3;
-  --secondary-foreground: #0e2238;
-  --muted: #dee6ee;
-  --muted-foreground: #526379;
-  --accent: #4073b5;
-  --accent-foreground: #f8fbff;
-  --destructive: #d13b3b;
-  --destructive-foreground: #fffaf9;
-  --border: #d6e0ea;
-  --input: #d6e0ea;
-  --ring: #2b5ea3;
+  --glass-fill: rgb(255 255 255 / 0.42);
+  --glass-fill-strong: rgb(255 255 255 / 0.62);
+  --glass-stroke-strong: rgb(18 24 21 / 0.22);
+  --glass-stroke-mid: rgb(18 24 21 / 0.08);
+  --glass-highlight: rgb(255 255 255 / 0.75);
+  --glass-shadow: 0 1px 2px rgb(18 24 21 / 0.06), 0 8px 24px -12px rgb(18 24 21 / 0.18);
+  --cta: #121815;
+  --cta-foreground: #f1f4f0;
+  --background: #e5e9e5;
+  --foreground: #121815;
+  --card: #f1f4f0;
+  --card-foreground: #121815;
+  --popover: #f1f4f0;
+  --popover-foreground: #121815;
+  --primary: #26584a;
+  --primary-foreground: #f1f7f4;
+  --secondary: #d8ded8;
+  --secondary-foreground: #1c2621;
+  --muted: #d4dbd4;
+  --muted-foreground: #4f5a54;
+  --accent: #26584a;
+  --accent-foreground: #f1f7f4;
+  --destructive: #5e1509;
+  --destructive-foreground: #fdf7f6;
+  --border: #c6cfc7;
+  --input: #c6cfc7;
+  --ring: #26584a;
   --chart-1: #1e4e8c;
   --chart-2: #2b74b9;
   --chart-3: #78a9e0;
@@ -36,7 +50,7 @@
   --sidebar-accent-foreground: #0e2238;
   --sidebar-border: #d6e0ea;
   --sidebar-ring: #2b5ea3;
-  --font-sans: var(--font-poppins), Poppins, ui-sans-serif, sans-serif, system-ui;
+  --font-sans: Barlow, ui-sans-serif, sans-serif, system-ui;
   --font-serif: Fraunces, ui-serif, serif;
   --font-mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
   --radius: 0.625rem;
@@ -59,25 +73,33 @@
 }
 
 .dark {
-  --background: #0b1016;
-  --foreground: #f3f6fa;
-  --card: #111821;
-  --card-foreground: #f3f6fa;
-  --popover: #17212e;
-  --popover-foreground: #f3f6fa;
-  --primary: #5a9bff;
-  --primary-foreground: #0b1016;
-  --secondary: #1c2533;
-  --secondary-foreground: #f3f6fa;
-  --muted: #202b3b;
-  --muted-foreground: #a0b3c8;
-  --accent: #3374c2;
-  --accent-foreground: #f3f6fa;
-  --destructive: #e5544b;
-  --destructive-foreground: #fdf8f7;
-  --border: #1f2936;
-  --input: #263244;
-  --ring: #5a9bff;
+  --glass-fill: rgb(255 255 255 / 0.01);
+  --glass-fill-strong: rgb(255 255 255 / 0.04);
+  --glass-stroke-strong: rgb(255 255 255 / 0.45);
+  --glass-stroke-mid: rgb(255 255 255 / 0.15);
+  --glass-highlight: rgb(255 255 255 / 0.1);
+  --glass-shadow: 4px 4px 4px rgb(0 0 0 / 0.05);
+  --cta: #ffffff;
+  --cta-foreground: #050606;
+  --background: #050606;
+  --foreground: #f2f4f3;
+  --card: #0b0d0d;
+  --card-foreground: #f2f4f3;
+  --popover: #101313;
+  --popover-foreground: #f2f4f3;
+  --primary: #8ec8ae;
+  --primary-foreground: #050606;
+  --secondary: #151918;
+  --secondary-foreground: #f2f4f3;
+  --muted: #151918;
+  --muted-foreground: #a2aaa6;
+  --accent: #8ec8ae;
+  --accent-foreground: #050606;
+  --destructive: #e2705f;
+  --destructive-foreground: #160c0a;
+  --border: #222827;
+  --input: #2b3230;
+  --ring: #8ec8ae;
   --chart-1: #5a9bff;
   --chart-2: #79b2ff;
   --chart-3: #95c5ff;
@@ -91,7 +113,7 @@
   --sidebar-accent-foreground: #f3f6fa;
   --sidebar-border: #1f2936;
   --sidebar-ring: #5a9bff;
-  --font-sans: var(--font-poppins), Poppins, ui-sans-serif, sans-serif, system-ui;
+  --font-sans: Barlow, ui-sans-serif, sans-serif, system-ui;
   --font-serif: Fraunces, ui-serif, serif;
   --font-mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
   --radius: 0.625rem;
@@ -131,6 +153,8 @@
   --color-border: var(--border);
   --color-input: var(--input);
   --color-ring: var(--ring);
+  --color-cta: var(--cta);
+  --color-cta-foreground: var(--cta-foreground);
   --color-chart-1: var(--chart-1);
   --color-chart-2: var(--chart-2);
   --color-chart-3: var(--chart-3);
@@ -288,5 +312,174 @@
   }
   .scrollbar-none::-webkit-scrollbar {
     display: none;
+  }
+}
+
+/* The one entrance, as in heritage_graph_ui. */
+@theme {
+  --animate-blur-rise: blur-rise 0.8s cubic-bezier(0.22, 1, 0.36, 1) both;
+
+  @keyframes blur-rise {
+    from {
+      opacity: 0;
+      filter: blur(10px);
+      transform: translateY(var(--rise, 20px));
+    }
+    to {
+      opacity: 1;
+      filter: blur(0);
+      transform: none;
+    }
+  }
+}
+
+/* ══════════════════════════════════════════════════════════════════════════
+   Liquid glass
+
+   Two strengths of the same material. `liquid-glass` is for things that sit on
+   a photograph and must not compete with it — the nav pill, badges, tags;
+   `liquid-glass-strong` blurs hard enough to carry body text over anything.
+
+   The edge is a ::before ring, not a border: a border is one colour all the way
+   round, and glass is bright where it faces the light and invisible side-on.
+   The ring is the element's own box with its content box masked out
+   (`mask-composite: exclude`), so it follows any radius without an image.
+
+   No `overflow: hidden`, which the reference used: it clips focus outlines and
+   the active-link rule under the nav. The ring needs a positioned host, but
+   setting `position: relative` unconditionally would override `absolute` /
+   `fixed` / `sticky` on the same element depending on utility order — so it
+   only applies when none of those is present.
+   ══════════════════════════════════════════════════════════════════════════ */
+@utility liquid-glass {
+  isolation: isolate;
+  background-color: var(--glass-fill);
+  background-blend-mode: luminosity;
+  -webkit-backdrop-filter: blur(4px) saturate(1.15);
+  backdrop-filter: blur(4px) saturate(1.15);
+  box-shadow: inset 0 1px 1px var(--glass-highlight);
+
+  &:where(:not(.absolute, .fixed, .sticky)) {
+    position: relative;
+  }
+  &::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    z-index: -1;
+    padding: 1.4px;
+    border-radius: inherit;
+    background: linear-gradient(
+      180deg,
+      var(--glass-stroke-strong) 0%,
+      var(--glass-stroke-mid) 20%,
+      transparent 40%,
+      transparent 60%,
+      var(--glass-stroke-mid) 80%,
+      var(--glass-stroke-strong) 100%
+    );
+    -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+    -webkit-mask-composite: xor;
+    mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+    mask-composite: exclude;
+    pointer-events: none;
+  }
+}
+
+@utility liquid-glass-strong {
+  isolation: isolate;
+  background-color: var(--glass-fill-strong);
+  background-blend-mode: luminosity;
+  -webkit-backdrop-filter: blur(50px) saturate(1.2);
+  backdrop-filter: blur(50px) saturate(1.2);
+  box-shadow: var(--glass-shadow), inset 0 1px 1px var(--glass-highlight);
+
+  &:where(:not(.absolute, .fixed, .sticky)) {
+    position: relative;
+  }
+  &::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    z-index: -1;
+    padding: 1.4px;
+    border-radius: inherit;
+    background: linear-gradient(
+      180deg,
+      color-mix(in srgb, var(--glass-stroke-strong) 110%, transparent) 0%,
+      color-mix(in srgb, var(--glass-stroke-mid) 130%, transparent) 20%,
+      transparent 40%,
+      transparent 60%,
+      color-mix(in srgb, var(--glass-stroke-mid) 130%, transparent) 80%,
+      color-mix(in srgb, var(--glass-stroke-strong) 110%, transparent) 100%
+    );
+    -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+    -webkit-mask-composite: xor;
+    mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+    mask-composite: exclude;
+    pointer-events: none;
+  }
+}
+
+/* Without backdrop-filter a 1% fill is no panel at all, and text set on it
+   lands straight on the photograph. Fall back to the opaque card surface. */
+@supports not ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) {
+  .liquid-glass,
+  .liquid-glass-strong {
+    background-color: color-mix(in srgb, var(--card) 92%, transparent);
+  }
+}
+
+/*
+ * Display type. Instrument Serif, italic, set tight — the cinematic register
+ * the headlines use. A utility rather than a theme font key so the italic and
+ * the tracking travel with the family and cannot be half-applied.
+ */
+@utility font-display {
+  font-family: var(--font-display), var(--font-serif), ui-serif, serif;
+  font-style: italic;
+  font-weight: 400;
+  letter-spacing: -0.035em;
+}
+
+/* ══════════════════════════════════════════════════════════════════════════
+   Reveal states, driven from src/components/motion.
+
+   `data-reveal` is a block that rises in as one; `data-reveal-text` is a line
+   whose words rise in one after another. Kept as two attributes so a block can
+   contain a headline without either one's state leaking into the other.
+
+   The server always renders `static`, which is fully visible — so content never
+   depends on JavaScript, an observer firing, or a motion preference the server
+   cannot know. After mount, something below the fold is `armed` (held at the
+   start frame) and becomes `play` when it scrolls into view. Something already
+   on screen at mount is left `static`: animating it would mean hiding text the
+   reader is already looking at.
+   ══════════════════════════════════════════════════════════════════════════ */
+@layer components {
+  [data-reveal='armed'],
+  [data-reveal-text='armed'] [data-reveal-word] {
+    opacity: 0;
+  }
+  [data-reveal='play'],
+  [data-reveal-text='play'] [data-reveal-word] {
+    animation: var(--animate-blur-rise);
+    animation-delay: calc(var(--reveal-delay, 0ms) + var(--i, 0) * var(--reveal-stagger, 100ms));
+  }
+  [data-reveal-word] {
+    display: inline-block;
+    white-space: pre;
+  }
+}
+
+/* Unlayered so they win over any utility, whatever its specificity. */
+@media (prefers-reduced-motion: reduce) {
+  .animate-blur-rise,
+  [data-reveal],
+  [data-reveal-word] {
+    animation: none !important;
+    opacity: 1 !important;
+    filter: none !important;
+    transform: none !important;
   }
 }

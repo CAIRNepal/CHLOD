@@ -44,15 +44,17 @@ export function LanguageSwitcher() {
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
+        {/* The language code sits inside the button, beside the globe. As a
+            badge hung off the corner it overflowed the glass control pill. */}
         <Button
           variant="ghost"
-          size="icon"
-          className="relative"
+          size="sm"
+          className="h-9 gap-1 rounded-full px-2.5 text-foreground/70 hover:bg-foreground/[0.06] hover:text-foreground"
           disabled={isPending}
           aria-label={t('switchTo')}
         >
-          <Globe className="h-4 w-4" />
-          <span className="absolute -bottom-0.5 -right-0.5 text-[10px] font-bold leading-none bg-primary/10 dark:bg-primary/10 text-primary dark:text-primary rounded px-0.5">
+          <Globe className="h-4 w-4" aria-hidden="true" />
+          <span className="text-[11px] font-semibold leading-none" aria-hidden="true">
             {locale === 'en' ? 'EN' : 'ने'}
           </span>
         </Button>

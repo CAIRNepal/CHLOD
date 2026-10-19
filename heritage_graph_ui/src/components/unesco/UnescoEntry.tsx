@@ -4,10 +4,12 @@
  * The entry experience at `/`.
  *
  * WHAT A VISITOR MEETS, IN ORDER
- *  1. The name. A full-bleed photograph with the wordmark over it and one line
- *     saying what this is. An earlier version led with "Seven monument zones"
- *     — true, but it told a first-time visitor what they were looking at
- *     without ever telling them where they were.
+ *  1. The first screen. A full-viewport photograph, the name in the badge and
+ *     one line saying what this is, two ways in, and two sourced figures. An
+ *     earlier version led with "Seven monument zones" — true, but it told a
+ *     first-time visitor what they were looking at without ever telling them
+ *     where they were. (The relief wordmark that used to sit here is retired:
+ *     the name is now in the nav on every page, and in the badge.)
  *  2. Why a graph. One concrete example — a temple, its guthi, its festival,
  *     its deity — beside a live web of the seven zones. The idea is meant to
  *     land visually before it is read.
@@ -32,20 +34,20 @@
 import Link from 'next/link';
 import { useTranslations } from 'next-intl';
 import { motion } from 'framer-motion';
-import { IconArrowRight } from '@tabler/icons-react';
+import { IconArrowDown, IconArrowRight, IconArrowUpRight } from '@tabler/icons-react';
 
-import { Button } from '@/components/ui/button';
-import { imageReveal, revealOnScroll, wideColumn } from '@/lib/design';
+import { revealOnScroll, wideColumn } from '@/lib/design';
 import { useReveal } from '@/lib/use-reveal';
-import { KATHMANDU_VALLEY, LUMBINI } from '@/lib/unesco/ground-truth';
+import { LUMBINI } from '@/lib/unesco/ground-truth';
 import { museumHref } from '@/lib/unesco/graph-bindings';
 
 import { Eyebrow, OpeningGround } from '@/components/editorial';
-import { GraphBoundaryNote, PropertyPhotograph, ZoneCollection } from './entry-sections';
+import { BlurText, Reveal } from '@/components/motion';
+import { GraphBoundaryNote, PropertyPhotograph, ZoneRail } from './entry-sections';
 import { Constellation } from './Constellation';
-import { Wordmark } from './Wordmark';
 import { HeroPhotographs } from './HeroPhotographs';
-import { CardWeb } from './CardWeb';
+import { HeroStats } from './HeroStats';
+import { TrustBar } from './TrustBar';
 import { NextSteps } from './NextSteps';
 import { AmbientWash, LiveBackdrop } from './depth';
 import { HowItWorks } from './HowItWorks';
@@ -60,68 +62,96 @@ export function UnescoEntry() {
           the page feels alive without competing with the photography. */}
       <LiveBackdrop />
 
-      {/* ── The opening: the name, then what this is ──
-          One group, not two sections with a gap between them. The hero
-          photograph dissolves into the page, and the section that followed
-          carried its own tinted wash — so a strip of untinted background sat
-          between the two and read as a pale band across the page. A single
-          vertical gradient over the whole group, soft at both ends, means there
-          is no edge anywhere to see. */}
-      <div className="relative isolate flex flex-col">
-        <OpeningGround />
-      {/* ── 1. The name ── */}
-      <section aria-labelledby="entry-title" className="relative">
-        <motion.div variants={imageReveal} initial="hidden" animate="show">
-          {/* The hero rotates through the UNESCO-listed places rather than
-              holding one photograph. Frame, mask, parallax and scrims are
-              unchanged; only the source moves. The set comes from the
-              ground-truth module, so it cannot drift from the authority the rest
-              of the page derives its UNESCO facts from. */}
-          <HeroPhotographs>
-            {/* Two scrims, both fading out before the bottom edge so neither
-                deposits a dark band where the photograph is disappearing.
-                Vertical carries the top of the frame and the header above it;
-                horizontal darkens the left, where the type sits, and leaves the
-                right side of the photograph at full brightness. A single
-                symmetrical scrim strong enough for the lede would have flattened
-                the whole picture. */}
-            <div
-              className="pointer-events-none absolute inset-0 bg-[linear-gradient(to_bottom,rgba(0,0,0,0.55)_0%,rgba(0,0,0,0.46)_46%,rgba(0,0,0,0.24)_74%,transparent_100%)]"
-              aria-hidden="true"
-            />
-            {/* The horizontal scrim carries the SAME vertical mask as the
-                photograph. It has no falloff of its own — a left-to-right
-                gradient is equally dark at the top and the bottom — so without
-                the mask it kept painting grey over the page background below
-                where the photograph had already dissolved, and put a hard edge
-                exactly where the figure ended. */}
-            <div
-              className="pointer-events-none absolute inset-0 bg-[linear-gradient(to_right,rgba(0,0,0,0.5)_0%,rgba(0,0,0,0.28)_38%,transparent_68%)] [mask-image:linear-gradient(to_bottom,#000_0%,#000_46%,transparent_86%)]"
-              aria-hidden="true"
-            />
-            {/* Type sits in the upper, still-opaque part of the frame. It used
-                to sit at the bottom, which is now the part that fades away. */}
-            <div className="absolute inset-0 flex items-center">
-              <div className={`${wideColumn} -mt-6 sm:-mt-10`}>
-                <Eyebrow className="text-white/70">{t('eyebrow')}</Eyebrow>
-                {/* The wordmark sits forward of the photograph, which drifts
-                    behind it on scroll — the two read as separate planes
-                    rather than as text on a picture. */}
-                <Wordmark
-                  id="entry-title"
-                  first={t('wordmarkFirst')}
-                  second={t('wordmarkSecond')}
-                  className="mt-3"
-                />
-                <p className="mt-4 max-w-[46ch] text-sm leading-relaxed text-white/85 sm:text-lg">
-                  {t('heroLede')}
+      {/* ── 1. The first screen ──
+          The whole viewport, photograph edge to edge, with the bar floating
+          over it (`data-site-hero` is what tells the bar to go transparent).
+          Forced `dark`: the ground is a photograph under a black scrim in
+          either theme, so the glass and the type use the dark tokens here
+          whatever the reader has chosen for the rest of the site.
+
+          Order of arrival, all CSS so none of it waits for hydration: the
+          badge, the headline word by word, the lede, the two ways in, the
+          figures, the sources. The photograph itself never fades in — it is
+          the LCP element and is on screen from the first paint. */}
+      <section
+        aria-labelledby="entry-title"
+        data-site-hero
+        className="dark relative isolate flex h-svh min-h-[42rem] flex-col overflow-hidden text-foreground"
+      >
+        <HeroPhotographs>
+          <div className="relative z-10 flex h-full flex-col items-center px-4 text-center">
+            <div className="flex flex-1 flex-col items-center justify-center pt-24">
+              <Reveal trigger="mount" delay={400}>
+                <p className="liquid-glass inline-flex max-w-[22rem] items-center gap-2.5 rounded-full py-1 pr-3.5 pl-1 text-left text-xs leading-tight font-light text-foreground/90 sm:max-w-none sm:text-sm">
+                  <span className="shrink-0 rounded-full bg-cta px-2.5 py-0.5 text-xs font-medium whitespace-nowrap text-cta-foreground">
+                    {t('hero.badgeChip')}
+                  </span>
+                  {t('hero.badge')}
                 </p>
-              </div>
+              </Reveal>
+
+              <BlurText
+                as="h1"
+                id="entry-title"
+                trigger="mount"
+                delay={500}
+                text={t('hero.headline')}
+                className="mt-6 max-w-[16ch] font-display text-[clamp(3.25rem,9vw,5.5rem)] leading-[0.86] text-balance text-foreground [:lang(ne)_&]:text-[clamp(2.5rem,6vw,4.25rem)]"
+              />
+
+              <Reveal
+                as="p"
+                trigger="mount"
+                delay={800}
+                className="mt-5 max-w-2xl text-sm leading-snug font-light text-foreground/90 md:text-base"
+              >
+                {t('heroLede')}
+              </Reveal>
+
+              <Reveal trigger="mount" delay={1100} className="mt-7 flex flex-wrap items-center justify-center gap-6">
+                <Link
+                  href="/heritage-museum"
+                  className="liquid-glass-strong group inline-flex items-center gap-2 rounded-full px-5 py-2.5 text-sm font-medium text-foreground transition-colors focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring"
+                >
+                  {t('hero.ctaMuseum')}
+                  <IconArrowUpRight
+                    className="size-4 transition-transform duration-300 group-hover:translate-x-0.5 group-hover:-translate-y-0.5 motion-reduce:transition-none"
+                    aria-hidden="true"
+                  />
+                </Link>
+                <a
+                  href="#how-heading"
+                  className="group inline-flex items-center gap-2 rounded-full text-sm font-medium text-foreground/90 transition-colors hover:text-foreground focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-ring"
+                >
+                  <IconArrowDown
+                    className="size-4 transition-transform duration-300 group-hover:translate-y-0.5 motion-reduce:transition-none"
+                    aria-hidden="true"
+                  />
+                  {t('hero.ctaHow')}
+                </a>
+              </Reveal>
+
+              <Reveal trigger="mount" delay={1300} className="mt-9 hidden sm:block [@media(max-height:46rem)]:hidden">
+                <HeroStats />
+              </Reveal>
             </div>
-          </HeroPhotographs>
-        </motion.div>
+
+            {/* Sources, above the photograph's credit pill. On a phone the
+                screen has no room for both under the CTAs, and the credit is
+                the one that is a licence condition. */}
+            <Reveal trigger="mount" delay={1400} className="hidden pb-24 md:block [@media(max-height:40rem)]:hidden">
+              <TrustBar />
+            </Reveal>
+            <div className="pb-20 md:hidden" aria-hidden="true" />
+          </div>
+        </HeroPhotographs>
       </section>
 
+      {/* ── What this is ──
+          The intro and its live web share one soft ground, as before; the
+          opening photograph is now its own full screen above it. */}
+      <div className="relative isolate flex flex-col">
+        <OpeningGround />
       {/* ── 2. Why a graph ── prose beside a live web ── */}
       <section aria-labelledby="intro-heading" className="relative pt-16 md:pt-24">
         <div className={wideColumn}>
@@ -132,7 +162,7 @@ export function UnescoEntry() {
             <motion.div {...reveal} variants={revealOnScroll}>
               <h2
                 id="intro-heading"
-                className="mx-auto max-w-[22ch] font-serif text-3xl leading-[1.1] text-balance sm:text-4xl"
+                className="mx-auto max-w-[18ch] font-display text-4xl leading-[0.95] text-balance sm:text-6xl"
               >
                 {t('introTitle')}
               </h2>
@@ -158,27 +188,9 @@ export function UnescoEntry() {
       {/* ── 3. What the platform actually does ── */}
       <HowItWorks />
 
-      {/* ── 4. The seven zones, as the readable index ── */}
-      <section aria-labelledby="zones-heading">
-        <motion.div {...reveal} variants={revealOnScroll} className={`${wideColumn} mb-8`}>
-          <Eyebrow>{t('inscribedYear', { year: KATHMANDU_VALLEY.yearInscribed })}</Eyebrow>
-          <h2
-            id="zones-heading"
-            className="mt-2 font-serif text-3xl leading-tight text-balance sm:text-4xl"
-          >
-            {t('zonesHeadingPlain')}
-          </h2>
-          <p className="mt-4 max-w-[64ch] leading-relaxed text-muted-foreground">
-            {t('zonesPlainNote')}
-          </p>
-        </motion.div>
-
-        <div className={wideColumn}>
-          <CardWeb>
-            <ZoneCollection layout="grid" headingLevel={3} />
-          </CardWeb>
-        </div>
-      </section>
+      {/* ── 4. The seven zones, as the readable index ──
+          Pinned: the section holds and the row of places passes through it. */}
+      <ZoneRail />
 
       {/* ── 5. Two doors out ── */}
       <NextSteps />
@@ -220,7 +232,7 @@ export function UnescoEntry() {
               <Eyebrow>{t('culturalHeading')}</Eyebrow>
               <h2
                 id="lumbini-heading"
-                className="mt-2 max-w-[22ch] font-serif text-3xl leading-tight text-balance sm:text-4xl"
+                className="mt-3 max-w-[18ch] font-display text-4xl leading-[0.95] text-balance sm:text-5xl"
               >
                 {t('properties.lumbini')}
               </h2>
@@ -230,12 +242,16 @@ export function UnescoEntry() {
               <p className="mt-4 text-sm text-muted-foreground">
                 {t('inscribedYear', { year: LUMBINI.yearInscribed })}
               </p>
-              <Button asChild className="mt-6">
-                <Link href={museumHref('lumbini')}>
-                  {t('openInMuseum')}
-                  <IconArrowRight className="size-4" aria-hidden="true" />
-                </Link>
-              </Button>
+              <Link
+                href={museumHref('lumbini')}
+                className="liquid-glass-strong group mt-7 inline-flex items-center gap-2 rounded-full px-5 py-2.5 text-sm font-medium text-foreground focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring"
+              >
+                {t('openInMuseum')}
+                <IconArrowRight
+                  className="size-4 transition-transform duration-300 group-hover:translate-x-0.5 motion-reduce:transition-none"
+                  aria-hidden="true"
+                />
+              </Link>
             </div>
           </div>
 

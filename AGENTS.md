@@ -96,6 +96,7 @@ heritagegraph/
 Feature specs and design artifacts live under `specs/`. Example:
 
 - **Identity layer (claim-first)** — [`specs/005-identity-layer/spec.md`](specs/005-identity-layer/spec.md) (draft; ties together entity clusters, same-referent membership claims, merge/split audit, APIs, and reviewer workspace UI).
+- **Liquid-glass interface** — [`specs/008-liquid-glass-ui/proposal.md`](specs/008-liquid-glass-ui/proposal.md) (frontend only: glass tokens and utilities, glass pill nav for both shells, motion primitives, museum Street (3D) view; per-commit log in `CHANGES.md`).
 
 ---
 
@@ -131,6 +132,8 @@ fetch('http://backend.localhost/data/endpoint/', {
 
 ### 6. UI components are shadcn/ui
 Installed via `npx shadcn@latest add <component>`. Style: "new-york". Colors managed in `globals.css` via tweakcn. **Do not add custom colors to individual components.**
+
+**Surfaces and type (spec 008).** Panels are `liquid-glass` (labels, chips, pills over a photograph) or `liquid-glass-strong` (anything carrying body text); never hand-roll `backdrop-blur` + translucent fill. The solid call-to-action is `bg-cta text-cta-foreground` — not `bg-primary`, which drives inline links. Headlines use `font-display` (Instrument Serif italic; rebound to Noto Serif Devanagari, upright, under `body:lang(ne)`). Entrances use `Reveal` / `BlurText` from `@/components/motion`, which render visible on the server; do not add Framer `initial={{ opacity: 0 }}` to new surfaces. A section over a photograph forces the dark tokens with `className="dark"`, as the entry hero does.
 
 ### 7. Root URL conf is `urls` not `heritage_graph.urls`
 The Django `ROOT_URLCONF` in base.py is set to `"urls"` — the file is at `heritage_graph/urls.py` but is imported as a top-level module because `WORKDIR` is `/app` in Docker.
@@ -248,7 +251,7 @@ The Django `ROOT_URLCONF` in base.py is set to `"urls"` — the file is at `heri
 
 ### Frontend Routes — Main app (`heritage_graph_ui`, port 3000)
 
-- `/` — **public UNESCO entry experience** (long-scroll editorial; works signed out). Facts come from `src/lib/unesco/ground-truth.ts`, photography from `src/data/unesco-imagery.json` (regenerate with `node scripts/freeze-unesco-imagery.mjs`). **Never render `node.unescoStatus` or UNESCO claims found in graph `rdfs:comment` literals** — both assert "World Heritage Site" on individual monument zones, and on Nyatapola Temple and the city of Bhaktapur, which are not zones at all. Resolve status through `src/lib/unesco/status.ts` instead.
+- `/` — **public UNESCO entry experience** (long-scroll editorial; works signed out). The hero is a full-screen `data-site-hero` section — the top bar goes transparent over it — with figures from `HeroStats` (ground-truth parameters, never literals in copy) and a `TrustBar` that may only name sources listed in the `/methods` licence matrix. The seven zones are a `PinnedRail`. Facts come from `src/lib/unesco/ground-truth.ts`, photography from `src/data/unesco-imagery.json` (regenerate with `node scripts/freeze-unesco-imagery.mjs`). **Never render `node.unescoStatus` or UNESCO claims found in graph `rdfs:comment` literals** — both assert "World Heritage Site" on individual monument zones, and on Nyatapola Temple and the city of Bhaktapur, which are not zones at all. Resolve status through `src/lib/unesco/status.ts` instead.
 - `/dashboard` — dashboard home (authenticated shell); moved off `/` in the 2026-08 entry redesign
 - `/preview/entry-a`, `/preview/entry-b` — the two compositional directions the entry was chosen from; `noindex`, retained for comparison and safe to delete
 - `/knowledge/<domain>` — knowledge base (entity, person, location, event, period, tradition, source)
@@ -268,7 +271,7 @@ The Django `ROOT_URLCONF` in base.py is set to `"urls"` — the file is at `heri
 - `/community/contributors` — contributor list
 - `/graphview` — graph visualization
 - `/atlas` — Heritage Atlas (Cesium globe): demo corpus by default; **live mode consumes the authoritative KG projection** `GET /api/v1/cidoc/kg/graph/` (same as the Museum) via `lib/atlas-kg-hydrate.ts` — IRI node ids, tiered coord provenance (verified/inherited/gazetteer/unmapped, shared `lib/kg-geo.ts`), real comments/media, assertion-backed edge provenance (no synthetic assertions); URL-synced `source`/`selected`/`panel`/`year`; curator Reviewed/All scope toggle; 5-min sessionStorage cache
-- `/heritage-museum` — narrative knowledge graph: **Graph** (d3-force), **Map** (Leaflet), **Stories** (cinematic photo-essay reader). The Stories tab is *not* XR — `ImmersiveScene` is DOM/CSS. The three.js + WebXR `PanoramaViewer` is offered only when a hero image measures ~2:1 (`lib/heritage-museum/panorama-support.ts`), because wrapping an ordinary photo onto a sphere adds no immersion. Cross-links to Atlas via `lib/cross-surface-links.ts` (live mode only — demo corpora have unrelated ids)
+- `/heritage-museum` — narrative knowledge graph: **Graph** (d3-force), **Map** (Leaflet), **Stories** (cinematic photo-essay reader). The Stories tab is *not* XR — `ImmersiveScene` is DOM/CSS. The three.js + WebXR `PanoramaViewer` is offered only when a hero image measures ~2:1 (`lib/heritage-museum/panorama-support.ts`), because wrapping an ordinary photo onto a sphere adds no immersion. Cross-links to Atlas via `lib/cross-surface-links.ts` (live mode only — demo corpora have unrelated ids). With no record selected, the gallery offers **Grid / Street (3D)**: `xr/StreetGallery3D.tsx` (imperative three.js, lazy-loaded) hangs exhibits with a photograph along a corridor (`lib/heritage-museum/street-layout.ts`). It holds at most 12 textures, renders on demand, and keeps every visible photograph's credit in the DOM overlay (D4). It is disabled without WebGL 2 or under reduced motion
 - `/platform-admin` — In-app user and reviewer role management (staff / expert curator)
 
 ---
@@ -411,4 +414,5 @@ HeritageGraph uses **Celery + Redis** when async tasks are enabled:
 | [`documentation/deployment/DEPLOYMENT.md`](documentation/deployment/DEPLOYMENT.md) | Production deployment |
 | [`documentation/pipelines/OCR.md`](documentation/pipelines/OCR.md) | OCR pipeline (suspended) |
 | [`specs/007-entity-relationship-proposals/README.md`](specs/007-entity-relationship-proposals/README.md) | Entity & relationship proposals (007) |
+| [`specs/008-liquid-glass-ui/README.md`](specs/008-liquid-glass-ui/README.md) | Liquid-glass interface (008) — proposal, 3D research, change log |
 | [`CONTRIBUTING.md`](CONTRIBUTING.md) | Contributor instructions |

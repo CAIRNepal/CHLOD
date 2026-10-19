@@ -217,11 +217,11 @@ export function CommandMenuTrigger() {
       type="button"
       onClick={dispatch}
       aria-label="Open search (Command or Control + K)"
-      className="hidden @[44rem]/header:inline-flex items-center gap-2 rounded-md border border-border bg-muted/50 px-2.5 py-1.5 text-xs text-muted-foreground hover:text-foreground hover:bg-muted transition-colors"
+      className="hidden @[44rem]/header:inline-flex items-center gap-2 rounded-full px-3 py-2 text-xs text-foreground/70 hover:text-foreground hover:bg-foreground/[0.06] transition-colors focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring"
     >
       <IconSearch className="h-3.5 w-3.5" />
-      <span>Search…</span>
-      <kbd className="ml-1 rounded bg-muted px-1.5 py-0.5 font-mono text-[10px]">⌘K</kbd>
+      <span className="hidden @[84rem]/header:inline">Search…</span>
+      <kbd className="ml-1 hidden rounded-full bg-foreground/10 px-1.5 py-0.5 font-mono text-[10px] @[84rem]/header:inline">⌘K</kbd>
     </button>
   );
 }

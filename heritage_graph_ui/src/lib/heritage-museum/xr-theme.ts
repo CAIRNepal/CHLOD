@@ -28,14 +28,18 @@ export function useTimelineTranslations() {
     t(`timeline.${key}` as Parameters<typeof t>[0], values);
 }
 
-export const xrGlassPanel =
-  'rounded-2xl border border-border bg-card/90 backdrop-blur-xl shadow-lg';
+/*
+ * The museum's panels are the same liquid glass as the site chrome (spec 008),
+ * so the museum stops reading as a separate app inside the site. Both panel
+ * kinds use the STRONG glass: they carry body text, often over a photograph,
+ * and the light 4px blur is for chips and pills that only hold a label.
+ */
+export const xrGlassPanel = 'liquid-glass-strong rounded-2xl';
 
-export const xrSubtlePanel =
-  'rounded-xl border border-border bg-card/75 backdrop-blur-md';
+export const xrSubtlePanel = 'liquid-glass-strong rounded-xl';
 
 export const xrChip =
-  'inline-flex items-center gap-1.5 rounded-full border border-border bg-muted/60 px-2.5 py-1 text-xs text-muted-foreground';
+  'liquid-glass inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 text-xs text-muted-foreground';
 
 export const xrCinematicLeft =
   'pointer-events-none absolute inset-0 bg-gradient-to-r from-background/92 via-background/35 to-transparent';

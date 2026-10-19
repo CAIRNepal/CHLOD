@@ -25,9 +25,17 @@
  *     `priority`, so the page still paints on one image and the swap has the
  *     following one already decoded.
  *
- * The photograph's own treatment — 16/9, the dissolve mask, the parallax, the
- * 1.06 scale — is unchanged from the single static hero it replaces. Only the
- * source rotates; the frame, the scrims and the wordmark above it do not move.
+ * FULL BLEED (spec 008)
+ * The photograph is now the whole first screen rather than a 16:9 band that
+ * dissolved into the page — the role a background video plays on a cinematic
+ * landing page, filled by the archive's own credited photography instead of
+ * stock footage. The current frame drifts slowly (a Ken Burns scale) so the
+ * screen is never quite still; it is a CSS animation keyed to the frame, so it
+ * restarts on each swap and is removed entirely under reduced motion.
+ *
+ * The place name, the credit, the frame dots and the pause button sit together
+ * in one glass pill at the foot of the screen, over the photograph — so they
+ * use the on-image attribution, which stays light-on-dark in both themes.
  */
 
 import { useCallback, useEffect, useState } from 'react';
@@ -41,20 +49,8 @@ import { imageryFor } from '@/lib/unesco/imagery';
 import { KATHMANDU_VALLEY, LUMBINI } from '@/lib/unesco/ground-truth';
 import { cn } from '@/lib/utils';
 
-import { Parallax } from './depth';
-
 /** How long each photograph holds. Long enough to look at, not a slideshow. */
 const HOLD_MS = 7000;
-
-/**
- * The image treatment, kept identical to the static hero it replaces.
- *
- * The fade ends at 86%, not 100%: the image carries a parallax translate, so its
- * box slides inside the figure that clips it, and at 100% the clip cut the
- * photograph while the mask still had alpha left — a hard line across the page.
- */
-const IMAGE_CLASS =
-  'object-cover scale-[1.06] [mask-image:linear-gradient(to_bottom,#000_0%,#000_46%,rgba(0,0,0,0.5)_68%,transparent_86%)]';
 
 interface Subject {
   key: string;
@@ -91,7 +87,7 @@ export function HeroPhotographs({ children }: { children?: React.ReactNode }) {
     return () => window.clearInterval(id);
   }, [autoplay, advance]);
 
-  if (count === 0) return null;
+  if (count === 0) return <div className="absolute inset-0 bg-background">{children}</div>;
 
   const current = SUBJECTS[index];
   // The frame after this one is mounted at zero opacity so its bytes are
@@ -102,92 +98,106 @@ export function HeroPhotographs({ children }: { children?: React.ReactNode }) {
   const currentName = t(current.labelKey);
 
   return (
-    <figure className="relative m-0 overflow-hidden bg-transparent">
-      <div className="relative w-full" style={{ aspectRatio: '16 / 9' }}>
-        {visible.map((subject) => {
-          const image = imageryFor(subject.key)?.image;
-          if (!image) return null;
-          const isCurrent = subject.key === current.key;
-          return (
-            <motion.div
-              key={subject.key}
-              className="absolute inset-0"
-              initial={false}
-              animate={{ opacity: isCurrent ? 1 : 0 }}
-              transition={{ duration: reduce ? 0 : 1.1, ease: [0.22, 1, 0.36, 1] }}
-              aria-hidden={!isCurrent}
-            >
-              <Parallax distance={70} className="absolute inset-0">
-                <div className="relative h-full w-full">
-                  <Image
-                    src={image.url}
-                    alt={isCurrent ? t('photographOf', { name: t(subject.labelKey) }) : ''}
-                    fill
-                    sizes="100vw"
-                    // Only the first frame blocks paint. The rest are swaps.
-                    priority={subject.key === SUBJECTS[0].key}
-                    className={IMAGE_CLASS}
-                  />
-                </div>
-              </Parallax>
-            </motion.div>
-          );
-        })}
+    <figure className="absolute inset-0 m-0 overflow-hidden bg-background">
+      {visible.map((subject) => {
+        const image = imageryFor(subject.key)?.image;
+        if (!image) return null;
+        const isCurrent = subject.key === current.key;
+        return (
+          <motion.div
+            key={subject.key}
+            className="absolute inset-0"
+            initial={false}
+            animate={{ opacity: isCurrent ? 1 : 0 }}
+            transition={{ duration: reduce ? 0 : 1.4, ease: [0.22, 1, 0.36, 1] }}
+            aria-hidden={!isCurrent}
+          >
+            <Image
+              src={image.url}
+              alt={isCurrent ? t('photographOf', { name: t(subject.labelKey) }) : ''}
+              fill
+              sizes="100vw"
+              // Only the first frame blocks paint. The rest are swaps.
+              priority={subject.key === SUBJECTS[0].key}
+              // The drift is added the moment a frame becomes current, which
+              // is what starts it from 1.0; the waiting frame has none.
+              className={cn(
+                'object-cover',
+                isCurrent &&
+                  'motion-safe:animate-[hero-drift_14s_cubic-bezier(0.22,1,0.36,1)_both]',
+              )}
+            />
+          </motion.div>
+        );
+      })}
 
-        {children}
+      {/* Scrims. The reference design put white type straight onto video; a
+          photograph of a sunlit durbar square is far brighter than that, so the
+          type needs a floor. Top: under the floating nav. Middle: a wide, soft
+          vignette under the centred headline. Bottom: under the trust strip and
+          the credit pill. Each fades out before it reaches the middle of the
+          frame, so the picture still reads as a picture. */}
+      <div
+        aria-hidden="true"
+        className="pointer-events-none absolute inset-0 bg-[linear-gradient(to_bottom,rgba(0,0,0,0.55)_0%,rgba(0,0,0,0.12)_22%,rgba(0,0,0,0.12)_62%,rgba(0,0,0,0.78)_100%)]"
+      />
+      <div
+        aria-hidden="true"
+        className="pointer-events-none absolute inset-0 bg-[radial-gradient(70%_55%_at_50%_48%,rgba(0,0,0,0.45)_0%,rgba(0,0,0,0.18)_60%,transparent_100%)]"
+      />
 
-        {/* Which place this is, who took the photograph, and a way to stop it.
-            SURFACE tokens, not on-image whites. This row sits at the foot of the
-            frame, which is exactly where the dissolve mask has taken the
-            photograph to nothing — so it is on the page background, not on the
-            picture. White text there was invisible in light mode, which is the
-            same defect the caption plates elsewhere on this page exist to
-            avoid. `onSurface` is the attribution variant built for it. */}
-        <div className="absolute inset-x-0 bottom-0 z-10">
-          <div className="mx-auto flex w-full max-w-7xl flex-wrap items-center gap-x-3 gap-y-2 px-5 pb-5 sm:px-6 lg:px-8">
-            <p className="font-mono text-[0.7rem] uppercase tracking-[0.14em] text-muted-foreground">
-              {currentName}
-            </p>
-            {credit ? (
-              <div className="min-w-0">
-                <ImageAttribution credit={credit} variant="onSurface" />
-              </div>
-            ) : null}
+      {children}
 
-            <div className="ml-auto flex items-center gap-2">
-              {/* Which frame, as dots. Buttons, not decoration — a reader who
-                  wants a particular place should not have to wait for it. */}
-              <div className="hidden items-center gap-1.5 sm:flex">
-                {SUBJECTS.map((s, i) => (
-                  <button
-                    key={s.key}
-                    type="button"
-                    onClick={() => setIndex(i)}
-                    aria-label={t(s.labelKey)}
-                    aria-current={i === index}
-                    className={cn(
-                      'size-1.5 rounded-full transition-all focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-ring',
-                      i === index
-                        ? 'w-4 bg-primary'
-                        : 'bg-muted-foreground/40 hover:bg-muted-foreground/70',
-                    )}
-                  />
-                ))}
-              </div>
-              <button
-                type="button"
-                onClick={() => setPaused((p) => !p)}
-                aria-pressed={paused}
-                className="inline-flex items-center gap-1.5 rounded-full border border-border bg-card/70 px-2.5 py-1 text-[0.7rem] text-muted-foreground backdrop-blur-sm transition-colors hover:border-primary/30 hover:text-foreground focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring"
-              >
-                {paused ? (
-                  <IconPlayerPlay className="size-3.5" aria-hidden="true" />
-                ) : (
-                  <IconPlayerPause className="size-3.5" aria-hidden="true" />
-                )}
-                {paused ? t('heroPlay') : t('heroPause')}
-              </button>
+      {/* Which place this is, who took the photograph, and a way to stop it.
+          Centred, with side padding that clears both bottom corners: those
+          belong to fixed chrome (the chat button, the account avatar), and D4
+          requires that nothing floating ever covers a credit. */}
+      <div
+        role="group"
+        aria-label={t('hero.photoControls')}
+        className="absolute inset-x-0 bottom-0 z-20 flex justify-center px-16 pb-4 sm:px-20"
+      >
+        <div className="liquid-glass flex max-w-full flex-wrap items-center gap-x-3 gap-y-1 rounded-full py-1.5 pr-1.5 pl-4">
+          <p className="font-mono text-[0.68rem] uppercase tracking-[0.14em] text-white/90">
+            {currentName}
+          </p>
+          {credit ? (
+            <div className="min-w-0">
+              <ImageAttribution credit={credit} variant="onImage" />
             </div>
+          ) : null}
+
+          <div className="flex items-center gap-2">
+            {/* Which frame, as dots. Buttons, not decoration — a reader who
+                wants a particular place should not have to wait for it. */}
+            <div className="hidden items-center gap-1.5 md:flex">
+              {SUBJECTS.map((s, i) => (
+                <button
+                  key={s.key}
+                  type="button"
+                  onClick={() => setIndex(i)}
+                  aria-label={t(s.labelKey)}
+                  aria-current={i === index}
+                  className={cn(
+                    'h-1.5 rounded-full transition-all duration-500 focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-ring',
+                    i === index ? 'w-4 bg-white' : 'w-1.5 bg-white/40 hover:bg-white/70',
+                  )}
+                />
+              ))}
+            </div>
+            <button
+              type="button"
+              onClick={() => setPaused((p) => !p)}
+              aria-pressed={paused}
+              className="inline-flex items-center gap-1.5 rounded-full bg-white/10 px-2.5 py-1 text-[0.7rem] text-white/90 transition-colors hover:bg-white/20 hover:text-white focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring"
+            >
+              {paused ? (
+                <IconPlayerPlay className="size-3.5" aria-hidden="true" />
+              ) : (
+                <IconPlayerPause className="size-3.5" aria-hidden="true" />
+              )}
+              {paused ? t('heroPlay') : t('heroPause')}
+            </button>
           </div>
         </div>
       </div>

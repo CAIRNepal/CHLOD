@@ -5,6 +5,17 @@ import { useTheme } from 'next-themes';
 import { useEffect, useState } from 'react';
 import { Moon, Sun } from 'lucide-react';
 
+import { cn } from '@/lib/utils';
+
+/**
+ * A round icon button that sits inside the glass control pill.
+ *
+ * It was a sliding switch — a second, differently shaped control inside a row
+ * of round ones. The theme is not known until mount (next-themes reads it from
+ * storage), so before then the button renders as an empty placeholder of the
+ * same size rather than nothing: returning null made every control to its
+ * right jump 44px sideways on load.
+ */
 export function ThemeToggle() {
   const { setTheme, resolvedTheme } = useTheme();
   const [mounted, setMounted] = useState(false);
@@ -13,35 +24,31 @@ export function ThemeToggle() {
     setMounted(true);
   }, []);
 
-  if (!mounted || !resolvedTheme) return null;
+  const base =
+    'inline-flex size-9 shrink-0 items-center justify-center rounded-full text-foreground/70 transition-colors';
+
+  if (!mounted || !resolvedTheme) {
+    return <span className={base} aria-hidden="true" />;
+  }
 
   const isDark = resolvedTheme === 'dark';
 
   return (
-    <label className="relative inline-flex items-center cursor-pointer">
-      <input
-        type="checkbox"
-        className="sr-only peer"
-        checked={isDark}
-        onChange={() => {
-          if (!resolvedTheme) return;
-          setTheme(isDark ? 'light' : 'dark');
-        }}
-        aria-label="Toggle Dark Mode"
-        disabled={!mounted || !resolvedTheme}
-      />
-      <div className="w-11 h-6 bg-muted rounded-full peer peer-checked:bg-primary transition-colors"></div>
-      <div
-        className={`absolute left-1 top-1 w-4 h-4 bg-white rounded-full border border-border shadow-md transform transition-transform
-          ${isDark ? 'translate-x-5' : 'translate-x-0'}`}
-      />
-      <div className="absolute left-1 top-1 flex items-center justify-center w-4 h-4 pointer-events-none">
-        {isDark ? (
-          <Sun className="w-3 h-3 text-yellow-400" />
-        ) : (
-          <Moon className="w-3 h-3 text-gray-600" />
-        )}
-      </div>
-    </label>
+    <button
+      type="button"
+      onClick={() => setTheme(isDark ? 'light' : 'dark')}
+      aria-label="Toggle Dark Mode"
+      aria-pressed={isDark}
+      className={cn(
+        base,
+        'hover:bg-foreground/[0.06] hover:text-foreground focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring',
+      )}
+    >
+      {isDark ? (
+        <Sun className="size-4" aria-hidden="true" />
+      ) : (
+        <Moon className="size-4" aria-hidden="true" />
+      )}
+    </button>
   );
 }
