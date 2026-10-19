@@ -540,7 +540,23 @@
       "creditsLabel": "Image credit",
       "pause": "Pause",
       "play": "Play",
-      "unsourcedBeat": "Unsourced — demonstration text"
+      "unsourcedBeat": "Unsourced — demonstration text",
+      "street": {
+        "viewLabel": "Gallery view",
+        "viewGrid": "Grid",
+        "viewStreet": "Street (3D)",
+        "unavailableWebgl": "The 3D street needs WebGL 2, which this browser does not offer.",
+        "unavailableMotion": "The 3D street is off because your device asks for reduced motion.",
+        "region": "3D street of exhibits",
+        "hint": "Scroll, drag or use the arrow keys to walk. Enter opens the exhibit in front of you.",
+        "loading": "Building the street…",
+        "position": "{current} of {total}",
+        "open": "Open record",
+        "prev": "Previous exhibit",
+        "next": "Next exhibit",
+        "credits": "Credits for what you can see ({count})",
+        "exhibits": "Exhibits in this street"
+      }
     },
     "panel": {
       "emptyTitle": "Pick a place or story",

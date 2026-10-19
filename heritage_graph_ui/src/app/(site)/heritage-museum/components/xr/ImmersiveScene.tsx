@@ -52,6 +52,21 @@ const PanoramaViewer = dynamic(
   { ssr: false },
 );
 
+// The 3D street pulls in three.js; nobody who stays on the grid pays for it.
+const StreetGallery3D = dynamic(
+  () => import('./StreetGallery3D').then((m) => m.StreetGallery3D),
+  { ssr: false },
+);
+
+/** True when this browser can draw the 3D street. Client-only. */
+function supportsWebGL2(): boolean {
+  try {
+    return Boolean(document.createElement('canvas').getContext('webgl2'));
+  } catch {
+    return false;
+  }
+}
+
 const XR_STYLES = `
   @keyframes xrFadeInUp {
     from { opacity: 0; transform: translateY(12px); }
@@ -513,12 +528,80 @@ export function ImmersiveScene({
   );
   const handleMouseLeave = useCallback(() => setParallax({ x: 0, y: 0 }), []);
 
+  // Grid or street. The street is opt-in, and only offered when the browser
+  // has WebGL 2 and the reader has not asked for reduced motion — walking a
+  // camera is exactly the motion that setting asks us not to make. Capability
+  // is checked after mount (the server cannot know it), so the first render is
+  // the grid everywhere and hydration has nothing to reconcile.
+  const [galleryView, setGalleryView] = useState<'grid' | 'street'>('grid');
+  const [webgl2, setWebgl2] = useState<boolean | null>(null);
+  useEffect(() => setWebgl2(supportsWebGL2()), []);
+  const streetBlockedReason =
+    webgl2 === false ? t('street.unavailableWebgl') : reducedMotion ? t('street.unavailableMotion') : null;
+  const showStreet = galleryView === 'street' && !streetBlockedReason && withMediaCount > 1;
+  useEffect(() => {
+    if (streetBlockedReason) setGalleryView('grid');
+  }, [streetBlockedReason]);
+
   if (!node) {
+    // A street of one is not a street; the toggle appears from two exhibits.
+    const viewToggle =
+      withMediaCount > 1 ? (
+        <div className="flex flex-wrap items-center gap-3">
+          <div
+            role="radiogroup"
+            aria-label={t('street.viewLabel')}
+            className="liquid-glass inline-flex items-center gap-0.5 rounded-full p-1"
+          >
+            {(['grid', 'street'] as const).map((view) => {
+              const active = (view === 'street') === showStreet;
+              const disabled = view === 'street' && (Boolean(streetBlockedReason) || webgl2 === null);
+              return (
+                <button
+                  key={view}
+                  type="button"
+                  role="radio"
+                  aria-checked={active}
+                  disabled={disabled}
+                  onClick={() => setGalleryView(view)}
+                  className={cn(
+                    'rounded-full px-3 py-1.5 text-xs font-medium transition-colors focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring disabled:cursor-not-allowed disabled:opacity-50',
+                    active
+                      ? 'bg-foreground/10 text-foreground'
+                      : 'text-foreground/70 hover:bg-foreground/[0.06] hover:text-foreground',
+                  )}
+                >
+                  {view === 'grid' ? t('street.viewGrid') : t('street.viewStreet')}
+                </button>
+              );
+            })}
+          </div>
+          {streetBlockedReason ? (
+            <p className="text-xs text-muted-foreground">{streetBlockedReason}</p>
+          ) : null}
+        </div>
+      ) : null;
+
+    if (showStreet) {
+      return (
+        <div className="flex h-full w-full flex-col bg-background">
+          <h2 className="sr-only">{t('galleryTitle')}</h2>
+          <div className="shrink-0 px-4 pt-3 pb-3 sm:px-6">
+            <div className="mx-auto max-w-5xl">{viewToggle}</div>
+          </div>
+          <div className="relative min-h-0 flex-1">
+            <StreetGallery3D nodes={visualNodes} onSelect={onSelect} />
+          </div>
+        </div>
+      );
+    }
+
     return (
       <>
         <style>{XR_STYLES}</style>
         <div className="h-full w-full overflow-y-auto bg-background px-4 pb-6 pt-3 sm:px-6">
           <div className="mx-auto max-w-5xl">
+            {viewToggle ? <div className="mb-4">{viewToggle}</div> : null}
             {/* A real heading, and the decoration gone.
                 The default view rendered zero h1-h6 elements, so the page a
                 visitor lands on had no document outline at all — WCAG 1.3.1 and
