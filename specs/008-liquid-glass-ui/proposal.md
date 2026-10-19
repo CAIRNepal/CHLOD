@@ -70,7 +70,7 @@ Reverting is one `git revert` of the merge. Nothing persists outside the fronten
 |---|---|
 | Server/client hydration mismatch from motion preferences | Above-the-fold entrances are pure CSS. Scroll reveals arm only after mount, the pattern `src/lib/use-reveal.ts` already established. |
 | Content stuck invisible if an observer never fires | Reveals never start hidden on the server. Anything already in view at mount is shown, not animated. |
-| `position: sticky` broken by an `overflow` ancestor | The rail checks this at mount and falls back to the static grid. Ancestors use `overflow-x: clip`. |
+| `position: sticky` broken by an `overflow` ancestor | The rail's own frame uses `overflow: clip` (not `hidden`), its ancestors on `/` set no overflow, and it falls back to the static grid where sticky is unsupported. A new ancestor with `overflow: hidden` would break it, which is noted in `pinned-rail.tsx`. |
 | Glass text contrast in light mode | Light-mode glass has a more opaque fill. Text pairs are checked at ≥ 4.5:1 against the composited colour. |
 | WebGL memory and battery | DPR is capped at 2. The scene renders only while moving, holds at most 12 textures (LRU) and disposes everything on exit. It is opt-in, and disabled under reduced motion or without WebGL2. |
 | Bigger hero image (LCP) | Only the first frame has `priority`, and the next is pre-decoded. Two frames are in the DOM, never eight. |

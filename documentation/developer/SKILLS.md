@@ -302,6 +302,25 @@ A three-persona review workflow for expert-reviewed heritage claims with conflic
 | Alt component | `heritage_graph_ui/src/components/data-table-alt.tsx` |
 | Features | Sorting, filtering, pagination, column visibility, drag-and-drop rows, drawer detail |
 
+### Liquid-glass design system — Working (spec 008)
+
+| Layer | Files |
+|-------|-------|
+| Tokens & utilities | `heritage_graph_ui/src/app/globals.css` → `--glass-*`, `--cta`, `@utility liquid-glass`, `liquid-glass-strong`, `font-display`, `@keyframes blur-rise` / `hero-drift` |
+| Motion | `heritage_graph_ui/src/components/motion/` → `Reveal`, `BlurText`, `PinnedRail`, `useRevealState`, `onScrollFrame` (maths in `motion-math.ts`, tested) |
+| Navigation | `heritage_graph_ui/src/components/site-nav.tsx`, `site-chrome.tsx` (`SiteBar` over-hero state, `HeaderControls` pill) |
+| Entry page | `heritage_graph_ui/src/components/unesco/` → `HeroPhotographs`, `HeroStats`, `TrustBar`, `HowItWorks`, `ZoneRail` (in `entry-sections.tsx`) |
+| Landing app | `heritage_graph_landing/src/app/globals.css`, `src/components/public-site-header.tsx` |
+
+### Museum Street (3D) — Working (spec 008)
+
+| Layer | Files |
+|-------|-------|
+| View | `heritage_graph_ui/src/app/(site)/heritage-museum/components/xr/StreetGallery3D.tsx` (toggle in `ImmersiveScene.tsx`) |
+| Layout | `heritage_graph_ui/src/lib/heritage-museum/street-layout.ts` (tested in `src/lib/__tests__/street-layout.test.ts`) |
+| Textures | `heritage_graph_ui/src/lib/heritage-museum/wikimedia-texture.ts` (shared with `PanoramaViewer`) |
+| Strings | `messages/{en,ne}.json` → `heritageMuseum.xr.street.*` |
+
 ### Marketing landing — Working
 
 | Layer | Files |
