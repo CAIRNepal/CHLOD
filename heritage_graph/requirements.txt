@@ -6,7 +6,7 @@ certifi==2024.8.30
 cffi==1.17.1
 cfgv==3.4.0
 charset-normalizer==3.4.0
-click==8.2.1
+click==8.1.8
 cryptography==43.0.3
 celery==5.4.0
 defusedxml==0.8.0rc2
