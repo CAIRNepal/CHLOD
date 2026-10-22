@@ -28,6 +28,9 @@
 # ================================================================
 VENV_DIR  := .venv
 VENV_PY   := $(VENV_DIR)/bin/python
+# Generated ontology files depend on the LinkML version, so generate with the
+# pinned backend requirements (the venv) rather than whatever python3 is on PATH.
+GEN_PY    := $(if $(wildcard $(VENV_PY)),$(VENV_PY),python3)
 BACKEND   := heritage_graph
 FRONTEND  := heritage_graph_ui
 LANDING   := heritage_graph_landing
@@ -41,49 +44,49 @@ NODE_PATH := PATH=$(NODE_BIN):$$PATH
 # ONTOLOGY / SCHEMA REGISTRY (specs/004-yaml-driven-schema)
 # ================================================================
 ontology: ## Regenerate registry + museum/graph/forms viz artifacts from HeritageGraph.yaml
-	python3 tools/linkml_generate_registry.py
-	python3 tools/gen_heritage_viz_config.py
+	$(GEN_PY) tools/linkml_generate_registry.py
+	$(GEN_PY) tools/gen_heritage_viz_config.py
 
 ontology-check:
 	@test ! -f "$(CURDIR)/Heritagegraph.yaml" || (echo "ERROR: Remove repo-root Heritagegraph.yaml — canonical ontology is ontology/HeritageGraph.yaml" >&2 && exit 1)
-	python3 tools/linkml_generate_registry.py --check
-	python3 tools/gen_heritage_viz_config.py --check
+	$(GEN_PY) tools/linkml_generate_registry.py --check
+	$(GEN_PY) tools/gen_heritage_viz_config.py --check
 
 viz-config: ## Regenerate viz-config, enums, ontology-graph.ts, ontology_config.py
-	python3 tools/gen_heritage_viz_config.py
+	$(GEN_PY) tools/gen_heritage_viz_config.py
 
 viz-config-check: ## CI: fail if viz/namespace artifacts are out of date
-	python3 tools/gen_heritage_viz_config.py --check
+	$(GEN_PY) tools/gen_heritage_viz_config.py --check
 
 shacl: ## Regenerate minimal SHACL from registry.generated.json (run after ontology)
-	python3 tools/emit_minimal_shacl.py
+	$(GEN_PY) tools/emit_minimal_shacl.py
 
 shacl-check: ## CI: fail if generated SHACL TTL is out of date
-	python3 tools/emit_minimal_shacl.py --check
+	$(GEN_PY) tools/emit_minimal_shacl.py --check
 
 owl-ttl: ## Regenerate ontology/HeritageGraph.ttl (OWL TBox) from HeritageGraph.yaml
-	python3 tools/emit_owl_ttl.py
+	$(GEN_PY) tools/emit_owl_ttl.py
 
 owl-ttl-check: ## CI: fail if the OWL TBox TTL is out of date
-	python3 tools/emit_owl_ttl.py --check
+	$(GEN_PY) tools/emit_owl_ttl.py --check
 
 crm-bridge: ## Emit CIDOC-CRM alignment bridge + disjointness TBox (subClassOf/disjointWith)
-	python3 tools/emit_crm_bridge.py
+	$(GEN_PY) tools/emit_crm_bridge.py
 
 crm-bridge-check: ## CI: fail if the CRM bridge TTL is out of date
-	python3 tools/emit_crm_bridge.py --check
+	$(GEN_PY) tools/emit_crm_bridge.py --check
 
 skos-vocab-check: ## CI: fail if the SKOS vocabulary TTL is out of date
-	python3 tools/emit_skos_vocabularies.py --check
+	$(GEN_PY) tools/emit_skos_vocabularies.py --check
 
 contribute-routes-check: ## CI: contribute-hub intents map to Next.js pages
-	python3 tools/verify_contribute_intent_routes.py
+	$(GEN_PY) tools/verify_contribute_intent_routes.py
 
 serializers: ## Regenerate serializers.generated.py from HeritageGraph.yaml
-	python3 tools/generate_serializers.py
+	$(GEN_PY) tools/generate_serializers.py
 
 serializers-check: ## CI: fail if serializers.generated.py is out of date
-	python3 tools/generate_serializers.py --check
+	$(GEN_PY) tools/generate_serializers.py --check
 
 entityrefs: $(VENV_PY) ## Rebuild EntityRef edges from legacy CharField relation columns
 	cd $(BACKEND) && DJANGO_ENV=development ../$(VENV_PY) manage.py rebuild_entityrefs
@@ -116,7 +119,7 @@ rdf-export-dump: $(VENV_PY) ## Export public/schema RDF dumps to ontology/lod/du
 	cd $(BACKEND) && DJANGO_ENV=development ../$(VENV_PY) manage.py rdf_export_dump
 
 skos-vocab: ## Emit AAT-aligned SKOS controlled vocabularies from HeritageGraph.yaml enums
-	python3 tools/emit_skos_vocabularies.py
+	$(GEN_PY) tools/emit_skos_vocabularies.py
 
 kg-inference: $(VENV_PY) ## Materialize OWL-RL into graph/inferred
 	cd $(BACKEND) && DJANGO_ENV=development ../$(VENV_PY) manage.py kg_materialize_inference
@@ -150,7 +153,7 @@ schema-diff: ## Compare two ontology YAML files: OLD=ontology/HeritageGraph.yaml
 		echo "Usage: make schema-diff OLD=ontology/HeritageGraph.yaml NEW=/path/to/new.yaml"; \
 		exit 1; \
 	fi
-	python3 tools/schema_diff.py $(OLD) $(NEW)
+	$(GEN_PY) tools/schema_diff.py $(OLD) $(NEW)
 
 generate: ontology viz-config shacl owl-ttl crm-bridge skos-vocab serializers entityrefs schema-rebuild registry-alignment ## Full pipeline from ontology/HeritageGraph.yaml
 	@echo "==> Full ontology pipeline complete (registry, viz, SHACL, CRM bridge, SKOS, serializers, entityrefs, DB snapshot, alignment report)"
