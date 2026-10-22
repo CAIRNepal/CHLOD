@@ -73,7 +73,7 @@ def tripleset_for_cultural_entity(entity: Any) -> tuple[list[Any], set[str], str
     # (Raw `heritageGraph:<category>` lowercase IRIs match no NodeType and get
     # silently dropped at render time.) Targets are class IRIs that resolve to a
     # museum NodeType directly or via the ontology hierarchy.
-    hg = RDF_PREFIXES.get("heritageGraph", "https://w3id.org/heritagegraph/")
+    hg = RDF_PREFIXES.get("heritageGraph", "https://cair-nepal.org/heritagegraph/")
     crm = RDF_PREFIXES.get("crm", "http://www.cidoc-crm.org/cidoc-crm/")
     category_class = {
         "monument": hg + "ArchitecturalStructure",

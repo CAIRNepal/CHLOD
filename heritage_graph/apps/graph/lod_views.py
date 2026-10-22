@@ -144,13 +144,13 @@ def _html_redirect_url(uri: str) -> str | None:
     """
     Derive the UI /knowledge/{type}/{id} URL from a resource IRI.
 
-    Resource IRIs follow: https://w3id.org/heritagegraph/{type}/{slug-or-uuid}
+    Resource IRIs follow: https://cair-nepal.org/heritagegraph/{type}/{slug-or-uuid}
     """
     base = str(getattr(settings, "RDF_RESOURCE_BASE_URI", "")).rstrip("/")
     if base and uri.startswith(base + "/"):
         remainder = uri[len(base) + 1:]
-    elif uri.startswith("https://w3id.org/heritagegraph/"):
-        remainder = uri[len("https://w3id.org/heritagegraph/"):]
+    elif uri.startswith("https://cair-nepal.org/heritagegraph/"):
+        remainder = uri[len("https://cair-nepal.org/heritagegraph/"):]
     else:
         return None
 

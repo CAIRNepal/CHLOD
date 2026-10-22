@@ -26,7 +26,7 @@ def export_rdfstar_trig(output_path: Path) -> int:
         "@prefix crminf: <http://www.cidoc-crm.org/crminf/> .",
         "@prefix prov: <http://www.w3.org/ns/prov#> .",
         "",
-        "<https://w3id.org/heritagegraph/graph/annotations> {",
+        "<https://cair-nepal.org/heritagegraph/graph/annotations> {",
     ]
     count = 0
     for assertion in HeritageAssertion.objects.filter(

@@ -54,11 +54,11 @@ def is_non_curated_instance_iri(iri: str | None) -> bool:
         "http://www.nanopub.org/",
         "https://creativecommons.org/",
         "https://vocab.getty.edu/",
-        "https://w3id.org/heritagegraph/graph/",
+        "https://cair-nepal.org/heritagegraph/graph/",
     )
     if any(text.startswith(p) for p in allowed_prefixes):
         return False
-    hg = RDF_PREFIXES.get("heritageGraph", "https://w3id.org/heritagegraph/")
+    hg = RDF_PREFIXES.get("heritageGraph", "https://cair-nepal.org/heritagegraph/")
     if text.startswith(hg) and "/resource/" not in text:
         return False
     return True
@@ -193,7 +193,7 @@ def relationship_predicate_uri(prop_suffix: str) -> str:
         return expand_curie(slot_uri)
     if _CRM_PROPERTY_CODE.match(suffix):
         return RDF_PREFIXES["crm"] + suffix
-    return RDF_PREFIXES.get("heritageGraph", "https://w3id.org/heritagegraph/") + suffix
+    return RDF_PREFIXES.get("heritageGraph", "https://cair-nepal.org/heritagegraph/") + suffix
 
 
 def document_graph_uri(document_id: str) -> str:

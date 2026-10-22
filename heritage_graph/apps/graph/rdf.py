@@ -19,8 +19,8 @@ class Namespaces:
 
 
 NS = Namespaces(
-    hg=getattr(settings, "HERITAGE_NAMESPACE", "https://w3id.org/heritagegraph/"),
-    hgr=getattr(settings, "HERITAGE_RESOURCE_NS", "https://w3id.org/heritagegraph/resource/"),
+    hg=getattr(settings, "HERITAGE_NAMESPACE", "https://cair-nepal.org/heritagegraph/"),
+    hgr=getattr(settings, "HERITAGE_RESOURCE_NS", "https://cair-nepal.org/heritagegraph/resource/"),
 )
 
 

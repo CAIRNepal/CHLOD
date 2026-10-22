@@ -306,11 +306,11 @@ HERITAGEGRAPH_SCHEMA_REGISTRY_PREFER_FRESH = os.environ.get(
 # Canonical namespaces must match published ontology and resolvers.
 OXIGRAPH_URL = os.environ.get("OXIGRAPH_URL", "http://localhost:7878")
 HERITAGE_NAMESPACE = os.environ.get(
-    "HERITAGE_NAMESPACE", "https://w3id.org/heritagegraph/"
+    "HERITAGE_NAMESPACE", "https://cair-nepal.org/heritagegraph/"
 )
 HERITAGE_RESOURCE_NS = os.environ.get(
     "HERITAGE_RESOURCE_NS",
-    "https://w3id.org/heritagegraph/resource/",
+    "https://cair-nepal.org/heritagegraph/resource/",
 )
 
 # RDF_ENDPOINT_URL is the SPARQL UPDATE endpoint used by post_save signals to
@@ -351,7 +351,7 @@ OXIGRAPH_STORE_PATH = os.environ.get(
 # Published instance triples go into this named graph (empty = default graph only).
 RDF_PUBLIC_GRAPH_URI = os.environ.get(
     "RDF_PUBLIC_GRAPH_URI",
-    "https://w3id.org/heritagegraph/graph/public",
+    "https://cair-nepal.org/heritagegraph/graph/public",
 )
 # Optional SHACL gate on contribution projection (uses generated minimal shapes).
 RDF_SHACL_VALIDATE_ON_WRITE = os.environ.get(
@@ -371,23 +371,23 @@ RDF_SHACL_FAIL_OPEN_ON_ERROR = os.environ.get(
 ).lower() in {"1", "true", "yes", "y", "on"}
 RDF_SCHEMA_GRAPH_URI = os.environ.get(
     "RDF_SCHEMA_GRAPH_URI",
-    "https://w3id.org/heritagegraph/graph/schema",
+    "https://cair-nepal.org/heritagegraph/graph/schema",
 )
 RDF_DOCUMENT_GRAPH_BASE_URI = os.environ.get(
     "RDF_DOCUMENT_GRAPH_BASE_URI",
-    "https://w3id.org/heritagegraph/graph/document",
+    "https://cair-nepal.org/heritagegraph/graph/document",
 )
 RDF_PROVENANCE_GRAPH_BASE_URI = os.environ.get(
     "RDF_PROVENANCE_GRAPH_BASE_URI",
-    "https://w3id.org/heritagegraph/graph/prov",
+    "https://cair-nepal.org/heritagegraph/graph/prov",
 )
 RDF_ASSERTION_GRAPH_BASE_URI = os.environ.get(
     "RDF_ASSERTION_GRAPH_BASE_URI",
-    "https://w3id.org/heritagegraph/graph/assertion",
+    "https://cair-nepal.org/heritagegraph/graph/assertion",
 )
 RDF_SNAPSHOT_GRAPH_BASE_URI = os.environ.get(
     "RDF_SNAPSHOT_GRAPH_BASE_URI",
-    "https://w3id.org/heritagegraph/graph/snapshot",
+    "https://cair-nepal.org/heritagegraph/graph/snapshot",
 )
 # Copy public triples to snapshot graph on assertion publish (Phase 2 versioning).
 RDF_SNAPSHOT_ON_PUBLISH = os.environ.get("RDF_SNAPSHOT_ON_PUBLISH", "true").lower() in {
@@ -399,7 +399,7 @@ RDF_SNAPSHOT_ON_PUBLISH = os.environ.get("RDF_SNAPSHOT_ON_PUBLISH", "true").lowe
 }
 RDF_PUBLIC_SPARQL_URL = os.environ.get(
     "RDF_PUBLIC_SPARQL_URL",
-    "https://w3id.org/heritagegraph/sparql",
+    "https://cair-nepal.org/heritagegraph/sparql",
 )
 # Legacy Submission rows are not projected to RDF when true (Phase 2).
 RDF_EXCLUDE_LEGACY_SUBMISSION = os.environ.get(
@@ -407,7 +407,7 @@ RDF_EXCLUDE_LEGACY_SUBMISSION = os.environ.get(
 ).lower() in {"1", "true", "yes", "y", "on"}
 RDF_INFERRED_GRAPH_URI = os.environ.get(
     "RDF_INFERRED_GRAPH_URI",
-    "https://w3id.org/heritagegraph/graph/inferred",
+    "https://cair-nepal.org/heritagegraph/graph/inferred",
 )
 # Promote OCR/agent auto-accepted triples into the public graph.
 RDF_KG_PROMOTE_ON_AUTO_ACCEPT = os.environ.get(

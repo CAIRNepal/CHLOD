@@ -24,7 +24,7 @@ from django.views import View
 
 logger = logging.getLogger(__name__)
 
-HG = "https://w3id.org/heritagegraph/"
+HG = "https://cair-nepal.org/heritagegraph/"
 
 # Ordered from most to least restrictive
 _TIER_FILTERS: dict[str, tuple[str, ...]] = {

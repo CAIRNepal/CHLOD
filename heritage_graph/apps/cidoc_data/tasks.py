@@ -51,13 +51,13 @@ def generate_iiif_manifest(self, data_source_id: str):
         )
         manifest = {
             "@context": "http://iiif.io/api/presentation/3/context.json",
-            "id": f"https://w3id.org/heritagegraph/source/{data_source_id}/manifest",
+            "id": f"https://cair-nepal.org/heritagegraph/source/{data_source_id}/manifest",
             "type": "Manifest",
             "label": {"none": [source.name]},
             "items": [],
         }
         if file_url:
-            canvas_id = f"https://w3id.org/heritagegraph/source/{data_source_id}/canvas/1"
+            canvas_id = f"https://cair-nepal.org/heritagegraph/source/{data_source_id}/canvas/1"
             manifest["items"].append(
                 {
                     "id": canvas_id,

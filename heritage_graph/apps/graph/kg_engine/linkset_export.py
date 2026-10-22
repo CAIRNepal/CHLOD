@@ -11,7 +11,7 @@ def build_linkset_ttl() -> str:
     from apps.cidoc_data.models import EntityCluster
 
     base = str(getattr(settings, "RDF_RESOURCE_BASE_URI", "")).rstrip("/")
-    dataset = "https://w3id.org/heritagegraph/dataset/public"
+    dataset = "https://cair-nepal.org/heritagegraph/dataset/public"
     lines = [
         "@prefix void: <http://rdfs.org/ns/void#> .",
         "@prefix owl: <http://www.w3.org/2002/07/owl#> .",

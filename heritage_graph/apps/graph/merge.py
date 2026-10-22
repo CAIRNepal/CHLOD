@@ -16,7 +16,7 @@ logger = logging.getLogger(__name__)
 
 PROV = "http://www.w3.org/ns/prov#"
 RDF_TYPE = "http://www.w3.org/1999/02/22-rdf-syntax-ns#type"
-HG = "https://w3id.org/heritagegraph/"
+HG = "https://cair-nepal.org/heritagegraph/"
 
 
 def execute_merge(merge_request_id: str) -> dict[str, Any]:

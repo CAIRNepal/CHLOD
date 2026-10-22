@@ -17,7 +17,7 @@ def generate_void_dcat() -> str:
 
     engine = get_kg_engine()
     base = str(
-        getattr(settings, "RDF_RESOURCE_BASE_URI", "https://w3id.org/heritagegraph")
+        getattr(settings, "RDF_RESOURCE_BASE_URI", "https://cair-nepal.org/heritagegraph")
     ).rstrip("/")
     sparql_url = (
         str(getattr(settings, "RDF_PUBLIC_SPARQL_URL", "") or "").strip()
@@ -67,7 +67,7 @@ def generate_void_dcat() -> str:
         "@prefix foaf: <http://xmlns.com/foaf/0.1/> .\n"
         "@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .\n"
         "\n"
-        "<https://w3id.org/heritagegraph/dataset/public>\n"
+        "<https://cair-nepal.org/heritagegraph/dataset/public>\n"
         "  a void:Dataset, dcat:Dataset ;\n"
         '  dcterms:title "HeritageGraph public knowledge graph"@en ;\n'
         "  dcterms:description"

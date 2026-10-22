@@ -44,7 +44,7 @@ _EDTF_SUFFIX: dict[str, str] = {
 
 CRM = "http://www.cidoc-crm.org/cidoc-crm/"
 XSD = "http://www.w3.org/2001/XMLSchema#"
-HG_BASE = "https://w3id.org/heritagegraph/"
+HG_BASE = "https://cair-nepal.org/heritagegraph/"
 
 
 @dataclass

@@ -17,7 +17,7 @@ from dataclasses import dataclass, field
 
 logger = logging.getLogger(__name__)
 
-HG = "https://w3id.org/heritagegraph/"
+HG = "https://cair-nepal.org/heritagegraph/"
 CRM = "http://www.cidoc-crm.org/cidoc-crm/"
 
 

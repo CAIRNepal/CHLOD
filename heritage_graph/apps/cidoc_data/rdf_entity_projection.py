@@ -77,7 +77,7 @@ def expand_curie(curie: str) -> str:
         return raw
     if ":" not in raw:
         return (
-            RDF_PREFIXES.get("heritageGraph", "https://w3id.org/heritagegraph/") + raw
+            RDF_PREFIXES.get("heritageGraph", "https://cair-nepal.org/heritagegraph/") + raw
         )
     prefix, _, local = raw.partition(":")
     base = RDF_PREFIXES.get(prefix)
@@ -617,7 +617,7 @@ def project_entity_to_rdf(entity) -> tuple[str, set[str]] | None:
 
     uri = cultural_entity_uri(entity.entity_id)
     label = (entity.name or str(entity.entity_id)).strip()
-    type_uri = RDF_PREFIXES.get("heritageGraph", "https://w3id.org/heritagegraph/") + (
+    type_uri = RDF_PREFIXES.get("heritageGraph", "https://cair-nepal.org/heritagegraph/") + (
         entity.category or "Entity"
     )
     triples = [

@@ -239,7 +239,7 @@ def mint_doi(self, project_snapshot_id: str) -> dict:
                     "publicationYear": pub_year,
                     "types": {"resourceTypeGeneral": "Dataset"},
                     "url": (
-                        f"https://w3id.org/heritagegraph/project/{snapshot.project_id}"
+                        f"https://cair-nepal.org/heritagegraph/project/{snapshot.project_id}"
                     ),
                     "event": "publish",
                 },
