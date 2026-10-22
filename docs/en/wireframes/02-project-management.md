@@ -9,7 +9,7 @@
 
 | Field | Value |
 |-------|-------|
-| Feature | Mint `w3id.org/heritagegraph/project/{uuid}` on Project creation |
+| Feature | Mint `cair-nepal.org/heritagegraph/project/{uuid}` on Project creation |
 | Status | `[TODO]` |
 | Trigger | `post_save` signal on `Project` (first creation only) |
 | Files | `apps/heritage_data/signals.py`, `apps/heritage_data/models.py` (add `pid` field) |
@@ -165,6 +165,6 @@ sequenceDiagram
 │  └────────────────────────────────────────────────────────────────┘ │
 │                                                                      │
 │  Named graph   hg:project/3f2a.../graph   [3 triples preview ↗]    │
-│  PID           https://w3id.org/heritagegraph/project/3f2a...      │
+│  PID           https://cair-nepal.org/heritagegraph/project/3f2a...      │
 └──────────────────────────────────────────────────────────────────────┘
 ```

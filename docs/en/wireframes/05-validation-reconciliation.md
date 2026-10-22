@@ -180,7 +180,7 @@ sequenceDiagram
 │  │  Name:     Bhairabnath Temple (Taumadhi)                      │  │
 │  │  Type:     Temple                                              │  │
 │  │  Location: Taumadhi Tole, Bhaktapur                           │  │
-│  │  PID:      w3id.org/heritagegraph/structure/bhairabnath-...   │  │
+│  │  PID:      cair-nepal.org/heritagegraph/structure/bhairabnath-...   │  │
 │  │  [View existing entity ↗]                                     │  │
 │  └────────────────────────────────────────────────────────────────┘  │
 │                                                                       │

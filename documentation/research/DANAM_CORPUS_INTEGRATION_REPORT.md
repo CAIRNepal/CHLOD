@@ -30,7 +30,7 @@ This dual-layer design is the same pattern used, in different vocabularies, by W
 
 ## 2. Corpus characterization (what you are finalizing)
 
-Measured on `data/reconciled/danam-heritagegraph.nq` (post–vocabulary crosswalk to `https://w3id.org/heritagegraph/`):
+Measured on `data/reconciled/danam-heritagegraph.nq` (post–vocabulary crosswalk to `https://cair-nepal.org/heritagegraph/`):
 
 | Metric | Value |
 |--------|------:|
@@ -39,7 +39,7 @@ Measured on `data/reconciled/danam-heritagegraph.nq` (post–vocabulary crosswal
 | Dominant types | E53_Place ≈ 7 861; crminf:I2_Belief ≈ 7 860; ArchitecturalStructure ≈ 6 771; ReligiousStructure ≈ 798; WaterStructure ≈ 141; DhungeDhara ≈ 115 |
 | Named graphs | `…/graph/openstreetmap` (~106k), `…/graph/crosswalk` (~20k), `…/graph/wikidata` (~3.8k), `…/graph/intangible`, `…/graph/unesco` |
 | Instance IRIs | `https://data.cair-nepal.org/heritagegraph/…` (stable external identifiers) |
-| Ontology IRIs | Current released TBox (`w3id.org/heritagegraph/` + CIDOC-CRM / CRMinf) |
+| Ontology IRIs | Current released TBox (`cair-nepal.org/heritagegraph/` + CIDOC-CRM / CRMinf) |
 
 **Already done (keep):** `data/reconcile_store.py` + `reconcile_crosswalk.json` rewrote the legacy `cair-nepal.org/heritagegraph/` snake_case vocabulary into the released camelCase ontology and dropped retired predicates / old T-Box graph.
 
@@ -125,7 +125,7 @@ danam-heritagegraph.nq
 ### 5.1 Identity policy
 
 - **Stable external IRI:** keep `https://data.cair-nepal.org/heritagegraph/id/...` as `dcterms:identifier` / `owl:sameAs`.  
-- **Platform IRI:** mint `https://w3id.org/heritagegraph/resource/{type}/{pk}` via normal projection.  
+- **Platform IRI:** mint `https://cair-nepal.org/heritagegraph/resource/{type}/{pk}` via normal projection.  
 - **Dedup:** idempotent ETL key = external IRI (or DANAM `rid` when present). Re-runs update, never duplicate.  
 - **Identity layer (spec 005):** after load, run cluster hints for label collisions (e.g. temples already contributed manually vs DANAM).
 

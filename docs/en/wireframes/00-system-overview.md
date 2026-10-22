@@ -78,7 +78,7 @@ flowchart TD
     A1 --> A2["Role resolved\ncontributor / reviewer / curator\n[DONE]"]
 
     A2 --> B0["Create Project\ntitle · scope · license\n[DONE - model exists]"]
-    B0 --> B1["Mint project PID\nw3id.org/heritagegraph/project/id\n[TODO]"]
+    B0 --> B1["Mint project PID\ncair-nepal.org/heritagegraph/project/id\n[TODO]"]
     B1 --> B2["Add collaborators\nviewer / editor / manager\n[DONE - ProjectMembership]"]
 
     B2 --> C0["Upload files\nimage · PDF · CSV · audio\n[PARTIAL]"]

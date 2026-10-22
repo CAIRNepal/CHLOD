@@ -10,8 +10,8 @@
 | Is Oxigraph publicly routed? | **No.** `docker-compose.yml` service `oxigraph` uses `expose: 7878` on the internal `backend` network only — no `ports:`, no Traefik labels. Correct default. |
 | Configured client endpoint | `apps/graph/oxigraph/client_oxigraph.py` → `settings.OXIGRAPH_URL` (default `http://localhost:7878`); compose sets `OXIGRAPH_URL=http://oxigraph:7878`, `RDF_QUERY_URL=http://oxigraph:7878/query`, `RDF_ENDPOINT_URL=http://oxigraph:7878/update`. Dev falls back to embedded pyoxigraph at `OXIGRAPH_STORE_PATH`. |
 | Second triplestore (Fuseki)? | **None.** Only Oxigraph (`grep -ri fuseki` → only a placeholder filename). |
-| Is graph/public queryable over HTTP today? | **Yes, mediated:** `POST /api/v1/cidoc/sparql/` (`SparqlProxyView`) proxies to Oxigraph and rejects writes via `is_readonly_sparql_query()` (rdf_signals.py — regex allowlist of SELECT/ASK/CONSTRUCT/DESCRIBE). The named graph `https://w3id.org/heritagegraph/graph/public` is addressable with `GRAPH`/`FROM`. |
-| Resource IRIs | `https://w3id.org/heritagegraph/resource/<registry_key>/<pk>` (`RDF_RESOURCE_BASE_URI`). |
+| Is graph/public queryable over HTTP today? | **Yes, mediated:** `POST /api/v1/cidoc/sparql/` (`SparqlProxyView`) proxies to Oxigraph and rejects writes via `is_readonly_sparql_query()` (rdf_signals.py — regex allowlist of SELECT/ASK/CONSTRUCT/DESCRIBE). The named graph `https://cair-nepal.org/heritagegraph/graph/public` is addressable with `GRAPH`/`FROM`. |
+| Resource IRIs | `https://cair-nepal.org/heritagegraph/resource/<registry_key>/<pk>` (`RDF_RESOURCE_BASE_URI`). |
 
 **Conclusion:** the paper's federation claim is *almost* supported today through the
 read-only proxy; what's missing is (a) a stable public hostname, (b) SERVICE-clause
@@ -24,13 +24,13 @@ stand on until reconciliation is run.
 ## 2. Draft three-endpoint federation query
 
 Demonstrator: **Bhimsen Tower (Dharahara)** —
-`https://w3id.org/heritagegraph/resource/monument/21` (real row in the curated DB).
+`https://cair-nepal.org/heritagegraph/resource/monument/21` (real row in the curated DB).
 Prefixes are exactly those defined in `apps/graph/ontology_config.py`; Wikidata
 *property* IRIs are written in full because `wdt:`/`wd:` are deliberately not in
 `RDF_PREFIXES` (only `wikidata:` for the entity namespace).
 
 ```sparql
-PREFIX heritageGraph: <https://w3id.org/heritagegraph/>
+PREFIX heritageGraph: <https://cair-nepal.org/heritagegraph/>
 PREFIX crm:      <http://www.cidoc-crm.org/cidoc-crm/>
 PREFIX rdfs:     <http://www.w3.org/2000/01/rdf-schema#>
 PREFIX skos:     <http://www.w3.org/2004/02/skos/core#>
@@ -41,8 +41,8 @@ PREFIX gvp:      <http://vocab.getty.edu/ontology#>   # used only inside the Get
 SELECT ?monument ?label ?wd ?wdLabel ?coord ?image ?aatType ?aatPref WHERE {
 
   # ── 1. HeritageGraph (local graph/public) ────────────────────────────────
-  GRAPH <https://w3id.org/heritagegraph/graph/public> {
-    BIND (<https://w3id.org/heritagegraph/resource/monument/21> AS ?monument)
+  GRAPH <https://cair-nepal.org/heritagegraph/graph/public> {
+    BIND (<https://cair-nepal.org/heritagegraph/resource/monument/21> AS ?monument)
     ?monument rdfs:label ?label .
     # Reconciled identity links (written by the identity workspace):
     OPTIONAL { ?monument skos:exactMatch ?wd

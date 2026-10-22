@@ -55,7 +55,7 @@ ORCID_REDIRECT_URI=https://heritagegraph.cair.org.np/api/users/orcid/callback/
 
 ### SPEC-02: Project PID Minting
 
-**Goal:** Every `Project` gets a permanent identifier `https://w3id.org/heritagegraph/project/{uuid}` and a `prov:Activity` record in the triple store.
+**Goal:** Every `Project` gets a permanent identifier `https://cair-nepal.org/heritagegraph/project/{uuid}` and a `prov:Activity` record in the triple store.
 
 **Backend changes:**
 
@@ -444,7 +444,7 @@ def mint_doi(project_snapshot) -> str:
                 "publisher": "CAIR-Nepal",
                 "publicationYear": project_snapshot.created_at.year,
                 "resourceTypeGeneral": "Dataset",
-                "url": f"https://w3id.org/heritagegraph/project/{project.pk}",
+                "url": f"https://cair-nepal.org/heritagegraph/project/{project.pk}",
                 "schemaVersion": "http://datacite.org/schema/kernel-4",
             }
         }

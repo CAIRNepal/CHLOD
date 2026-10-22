@@ -29,7 +29,7 @@ flowchart LR
     V1 --> LOAD
 
     LOAD --> SPARQL["SPARQL endpoint refreshed\nOxigraph :7878/query"]
-    LOAD --> DEREF["Dereferenceable URIs\nw3id.org/heritagegraph/{type}/{id}"]
+    LOAD --> DEREF["Dereferenceable URIs\ncair-nepal.org/heritagegraph/{type}/{id}"]
     SPARQL --> CARE["CARE SPARQL proxy\nfilter access_tier at query time"]
     DEREF --> CN["Content negotiation\nAccept: text/turtle → TTL\nAccept: application/ld+json → JSON-LD\nAccept: text/html → UI redirect"]
 
@@ -42,11 +42,11 @@ flowchart LR
 
 | Field | Value |
 |-------|-------|
-| Feature | Same `w3id.org/heritagegraph/structure/{id}` URI returns TTL, JSON-LD, RDF/XML, or HTML based on `Accept` header |
+| Feature | Same `cair-nepal.org/heritagegraph/structure/{id}` URI returns TTL, JSON-LD, RDF/XML, or HTML based on `Accept` header |
 | Status | `[PARTIAL]` — `lod_views.py` exists; negotiation logic missing |
 | Files | `apps/graph/lod_views.py` |
 | Accept mapping | `text/turtle` → `rdflib` serialize from Oxigraph DESCRIBE · `application/ld+json` → JSON-LD plugin · `application/rdf+xml` → RDF/XML · `text/html` → 303 redirect to `/knowledge/{type}/{id}` |
-| Acceptance | `curl -H "Accept: text/turtle" https://w3id.org/heritagegraph/structure/bhairabnath-temple` returns valid Turtle with CIDOC-CRM triples |
+| Acceptance | `curl -H "Accept: text/turtle" https://cair-nepal.org/heritagegraph/structure/bhairabnath-temple` returns valid Turtle with CIDOC-CRM triples |
 
 ---
 
@@ -129,11 +129,11 @@ sequenceDiagram
 │  HeritageGraph SPARQL Explorer                                       │
 │  ─────────────────────────────────────────────────────────────────  │
 │                                                                      │
-│  Endpoint: https://w3id.org/heritagegraph/sparql                   │
+│  Endpoint: https://cair-nepal.org/heritagegraph/sparql                   │
 │  Access:   [● Authenticated — full access]  or  [○ Anonymous]      │
 │                                                                      │
 │  ┌────────────────────────────────────────────────────────────────┐ │
-│  │  PREFIX hg: <https://w3id.org/heritagegraph/>                 │ │
+│  │  PREFIX hg: <https://cair-nepal.org/heritagegraph/>                 │ │
 │  │  PREFIX crm: <http://www.cidoc-crm.org/cidoc-crm/>            │ │
 │  │  PREFIX skos: <http://www.w3.org/2004/02/skos/core#>          │ │
 │  │                                                                │ │

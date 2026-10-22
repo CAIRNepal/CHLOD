@@ -148,7 +148,7 @@ GOOGLE_CLIENT_ID=your-google-client-id.apps.googleusercontent.com
 GOOGLE_CLIENT_SECRET=your-google-client-secret
 RDF_SYNC_ENABLED=true
 RDF_ENDPOINT_URL=http://oxigraph:7878
-RDF_RESOURCE_BASE_URI=https://w3id.org/heritagegraph/resource/
+RDF_RESOURCE_BASE_URI=https://cair-nepal.org/heritagegraph/resource/
 ```
 
 **Done when:** `grep RDF_SYNC_ENABLED .env` → `RDF_SYNC_ENABLED=true`
@@ -466,7 +466,7 @@ import requests
 OXIGRAPH_URL = os.environ.get("OXIGRAPH_URL", "http://localhost:7878")
 SPARQL_UPDATE_URL = OXIGRAPH_URL.rstrip("/") + "/sparql"
 
-HERITAGE_NS  = "https://w3id.org/heritagegraph/resource/"
+HERITAGE_NS  = "https://cair-nepal.org/heritagegraph/resource/"
 CIDOC_NS     = "http://www.cidoc-crm.org/cidoc-crm/"
 RDFS         = "http://www.w3.org/2000/01/rdf-schema#"
 WD_ENTITY    = "http://www.wikidata.org/entity/"

@@ -31,7 +31,7 @@ flowchart TD
 
     subgraph P1 [Phase 1 · Project]
         A2 --> B0["Create project<br>title, bbox, temporal scope, license"]
-        B0 --> B1["Mint project PID<br>w3id.org/heritagegraph/project/{id}"]
+        B0 --> B1["Mint project PID<br>cair-nepal.org/heritagegraph/project/{id}"]
         B1 --> B2["ProjectCreationActivity<br>prov:wasGeneratedBy"]
         B2 --> B3["Add collaborators<br>roles: viewer / editor / manager"]
     end
@@ -284,14 +284,14 @@ hg:dataset a void:Dataset, dcat:Dataset ;
     dcterms:title "HeritageGraph — Nepalese Cultural Heritage LOD" ;
     dcterms:license <https://creativecommons.org/licenses/by/4.0/> ;
     dcterms:publisher hg:CAIR-Nepal ;
-    void:sparqlEndpoint <https://w3id.org/heritagegraph/sparql> ;
+    void:sparqlEndpoint <https://cair-nepal.org/heritagegraph/sparql> ;
     void:triples 1284322 ;
     void:vocabulary crm:, prov:, skos:, geo: ;
     dcat:distribution hg:dist-ttl, hg:dist-jsonld, hg:dist-sparql .
 
 hg:dist-ttl a dcat:Distribution ;
     dcat:mediaType "text/turtle" ;
-    dcat:downloadURL <https://w3id.org/heritagegraph/dumps/latest.ttl> .
+    dcat:downloadURL <https://cair-nepal.org/heritagegraph/dumps/latest.ttl> .
 ```
 
 DCAT versioning (`dcat:version`) ties each published snapshot to a **DataCite DOI**, so a researcher can cite the exact dataset state they queried — closing the loop back to provenance.

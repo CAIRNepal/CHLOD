@@ -73,7 +73,7 @@
 
 ### 1-A Project PID `[TODO]`
 
-**What:** On `Project` creation, mint `w3id.org/heritagegraph/project/{uuid}` and store it.
+**What:** On `Project` creation, mint `cair-nepal.org/heritagegraph/project/{uuid}` and store it.
 
 **Files to modify:**
 - `heritage_graph/apps/heritage_data/models.py:2105` (`Project`) — add `pid = models.URLField(max_length=512, blank=True)` and `prov_activity_uri = models.URLField(blank=True)`

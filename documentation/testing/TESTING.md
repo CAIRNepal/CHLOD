@@ -91,7 +91,7 @@ Relevant environment (see [`docker-compose.yml`](../../docker-compose.yml) and [
 | `RDF_SYNC_ENABLED` | `true` | Project triples on CIDOC save |
 | `RDF_ENDPOINT_URL` | `http://oxigraph:7878/update` | SPARQL UPDATE |
 | `RDF_QUERY_URL` | `http://oxigraph:7878/query` | SPARQL SELECT (proxy + diagnostics) |
-| `RDF_RESOURCE_BASE_URI` | `https://w3id.org/heritagegraph/resource/` | Instance IRIs |
+| `RDF_RESOURCE_BASE_URI` | `https://cair-nepal.org/heritagegraph/resource/` | Instance IRIs |
 | `HERITAGEGRAPH_SCHEMA_PATH` | `ontology/HeritageGraph.yaml` | Registry build |
 
 ### Frontend
@@ -294,7 +294,7 @@ DJANGO_ENV=development python manage.py rdf_rebuild --purge-imports
 Instance IRIs use:
 
 ```text
-https://w3id.org/heritagegraph/resource/{model_name_lower}/{pk}
+https://cair-nepal.org/heritagegraph/resource/{model_name_lower}/{pk}
 ```
 
 Example (replace `65` with a real person id):
@@ -302,7 +302,7 @@ Example (replace `65` with a real person id):
 ```sparql
 PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
 SELECT ?p ?o WHERE {
-  <https://w3id.org/heritagegraph/resource/person/65> ?p ?o .
+  <https://cair-nepal.org/heritagegraph/resource/person/65> ?p ?o .
 }
 LIMIT 50
 ```
