@@ -773,7 +773,7 @@
       },
       "linkedOpenData": {
         "title": "Linked Open Data",
-        "desc": "Persistent w3id.org identifiers, RDF content negotiation, and a public SPARQL endpoint."
+        "desc": "Persistent cair-nepal.org identifiers, RDF content negotiation, and a public SPARQL endpoint."
       },
       "communityCuration": {
         "title": "Community curation",
@@ -801,7 +801,7 @@
       },
       "identifiers": {
         "term": "Identifiers",
-        "definition": "Entities receive persistent w3id.org IRIs. External alignments are recorded as explicit links rather than silent merges."
+        "definition": "Entities receive persistent cair-nepal.org IRIs. External alignments are recorded as explicit links rather than silent merges."
       },
       "methodsCta": "Methods & provenance",
       "licenseCta": "Data licence terms"
@@ -908,7 +908,7 @@
     },
     "fair": {
       "heading": "FAIR + CARE",
-      "findable": "<term>Findable</term> — w3id resource IRIs; VoID/DCAT dataset description; corpus fingerprint (<code>manage.py corpus_fingerprint</code>).",
+      "findable": "<term>Findable</term> — cair-nepal.org resource IRIs; VoID/DCAT dataset description; corpus fingerprint (<code>manage.py corpus_fingerprint</code>).",
       "accessible": "<term>Accessible</term> — HTTPS dereference plus a CARE-aware read-only SPARQL endpoint (<code>/sparql/</code>).",
       "interoperable": "<term>Interoperable</term> — CIDOC-CRM, CRMinf, LinkML registry, CRM bridge, SHACL shapes, SKOS vocabularies.",
       "reusable": "<term>Reusable</term> — license matrix below; frozen L0 dump with SHA-256; idempotent L1 ETL; ontology pin in import reports.",

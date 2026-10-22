@@ -773,7 +773,7 @@
       },
       "linkedOpenData": {
         "title": "लिंक्ड ओपन डाटा",
-        "desc": "स्थायी w3id.org पहिचायक, RDF कन्टेन्ट नेगोसिएसन, र सार्वजनिक SPARQL एन्डपोइन्ट।"
+        "desc": "स्थायी cair-nepal.org पहिचायक, RDF कन्टेन्ट नेगोसिएसन, र सार्वजनिक SPARQL एन्डपोइन्ट।"
       },
       "communityCuration": {
         "title": "सामुदायिक क्युरेसन",
@@ -801,7 +801,7 @@
       },
       "identifiers": {
         "term": "पहिचायक",
-        "definition": "इकाईहरूले स्थायी w3id.org IRI पाउँछन्। बाह्य पङ्क्तिबद्धता मौन रूपमा मिसाइँदैन, स्पष्ट लिंकका रूपमा अभिलेख गरिन्छ।"
+        "definition": "इकाईहरूले स्थायी cair-nepal.org IRI पाउँछन्। बाह्य पङ्क्तिबद्धता मौन रूपमा मिसाइँदैन, स्पष्ट लिंकका रूपमा अभिलेख गरिन्छ।"
       },
       "methodsCta": "विधि र उद्गम",
       "licenseCta": "डाटा इजाजतपत्रका सर्त"
@@ -908,7 +908,7 @@
     },
     "fair": {
       "heading": "FAIR + CARE",
-      "findable": "<term>खोज्न सकिने</term> — w3id स्रोत IRI; VoID/DCAT डाटासेट विवरण; कोर्पस फिंगरप्रिन्ट (<code>manage.py corpus_fingerprint</code>)।",
+      "findable": "<term>खोज्न सकिने</term> — cair-nepal.org स्रोत IRI; VoID/DCAT डाटासेट विवरण; कोर्पस फिंगरप्रिन्ट (<code>manage.py corpus_fingerprint</code>)।",
       "accessible": "<term>पहुँचयोग्य</term> — HTTPS डिरेफरेन्स र CARE-सचेत पढ्ने-मात्र SPARQL एन्डपोइन्ट (<code>/sparql/</code>)।",
       "interoperable": "<term>अन्तरसञ्चालनीय</term> — CIDOC-CRM, CRMinf, LinkML रजिस्ट्री, CRM ब्रिज, SHACL आकार, SKOS शब्दावली।",
       "reusable": "<term>पुनःप्रयोगयोग्य</term> — तलको इजाजतपत्र तालिका; SHA-256 सहितको स्थिर L0 डम्प; idempotent L1 ETL; आयात प्रतिवेदनमा अन्टोलोजी पिन।",
