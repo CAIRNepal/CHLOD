@@ -1,7 +1,7 @@
 // AUTO-GENERATED — do not edit by hand.
 // Source:  ontology/HeritageGraph.yaml + tools/ui-vizmap.yaml
 // Regen:   python3 tools/gen_heritage_viz_config.py
-// Hash:    8df5c8a8c53f5e19
+// Hash:    32e9d7ec37774d65
 //
 // This file is the single source of truth for graph-visualization ontology
 // config consumed by:
@@ -17,7 +17,7 @@ export const RDF_PREFIXES: Readonly<Record<string, string>> = {
   owl: "http://www.w3.org/2002/07/owl#",
   xsd: "http://www.w3.org/2001/XMLSchema#",
   crm: "http://www.cidoc-crm.org/cidoc-crm/",
-  heritageGraph: "https://w3id.org/heritagegraph/",
+  heritageGraph: "https://cair-nepal.org/heritagegraph/",
   geo: "http://www.opengis.net/ont/geosparql#",
   prov: "http://www.w3.org/ns/prov#",
 };
@@ -91,21 +91,21 @@ export const RDF_CLASS_URI_TO_NODE_TYPE: Record<string, NodeType> = {
   "http://www.cidoc-crm.org/cidoc-crm/E52_Time-Span": "TimeSpan",
   "http://www.cidoc-crm.org/cidoc-crm/E53_Place": "Place",
   "http://www.cidoc-crm.org/cidoc-crm/E74_Group": "Group",
+  "https://cair-nepal.org/heritagegraph/ArchitecturalStructure": "ArchitecturalStructure",
+  "https://cair-nepal.org/heritagegraph/BuddhistMonument": "BuddhistMonument",
+  "https://cair-nepal.org/heritagegraph/CasteGroup": "CasteGroup",
+  "https://cair-nepal.org/heritagegraph/Deity": "Deity",
+  "https://cair-nepal.org/heritagegraph/Festival": "Festival",
+  "https://cair-nepal.org/heritagegraph/Guthi": "Guthi",
+  "https://cair-nepal.org/heritagegraph/HistoricalEvent": "HistoricalEvent",
+  "https://cair-nepal.org/heritagegraph/HistoricalPeriod": "HistoricalPeriod",
+  "https://cair-nepal.org/heritagegraph/IconographicObject": "IconographicObject",
+  "https://cair-nepal.org/heritagegraph/InformationObject": "Source",
+  "https://cair-nepal.org/heritagegraph/ReligiousTradition": "ReligiousTradition",
+  "https://cair-nepal.org/heritagegraph/RitualEvent": "RitualEvent",
+  "https://cair-nepal.org/heritagegraph/SyncreticRelationship": "SyncreticRelationship",
+  "https://cair-nepal.org/heritagegraph/Temple": "Temple",
   "https://linked.art/ns/terms/Set": "Set",
-  "https://w3id.org/heritagegraph/ArchitecturalStructure": "ArchitecturalStructure",
-  "https://w3id.org/heritagegraph/BuddhistMonument": "BuddhistMonument",
-  "https://w3id.org/heritagegraph/CasteGroup": "CasteGroup",
-  "https://w3id.org/heritagegraph/Deity": "Deity",
-  "https://w3id.org/heritagegraph/Festival": "Festival",
-  "https://w3id.org/heritagegraph/Guthi": "Guthi",
-  "https://w3id.org/heritagegraph/HistoricalEvent": "HistoricalEvent",
-  "https://w3id.org/heritagegraph/HistoricalPeriod": "HistoricalPeriod",
-  "https://w3id.org/heritagegraph/IconographicObject": "IconographicObject",
-  "https://w3id.org/heritagegraph/InformationObject": "Source",
-  "https://w3id.org/heritagegraph/ReligiousTradition": "ReligiousTradition",
-  "https://w3id.org/heritagegraph/RitualEvent": "RitualEvent",
-  "https://w3id.org/heritagegraph/SyncreticRelationship": "SyncreticRelationship",
-  "https://w3id.org/heritagegraph/Temple": "Temple",
 };
 
 /**
