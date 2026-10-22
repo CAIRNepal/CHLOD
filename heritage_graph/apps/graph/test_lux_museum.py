@@ -12,6 +12,8 @@ from apps.graph.kg_engine.lux_museum import (
 )
 from django.test import SimpleTestCase, override_settings
 
+HG = "https://cair-nepal.org/heritagegraph/"
+
 
 class LuxMuseumHelpersTest(SimpleTestCase):
     def test_is_lux_stub_uri(self):
@@ -128,8 +130,8 @@ class LuxMuseumHelpersTest(SimpleTestCase):
             [{"s": a, "p": "https://linked.art/ns/terms/member_of", "o": b, "plabel": None}],
             # 2) batched node-detail fetch (<=30 IRIs -> single batch)
             [
-                {"s": a, "type": "https://cair-nepal.org/heritagegraph/Person", "label": "A"},
-                {"s": b, "type": "https://cair-nepal.org/heritagegraph/Group", "label": "B"},
+                {"s": a, "type": f"{HG}Person", "label": "A"},
+                {"s": b, "type": f"{HG}Group", "label": "B"},
             ],
         ]
         out = fetch_museum_projection_with_lux(store=store)

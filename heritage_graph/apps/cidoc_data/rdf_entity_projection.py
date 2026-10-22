@@ -20,6 +20,7 @@ logger = logging.getLogger(__name__)
 from apps.graph.ontology_config import RDF_PREFIXES  # noqa: E402
 
 RDF_TYPE_URI = RDF_PREFIXES["rdf"] + "type"
+HG_NS = RDF_PREFIXES.get("heritageGraph", "https://cair-nepal.org/heritagegraph/")
 # External-authority identity links use skos:exactMatch rather than owl:sameAs.
 # owl:sameAs forces full bidirectional property identity under OWL reasoning
 # ("sameAs disease"): a consumer that also loads Wikidata/Getty would conflate
@@ -76,9 +77,7 @@ def expand_curie(curie: str) -> str:
     if raw.startswith(("http://", "https://")):
         return raw
     if ":" not in raw:
-        return (
-            RDF_PREFIXES.get("heritageGraph", "https://cair-nepal.org/heritagegraph/") + raw
-        )
+        return HG_NS + raw
     prefix, _, local = raw.partition(":")
     base = RDF_PREFIXES.get(prefix)
     if not base:
@@ -617,9 +616,7 @@ def project_entity_to_rdf(entity) -> tuple[str, set[str]] | None:
 
     uri = cultural_entity_uri(entity.entity_id)
     label = (entity.name or str(entity.entity_id)).strip()
-    type_uri = RDF_PREFIXES.get("heritageGraph", "https://cair-nepal.org/heritagegraph/") + (
-        entity.category or "Entity"
-    )
+    type_uri = HG_NS + (entity.category or "Entity")
     triples = [
         _Triple(uri, RDF_TYPE_URI, type_uri, None),
         _Triple(uri, RDF_PREFIXES["rdfs"] + "label", None, (label, "xsd:string")),

@@ -11,6 +11,7 @@ from apps.graph.ontology_config import RDF_PREFIXES, expand_curie
 from django.conf import settings
 
 # CRM property codes, e.g. ``P74_has_current_or_former_residence``.
+HG_NS = "https://cair-nepal.org/heritagegraph/"
 _CRM_PROPERTY_CODE = re.compile(r"^P\d+[A-Za-z0-9._-]*$")
 
 
@@ -58,7 +59,7 @@ def is_non_curated_instance_iri(iri: str | None) -> bool:
     )
     if any(text.startswith(p) for p in allowed_prefixes):
         return False
-    hg = RDF_PREFIXES.get("heritageGraph", "https://cair-nepal.org/heritagegraph/")
+    hg = RDF_PREFIXES.get("heritageGraph", HG_NS)
     if text.startswith(hg) and "/resource/" not in text:
         return False
     return True
@@ -193,7 +194,7 @@ def relationship_predicate_uri(prop_suffix: str) -> str:
         return expand_curie(slot_uri)
     if _CRM_PROPERTY_CODE.match(suffix):
         return RDF_PREFIXES["crm"] + suffix
-    return RDF_PREFIXES.get("heritageGraph", "https://cair-nepal.org/heritagegraph/") + suffix
+    return RDF_PREFIXES.get("heritageGraph", HG_NS) + suffix
 
 
 def document_graph_uri(document_id: str) -> str:
