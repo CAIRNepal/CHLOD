@@ -59,7 +59,7 @@ class NqParserTests(SimpleTestCase):
         sample.write_text(
             "\n".join(
                 [
-                    '<http://ex/a> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <https://w3id.org/heritagegraph/ArchitecturalStructure> <http://ex/g> .',
+                    '<http://ex/a> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <https://cair-nepal.org/heritagegraph/ArchitecturalStructure> <http://ex/g> .',
                     '<http://ex/a> <http://www.w3.org/2000/01/rdf-schema#label> "Test Temple"@en <http://ex/g> .',
                     "",
                 ]
@@ -73,6 +73,6 @@ class NqParserTests(SimpleTestCase):
         self.assertIn(
             "http://ex/a",
             index.type_subjects[
-                "https://w3id.org/heritagegraph/ArchitecturalStructure"
+                "https://cair-nepal.org/heritagegraph/ArchitecturalStructure"
             ],
         )

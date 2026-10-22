@@ -19,7 +19,7 @@ from apps.graph.kg_engine.inference import (
 from django.test import SimpleTestCase
 
 CRM = "http://www.cidoc-crm.org/cidoc-crm/"
-HG = "https://w3id.org/heritagegraph/resource/"
+HG = "https://cair-nepal.org/heritagegraph/resource/"
 RDF_TYPE = "http://www.w3.org/1999/02/22-rdf-syntax-ns#type"
 OWL_THING = "http://www.w3.org/2002/07/owl#Thing"
 OWL_SAME_AS = "http://www.w3.org/2002/07/owl#sameAs"
