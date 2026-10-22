@@ -6,6 +6,8 @@ import json
 import textwrap
 from typing import Any
 
+HG_NS = "https://cair-nepal.org/heritagegraph/"
+
 
 def _expand_curie(curie: str, prefixes: dict[str, str]) -> str:
     curie = (curie or "").strip()
@@ -14,11 +16,11 @@ def _expand_curie(curie: str, prefixes: dict[str, str]) -> str:
     if curie.startswith(("http://", "https://")):
         return curie
     if ":" not in curie:
-        return prefixes.get("heritageGraph", "https://cair-nepal.org/heritagegraph/") + curie
+        return prefixes.get("heritageGraph", HG_NS) + curie
     prefix, rest = curie.split(":", 1)
     base = prefixes.get(prefix)
     if not base:
-        return prefixes.get("heritageGraph", "https://cair-nepal.org/heritagegraph/") + rest
+        return prefixes.get("heritageGraph", HG_NS) + rest
     return base + rest
 
 

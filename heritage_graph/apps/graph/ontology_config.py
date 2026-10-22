@@ -50,6 +50,8 @@ RDF_PREFIXES: dict[str, str] = {
 # Inverse map used for compacting IRIs to CURIEs
 URI_TO_PREFIX: dict[str, str] = {v: k for k, v in RDF_PREFIXES.items()}
 
+_HG_NS = "https://cair-nepal.org/heritagegraph/"
+
 
 def expand_curie(curie: str) -> str:
     """Expand a CURIE (e.g. 'crm:E53_Place') to a full IRI."""
@@ -59,9 +61,9 @@ def expand_curie(curie: str) -> str:
     if curie.startswith(("http://", "https://")):
         return curie
     if ':' not in curie:
-        return RDF_PREFIXES.get('heritageGraph', 'https://cair-nepal.org/heritagegraph/') + curie
+        return RDF_PREFIXES.get('heritageGraph', _HG_NS) + curie
     prefix, rest = curie.split(':', 1)
     base = RDF_PREFIXES.get(prefix)
     if not base:
-        return RDF_PREFIXES.get('heritageGraph', 'https://cair-nepal.org/heritagegraph/') + rest
+        return RDF_PREFIXES.get('heritageGraph', _HG_NS) + rest
     return base + rest

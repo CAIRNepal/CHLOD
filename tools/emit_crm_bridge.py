@@ -49,6 +49,7 @@ SCHEMA_PATH = ROOT / "ontology" / "HeritageGraph.yaml"
 OUT = ROOT / "ontology" / "heritagegraph-crm-bridge.ttl"
 
 CRM = "http://www.cidoc-crm.org/cidoc-crm/"
+HG_NS = "https://cair-nepal.org/heritagegraph/"
 CRM_FAMILY_PREFIXES = ("crm", "crmsci", "crmdig", "crminf")
 
 
@@ -59,7 +60,7 @@ def _expand(curie: str, prefixes: dict[str, str]) -> str:
     if raw.startswith(("http://", "https://")):
         return raw
     if ":" not in raw:
-        return prefixes.get("heritageGraph", "https://cair-nepal.org/heritagegraph/") + raw
+        return prefixes.get("heritageGraph", HG_NS) + raw
     pfx, _, local = raw.partition(":")
     base = prefixes.get(pfx)
     return (base + local) if base else ""
@@ -76,7 +77,7 @@ def _is_aat(curie: str) -> bool:
 def generate(schema: dict) -> str:
     prefixes: dict[str, str] = schema.get("prefixes") or {}
     classes: dict[str, dict] = schema.get("classes") or {}
-    hg = prefixes.get("heritageGraph", "https://cair-nepal.org/heritagegraph/")
+    hg = prefixes.get("heritageGraph", HG_NS)
 
     def class_iri(name: str) -> str:
         return f"{hg}{name}"
