@@ -24,7 +24,7 @@ export const HERITAGEGRAPH_REPOSITORY = 'https://github.com/CAIRNepal/heritagegr
  */
 export const HERITAGEGRAPH_DOI: string | null = null;
 
-export const HERITAGEGRAPH_PUBLIC_GRAPH = 'https://w3id.org/heritagegraph/graph/public';
+export const HERITAGEGRAPH_PUBLIC_GRAPH = 'https://cair-nepal.org/heritagegraph/graph/public';
 
 /** Pinned SHA-256 of data/reconciled/danam-heritagegraph.nq (L0 research dump). */
 export const DANAM_NQ_SHA256 =

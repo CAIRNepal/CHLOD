@@ -16,7 +16,7 @@ export function exportVisibleGraphPayload(
 ): Record<string, unknown> {
   return {
     '@context': {
-      hg: 'https://w3id.org/heritagegraph/',
+      hg: 'https://cair-nepal.org/heritagegraph/',
       prov: 'http://www.w3.org/ns/prov#',
     },
     type: 'heritagegraph:MuseumSubgraphExport',

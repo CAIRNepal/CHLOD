@@ -1,9 +1,9 @@
 {
   "@context": {
-    "@vocab": "https://w3id.org/heritagegraph/",
-    "hg": "https://w3id.org/heritagegraph/",
+    "@vocab": "https://cair-nepal.org/heritagegraph/",
+    "hg": "https://cair-nepal.org/heritagegraph/",
     "crm": "http://www.cidoc-crm.org/cidoc-crm/",
-    "heritage": "https://w3id.org/heritagegraph/instance/",
+    "heritage": "https://cair-nepal.org/heritagegraph/instance/",
     "rdfs": "http://www.w3.org/2000/01/rdf-schema#",
     "xsd": "http://www.w3.org/2001/XMLSchema#",
     "dcterms": "http://purl.org/dc/terms/",

@@ -117,7 +117,7 @@ export function expandCurie(curie: string): string {
   if (!raw) return raw;
   if (raw.startsWith("http://") || raw.startsWith("https://")) return raw;
   if (!raw.includes(":")) {
-    return (RDF_PREFIXES.heritageGraph || "https://w3id.org/heritagegraph/") + raw;
+    return (RDF_PREFIXES.heritageGraph || "https://cair-nepal.org/heritagegraph/") + raw;
   }
   const [prefix, rest] = raw.split(":", 2);
   const base = RDF_PREFIXES[prefix];
@@ -132,7 +132,7 @@ export function getRdfResourceBase(): string {
     typeof process !== "undefined"
       ? process.env.NEXT_PUBLIC_RDF_RESOURCE_BASE_URI?.trim()
       : undefined;
-  return (fromEnv || "https://w3id.org/heritagegraph/resource").replace(/\/$/, "");
+  return (fromEnv || "https://cair-nepal.org/heritagegraph/resource").replace(/\/$/, "");
 }
 
 export function registryKeyToResourceSegment(registryKey: string): string {

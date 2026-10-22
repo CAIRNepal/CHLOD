@@ -27,9 +27,42 @@ function pathRequiresLogin(pathname: string): boolean {
 }
 
 /**
+ * Dev only: NextAuth stores its OAuth state/PKCE cookies on whatever host the
+ * browser used, but Google always returns to NEXTAUTH_URL. Opening the app on
+ * 127.0.0.1 or the LAN address therefore fails with "State cookie was missing".
+ * Send page requests to the NEXTAUTH_URL origin so both legs share cookies.
+ * Skipped in production, where the proxy's Host may differ from the app's.
+ */
+function canonicalDevRedirect(request: NextRequest): NextResponse | null {
+  if (process.env.NODE_ENV !== 'development') return null;
+  const raw = process.env.NEXTAUTH_URL?.trim();
+  if (!raw) return null;
+
+  let canonical: URL;
+  try {
+    canonical = new URL(raw);
+  } catch {
+    return null;
+  }
+
+  const host = request.headers.get('host');
+  if (!host || host === canonical.host) return null;
+
+  // Refresh, not Location: Next's middleware adapter rebuilds Location from the
+  // request Host and treats localhost/127.0.0.1 as the same, so a 307 loops.
+  const target = `${canonical.origin}${request.nextUrl.pathname}${request.nextUrl.search}`;
+  return new NextResponse(`Redirecting to ${target}`, {
+    headers: { Refresh: `0; url=${target}`, 'Content-Type': 'text/plain' },
+  });
+}
+
+/**
  * Locale cookie for next-intl, plus session gate for authenticated app surfaces.
  */
 export async function middleware(request: NextRequest) {
+  const canonicalRedirect = canonicalDevRedirect(request);
+  if (canonicalRedirect) return canonicalRedirect;
+
   const { pathname } = request.nextUrl;
 
   if (pathRequiresLogin(pathname)) {
