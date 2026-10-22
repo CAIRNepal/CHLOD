@@ -273,7 +273,7 @@ class Command(BaseCommand):
                         RDF_RESOURCE_BASE_URI=getattr(
                             settings,
                             "RDF_RESOURCE_BASE_URI",
-                            "https://w3id.org/heritagegraph/resource/",
+                            "https://cair-nepal.org/heritagegraph/resource/",
                         ).rstrip("/"),
                         OXIGRAPH_STORE_PATH=store_path,
                     ):

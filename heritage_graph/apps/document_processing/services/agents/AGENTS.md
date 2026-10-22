@@ -247,14 +247,14 @@ Written incrementally by `tasks.run_kg_pipeline`:
       "subject": "Pashupatinath",
       "predicate": "P108_was_produced_by",
       "object": "King Manadeva",
-      "subject_uri": "https://w3id.org/heritagegraph/entity/...",
+      "subject_uri": "https://cair-nepal.org/heritagegraph/entity/...",
       "confidence_score": 0.887,
       "confidence_breakdown": { "extraction_agreement": 1.0, "composite": 0.887 },
       "route": "community_review",
       "kumari_flagged": false,
       "conflict_detected": false,
       "db_assertion_id": "uuid",
-      "provenance_graph_uri": "https://w3id.org/heritagegraph/graph/document/<doc_id>"
+      "provenance_graph_uri": "https://cair-nepal.org/heritagegraph/graph/document/<doc_id>"
     }
   ]
 }
@@ -484,7 +484,7 @@ Agent 4: entity_resolution recalculated
 
 | Prefix | URI |
 |--------|-----|
-| `hg:` | `https://w3id.org/heritagegraph/` |
+| `hg:` | `https://cair-nepal.org/heritagegraph/` |
 | `crm:` | `http://www.cidoc-crm.org/cidoc-crm/` |
 | `prov:` | `http://www.w3.org/ns/prov#` |
 | `rdfs:` | `http://www.w3.org/2000/01/rdf-schema#` |
@@ -494,7 +494,7 @@ Agent 4: entity_resolution recalculated
 Each uploaded document's accepted triples live in:
 
 ```
-GRAPH <https://w3id.org/heritagegraph/graph/document/{document_uuid}>
+GRAPH <https://cair-nepal.org/heritagegraph/graph/document/{document_uuid}>
 ```
 
 This supports document-level retraction, versioning, and curator audit without polluting the global default graph.

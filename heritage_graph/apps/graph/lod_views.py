@@ -2,15 +2,17 @@
 
 from __future__ import annotations
 
-import json
+from html import escape
 from pathlib import Path
 
 from apps.graph.kg_engine.engine import get_kg_engine
 from apps.graph.kg_engine.partitions import GraphPartition
 from apps.graph.kg_engine.uris import is_safe_iri
+from apps.graph.ontology_config import RDF_PREFIXES
 from django.conf import settings
 from django.http import HttpResponse, HttpResponseNotFound, HttpResponseRedirect
 from django.views import View
+from rdflib import RDF, RDFS, XSD, BNode, Graph, Literal, URIRef
 
 
 def _resource_path_from_request(path: str) -> str:
@@ -39,11 +41,17 @@ class LodResourceView(View):
                 "Invalid resource path.", content_type="text/plain"
             )
         public = GraphPartition.PUBLIC.uri()
+        # The store hands back bare strings, so ask for each object's term kind,
+        # datatype and language tag too; without them a typed date, an @en label
+        # and an IRI-looking string literal all serialize as the same thing.
         sparql = f"""
-SELECT ?p ?o WHERE {{
+SELECT ?p ?o ?kind ?dt ?lang WHERE {{
   GRAPH <{public}> {{
     <{uri}> ?p ?o .
   }}
+  BIND(IF(isIRI(?o), "iri", IF(isBlank(?o), "bnode", "literal")) AS ?kind)
+  BIND(STR(DATATYPE(?o)) AS ?dt)
+  BIND(LANG(?o) AS ?lang)
 }}
 LIMIT 500
 """
@@ -53,40 +61,33 @@ LIMIT 500
                 f"No RDF description found for <{uri}>.",
                 content_type="text/plain",
             )
+        graph = _rows_to_graph(uri, rows)
 
         accept = (request.META.get("HTTP_ACCEPT") or "").lower()
 
-        if "text/turtle" in accept or "application/n-triples" in accept:
-            body = _rows_to_turtle(uri, rows)
+        if "application/n-triples" in accept:
+            body = graph.serialize(format="nt")
+            return HttpResponse(body, content_type="application/n-triples; charset=utf-8")
+
+        if "text/turtle" in accept:
+            body = graph.serialize(format="turtle")
             return HttpResponse(body, content_type="text/turtle; charset=utf-8")
 
         if "application/rdf+xml" in accept:
-            body = _rows_to_rdfxml(uri, rows)
+            try:
+                body = graph.serialize(format="xml")
+            except Exception:
+                # RDF/XML cannot express predicates without an NCName local part.
+                return HttpResponse(
+                    "This resource has no RDF/XML form; request text/turtle.",
+                    status=406,
+                    content_type="text/plain",
+                )
             return HttpResponse(body, content_type="application/rdf+xml; charset=utf-8")
 
         if "application/ld+json" in accept or "application/json" in accept:
-            graph: dict = {
-                "@context": {
-                    "rdfs": "http://www.w3.org/2000/01/rdf-schema#",
-                    "rdf": "http://www.w3.org/1999/02/22-rdf-syntax-ns#",
-                },
-                "@id": uri,
-            }
-            for row in rows:
-                pred = row.get("p", "")
-                obj = row.get("o", "")
-                key = pred.rsplit("/", 1)[-1].rsplit("#", 1)[-1]
-                if obj.startswith("http"):
-                    if isinstance(graph.get(key), list):
-                        graph[key].append({"@id": obj})
-                    else:
-                        graph[key] = {"@id": obj}
-                else:
-                    graph[key] = obj
-            return HttpResponse(
-                json.dumps(graph, indent=2),
-                content_type="application/ld+json; charset=utf-8",
-            )
+            body = graph.serialize(format="json-ld", context=_JSONLD_CONTEXT, indent=2)
+            return HttpResponse(body, content_type="application/ld+json; charset=utf-8")
 
         # HTML: 303 See Other → /knowledge/{type}/{id} in the UI
         redirect_url = _html_redirect_url(uri)
@@ -95,62 +96,59 @@ LIMIT 500
             response.status_code = 303
             return response
 
-        lines = [f"<{uri}>"]
-        for row in rows[:80]:
-            lines.append(f"  <{row.get('p', '')}> <{row.get('o', '')}> .")
         html = (
             "<!DOCTYPE html><html><head><title>HeritageGraph Resource</title></head>"
-            f"<body><h1>{uri}</h1><pre>{chr(10).join(lines)}</pre>"
+            f"<body><h1>{escape(uri)}</h1><pre>{escape(graph.serialize(format='nt'))}</pre>"
             "<p>Request with <code>Accept: text/turtle</code> for RDF.</p></body></html>"
         )
         return HttpResponse(html, content_type="text/html; charset=utf-8")
 
 
-def _rows_to_turtle(subject: str, rows: list[dict[str, str]]) -> str:
-    lines = ["@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .", ""]
+_JSONLD_CONTEXT = {
+    "rdf": str(RDF),
+    "rdfs": str(RDFS),
+    "xsd": str(XSD),
+}
+
+
+def _rows_to_graph(subject: str, rows: list[dict[str, str]]) -> Graph:
+    """Rebuild exact RDF terms from SELECT rows carrying kind/datatype/lang."""
+    graph = Graph()
+    graph.bind("rdfs", RDFS)
+    graph.bind("hg", RDF_PREFIXES.get("heritageGraph", ""))
+    graph.bind("crm", RDF_PREFIXES.get("crm", ""))
+    s = URIRef(subject)
     for row in rows:
-        p, o = row.get("p", ""), row.get("o", "")
-        if o.startswith("http"):
-            lines.append(f"<{subject}> <{p}> <{o}> .")
-        else:
-            escaped = o.replace("\\", "\\\\").replace('"', '\\"')
-            lines.append(f'<{subject}> <{p}> "{escaped}" .')
-    return "\n".join(lines) + "\n"
-
-
-def _rows_to_rdfxml(subject: str, rows: list[dict[str, str]]) -> str:
-    """Serialize SPARQL rows as RDF/XML (conservative, no rdflib dependency)."""
-    from xml.sax.saxutils import escape as _esc
-
-    parts = [
-        '<?xml version="1.0" encoding="UTF-8"?>',
-        '<rdf:RDF xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#">',
-        f'  <rdf:Description rdf:about="{_esc(subject)}">',
-    ]
-    for row in rows:
-        p, o = row.get("p", ""), row.get("o", "")
+        p, o = row.get("p"), row.get("o", "")
         if not p:
             continue
-        if o.startswith("http"):
-            parts.append(f'    <rdf:type rdf:resource="{_esc(o)}" />' if p.endswith("type") else
-                         f'    <p rdf:resource="{_esc(o)}" xmlns:p="{_esc(p)}" />')
+        kind = row.get("kind")
+        if kind == "iri":
+            obj = URIRef(o)
+        elif kind == "bnode":
+            obj = BNode(o)
+        elif row.get("lang"):
+            obj = Literal(o, lang=row["lang"])
+        elif row.get("dt") and row["dt"] != str(XSD.string):
+            # RDF 1.1: xsd:string is the simple literal, so keep it untyped.
+            obj = Literal(o, datatype=URIRef(row["dt"]))
         else:
-            parts.append(f"    <p xmlns:p=\"{_esc(p)}\">{_esc(o)}</p>")
-    parts += ["  </rdf:Description>", "</rdf:RDF>"]
-    return "\n".join(parts) + "\n"
+            obj = Literal(o)
+        graph.add((s, URIRef(p), obj))
+    return graph
 
 
 def _html_redirect_url(uri: str) -> str | None:
     """
     Derive the UI /knowledge/{type}/{id} URL from a resource IRI.
 
-    Resource IRIs follow: https://w3id.org/heritagegraph/{type}/{slug-or-uuid}
+    Resource IRIs follow: https://cair-nepal.org/heritagegraph/{type}/{slug-or-uuid}
     """
     base = str(getattr(settings, "RDF_RESOURCE_BASE_URI", "")).rstrip("/")
     if base and uri.startswith(base + "/"):
         remainder = uri[len(base) + 1:]
-    elif uri.startswith("https://w3id.org/heritagegraph/"):
-        remainder = uri[len("https://w3id.org/heritagegraph/"):]
+    elif uri.startswith("https://cair-nepal.org/heritagegraph/"):
+        remainder = uri[len("https://cair-nepal.org/heritagegraph/"):]
     else:
         return None
 

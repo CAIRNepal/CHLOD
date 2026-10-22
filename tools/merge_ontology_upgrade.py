@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """One-shot merge of the upstream HeritageGraph ontology draft into the deployed schema.
 
-The upstream draft (``ontology/upstream/HeritageGraph-0.1.0-upstream.yaml``) rebuilds
+The upstream draft (``ontology/upstream/HeritageGraph-1.0.1-upstream.yaml``) rebuilds
 the schema around PROV-O and adds deep Kumari-tradition modelling, but it drops the
 platform-operational classes that ``tools/ui-classmap.yaml`` and the Django models
 still depend on. Swapping it in verbatim would silently remove registry keys, which
@@ -28,7 +28,7 @@ import sys
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent.parent
-UPSTREAM = ROOT / "ontology" / "upstream" / "HeritageGraph-0.1.0-upstream.yaml"
+UPSTREAM = ROOT / "ontology" / "upstream" / "HeritageGraph-1.0.1-upstream.yaml"
 # Both inputs are pinned so the merge stays reproducible: the output overwrites the
 # live schema, so reading the baseline from there would feed the merge its own result.
 DEPLOYED = ROOT / "ontology" / "upstream" / "HeritageGraph-1.0.0-deployed.yaml"
@@ -74,20 +74,21 @@ RESTORE_SLOTS = [
 
 RESTORE_ENUMS = {"CulturalEntityCategoryEnum": "CulturalEntityCategory"}
 
-# The result is a superset of the deployed 1.0.0 schema, so it must not inherit the
-# upstream draft's 0.1.0 (which would move the published version backwards).
-MERGED_VERSION = "1.1.0"
+# The result is a superset of the deployed 1.1.0 schema, so it must not inherit the
+# upstream release's 1.0.1 (which would move the published version backwards).
+MERGED_VERSION = "1.2.0"
 MERGED_DESCRIPTION = (
     '"An event-centric LinkML schema for representing Nepal cultural heritage '
     "information, aligned with CIDOC-CRM and PROV-O through exact/broad mappings "
     "and subproperty bridges. Enables provenance tracking, ritual-spatial-temporal "
     "reasoning, and multi-calendar date representation. Merges the upstream "
-    'HeritageGraph 0.1.0 ontology draft into the deployed platform schema."'
+    'HeritageGraph 1.0.1 ontology release into the deployed platform schema."'
 )
 
 # Slots to re-attach to classes that survive the upgrade but lost them upstream.
 # Only those backing a real Django column, so the registry keeps driving the form.
 REATTACH_SLOTS = {
+    "ArchitecturalStructure": ["place_coordinates"],
     "DataSource": ["source_type", "archival_location"],
     "InformationObject": ["source_type", "archival_location"],
 }
@@ -96,8 +97,10 @@ REATTACH_SLOTS = {
 # them the registry JSON Schema stops rejecting nameless records and the contribute
 # forms stop marking the field mandatory, so they are carried over from the deployed
 # schema for every class that survives the upgrade.
+# ArchitecturalStructure.has_current_location is deliberately absent: its `rules:`
+# require it only for (partially) extant structures, and an unconditional marker
+# made BuddhistMonument (no location column) unsubmittable.
 RESTORE_REQUIRED = {
-    "ArchitecturalStructure": ["has_current_location"],
     "CasteGroup": ["name"],
     "ConditionAssessment": [
         "assessed_object",

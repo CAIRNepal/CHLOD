@@ -16,7 +16,7 @@ PROV_WAS_DERIVED_FROM = "http://www.w3.org/ns/prov#wasDerivedFrom"
 PROV_WAS_INFLUENCED_BY = "http://www.w3.org/ns/prov#wasInfluencedBy"
 PROV_GENERATED_AT = "http://www.w3.org/ns/prov#generatedAtTime"
 
-HG = "https://w3id.org/heritagegraph/"
+HG = "https://cair-nepal.org/heritagegraph/"
 HG_EXISTENCE_STATUS = f"{HG}existenceStatus"
 HG_HAS_ASSERTION = f"{HG}hasAssertion"
 HG_ASSERTS_ABOUT = f"{HG}assertsAbout"

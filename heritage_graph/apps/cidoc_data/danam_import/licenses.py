@@ -69,9 +69,9 @@ L1_CONSUMED_PREDICATES: frozenset[str] = frozenset(
         "http://www.w3.org/ns/prov#wasDerivedFrom",
         "http://www.w3.org/ns/prov#wasInfluencedBy",
         "http://www.w3.org/ns/prov#generatedAtTime",
-        "https://w3id.org/heritagegraph/existenceStatus",
-        "https://w3id.org/heritagegraph/hasAssertion",
-        "https://w3id.org/heritagegraph/assertsAbout",
-        "https://w3id.org/heritagegraph/confidenceScore",
+        "https://cair-nepal.org/heritagegraph/existenceStatus",
+        "https://cair-nepal.org/heritagegraph/hasAssertion",
+        "https://cair-nepal.org/heritagegraph/assertsAbout",
+        "https://cair-nepal.org/heritagegraph/confidenceScore",
     }
 )

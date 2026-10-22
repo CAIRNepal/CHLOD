@@ -19,7 +19,7 @@ BREAKOUT = "https://example.org/a> . ?s ?p ?o } UNION { GRAPH ?g { ?s ?p ?o "
 
 class IsSafeIriTests(SimpleTestCase):
     def test_accepts_a_normal_resource_iri(self):
-        self.assertTrue(is_safe_iri("https://w3id.org/heritagegraph/resource/person/1"))
+        self.assertTrue(is_safe_iri("https://cair-nepal.org/heritagegraph/resource/person/1"))
 
     def test_rejects_iri_closing_the_angle_brackets(self):
         self.assertFalse(is_safe_iri(BREAKOUT))
@@ -56,7 +56,7 @@ class InjectionEndpointTests(TestCase):
     def test_neighborhood_still_accepts_a_valid_iri(self):
         response = self.client.get(
             "/cidoc/kg/neighborhood/",
-            {"uri": "https://w3id.org/heritagegraph/resource/person/1"},
+            {"uri": "https://cair-nepal.org/heritagegraph/resource/person/1"},
         )
 
         self.assertEqual(response.status_code, 200)

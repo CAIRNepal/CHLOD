@@ -41,15 +41,23 @@ export function ImageAttribution({
   credit,
   className = '',
   variant = 'onImage',
+  focusable = true,
 }: {
   credit?: ImageCredit;
   className?: string;
   variant?: AttributionVariant;
+  /**
+   * False keeps the links out of the Tab order. For grids, where two credit
+   * links per card tripled the stops a keyboard user had to pass; the same
+   * credit is reachable on the record's own view.
+   */
+  focusable?: boolean;
 }) {
   if (!credit || (!credit.artist && !credit.license && !credit.descriptionUrl)) return null;
 
   const { artist, license, licenseUrl, descriptionUrl, source } = credit;
   const v = VARIANT_CLASSES[variant];
+  const tabIndex = focusable ? undefined : -1;
 
   return (
     <p className={cn('text-[10px] leading-tight', v.text, className)}>
@@ -66,6 +74,7 @@ export function ImageAttribution({
         descriptionUrl ? (
           <a
             href={descriptionUrl}
+            tabIndex={tabIndex}
             target="_blank"
             rel="noopener noreferrer"
             title={source ? `${artist} — ${source}` : artist}
@@ -82,6 +91,7 @@ export function ImageAttribution({
         licenseUrl ?
           <a
             href={licenseUrl}
+            tabIndex={tabIndex}
             target="_blank"
             rel="noopener noreferrer license"
             className={cn('rounded-xs focus-visible:outline-2 focus-visible:outline-offset-2', v.link)}

@@ -2,7 +2,7 @@
 AUTO-GENERATED — do not edit by hand.
 Source:  ontology/HeritageGraph.yaml (prefixes section)
 Regen:   python3 tools/gen_heritage_viz_config.py
-Hash:    8df5c8a8c53f5e19
+Hash:    32e9d7ec37774d65
 
 Import this module wherever RDF prefix expansion is needed instead of
 re-declaring the dict inline (which risks silent drift).
@@ -16,7 +16,7 @@ from __future__ import annotations
 
 RDF_PREFIXES: dict[str, str] = {
     "linkml": "https://w3id.org/linkml/",
-    "heritageGraph": "https://w3id.org/heritagegraph/",
+    "heritageGraph": "https://cair-nepal.org/heritagegraph/",
     "rdf": "http://www.w3.org/1999/02/22-rdf-syntax-ns#",
     "rdfs": "http://www.w3.org/2000/01/rdf-schema#",
     "owl": "http://www.w3.org/2002/07/owl#",
@@ -31,8 +31,8 @@ RDF_PREFIXES: dict[str, str] = {
     "dbo": "http://dbpedia.org/ontology/",
     "prov": "http://www.w3.org/ns/prov#",
     "crm": "http://www.cidoc-crm.org/cidoc-crm/",
-    "crmsci": "http://www.ics.forth.gr/isl/CRMsci/",
-    "crminf": "http://www.ics.forth.gr/isl/CRMinf/",
+    "crmsci": "http://www.cidoc-crm.org/extensions/crmsci/",
+    "crminf": "http://www.cidoc-crm.org/extensions/crminf/",
     "rico": "https://www.ica.org/standards/RiC/ontology#",
     "bibo": "http://purl.org/ontology/bibo/",
     "vann": "http://purl.org/vocab/vann/",
@@ -50,6 +50,8 @@ RDF_PREFIXES: dict[str, str] = {
 # Inverse map used for compacting IRIs to CURIEs
 URI_TO_PREFIX: dict[str, str] = {v: k for k, v in RDF_PREFIXES.items()}
 
+_HG_NS = "https://cair-nepal.org/heritagegraph/"
+
 
 def expand_curie(curie: str) -> str:
     """Expand a CURIE (e.g. 'crm:E53_Place') to a full IRI."""
@@ -59,9 +61,9 @@ def expand_curie(curie: str) -> str:
     if curie.startswith(("http://", "https://")):
         return curie
     if ':' not in curie:
-        return RDF_PREFIXES.get('heritageGraph', 'https://w3id.org/heritagegraph/') + curie
+        return RDF_PREFIXES.get('heritageGraph', _HG_NS) + curie
     prefix, rest = curie.split(':', 1)
     base = RDF_PREFIXES.get(prefix)
     if not base:
-        return RDF_PREFIXES.get('heritageGraph', 'https://w3id.org/heritagegraph/') + rest
+        return RDF_PREFIXES.get('heritageGraph', _HG_NS) + rest
     return base + rest

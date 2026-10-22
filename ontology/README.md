@@ -11,13 +11,23 @@ Generated companions (do not hand-edit):
 | [`lod/skos-vocabularies.ttl`](./lod/skos-vocabularies.ttl) | `make skos-vocab` | AAT-aligned SKOS concepts (from enum `meaning:` annotations) |
 | [`shapes/generated-heritagegraph-minimal-shacl.ttl`](./shapes) | `make shacl` | write-time SHACL validation |
 
-## Upstream merge (0.1.0 draft)
+## Upstream merge (1.0.1 release)
 
-[`upstream/HeritageGraph-0.1.0-upstream.yaml`](./upstream) is the CAIR-Nepal
-[heritagegraphontology](https://github.com/CAIRNepal/heritagegraphontology) pre-release
-draft. It was **rebased into** the canonical schema by
-[`tools/merge_ontology_upgrade.py`](../tools/merge_ontology_upgrade.py) rather than swapped in,
-because it drops classes the platform still depends on.
+[`upstream/HeritageGraph-1.0.1-upstream.yaml`](./upstream) is the CAIR-Nepal
+[heritagegraphontology](https://github.com/CAIRNepal/heritagegraphontology) 1.0.1 release
+(the 0.1.0 pre-release draft it replaces is kept alongside). It is **rebased into** the
+canonical schema by [`tools/merge_ontology_upgrade.py`](../tools/merge_ontology_upgrade.py)
+rather than swapped in, because it drops classes the platform still depends on.
+To pull a newer upstream, drop it into `upstream/`, point `UPSTREAM` at it, run the script,
+then `make generate`.
+
+1.0.1 over the 0.1.0 draft: `managed_by_guthi` on `ArchitecturalStructure`,
+`has_religious_tradition` on `ReligiousStructure`, `took_place_at` on `Enshrinement` and
+`RitualEvent`, `had_participant` on `RitualEvent`; `KumariRetirementEvent` carried out by any
+`Actor`; `occurs_before`/`occurs_after` move to `crm:P183`; date slots become `datetime` and
+`confidence_score` `decimal`; CRMsci/CRMinf use the cidoc-crm.org namespaces; the
+`heritageGraph:` namespace moves from `w3id.org/heritagegraph/` to
+`cair-nepal.org/heritagegraph/` (the platform's resource and named-graph IRIs follow).
 
 What the merge carries over from the draft:
 
@@ -40,6 +50,8 @@ What the merge restores on top of it (the draft removed these, but
   `tgn`, `wgs84`, `geonames`, `datacite`, `dct`).
 - Enum `meaning:` annotations, which only `emit_skos_vocabularies.py` reads and which the
   draft had reduced from 51 to 5.
+- `place_coordinates` on `ArchitecturalStructure`, and the conditional-only
+  `has_current_location` requirement.
 
 The draft's provenance slots supersede older equivalents — `has_provenance_assertion` →
 `has_assertion`, `is_about_entity`/`is_about_event` → `is_about`, `was_derived_from_source` →

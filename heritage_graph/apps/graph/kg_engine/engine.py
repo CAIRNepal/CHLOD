@@ -40,7 +40,7 @@ from django.conf import settings
 logger = logging.getLogger(__name__)
 
 CRM = "http://www.cidoc-crm.org/cidoc-crm/"
-HG = "https://w3id.org/heritagegraph/"
+HG = "https://cair-nepal.org/heritagegraph/"
 RDF_TYPE = "http://www.w3.org/1999/02/22-rdf-syntax-ns#type"
 
 # Map property names → (CRM class IRI, linking predicate IRI, event slug)

@@ -8,7 +8,7 @@ import re
 from pathlib import Path
 
 CRM = "http://www.cidoc-crm.org/cidoc-crm/"
-HG = "https://w3id.org/heritagegraph/"
+HG = "https://cair-nepal.org/heritagegraph/"
 PROV = "http://www.w3.org/ns/prov#"
 RDFS = "http://www.w3.org/2000/01/rdf-schema#"
 RDF = "http://www.w3.org/1999/02/22-rdf-syntax-ns#"

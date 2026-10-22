@@ -51,7 +51,7 @@ function buildIconHtml(node: GraphNode, selected: boolean): string {
       position:absolute;top:${size + 2}px;left:50%;transform:translateX(-50%);
       white-space:nowrap;font-size:11px;font-weight:600;
       color:${selected ? 'var(--ring)' : 'var(--foreground)'};
-      text-shadow:0 1px 3px #000;pointer-events:none;
+      text-shadow:0 0 3px var(--background),0 0 3px var(--background),0 0 6px var(--background);pointer-events:none;
     ">${node.label.replace(/[<>]/g, '')}</div>`;
 }
 
@@ -114,7 +114,6 @@ export function MapView({ nodes, selectedId, onNodeSelect }: MapViewProps) {
 
       L.tileLayer(HERITAGE_MUSEUM_TILE_LAYER.url, {
         attribution: HERITAGE_MUSEUM_TILE_LAYER.attribution,
-        subdomains: HERITAGE_MUSEUM_TILE_LAYER.subdomains,
         maxZoom: HERITAGE_MUSEUM_TILE_LAYER.maxZoom,
       }).addTo(map);
 

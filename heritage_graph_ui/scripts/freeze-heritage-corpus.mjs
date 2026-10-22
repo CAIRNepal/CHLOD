@@ -167,8 +167,10 @@ async function main() {
   const serialized = JSON.stringify(raw, null, 2) + '\n';
 
   if (CHECK) {
+    // Retrieval dates always move to today; only license/author drift is stale.
+    const undated = (s) => s.replace(/"retrieved": "\d{4}-\d{2}-\d{2}"/g, '"retrieved": ""');
     const current = await readFile(CORPUS, 'utf8');
-    if (current !== serialized) {
+    if (undated(current) !== undated(serialized)) {
       console.error('✗ heritage-demo.json is stale — run: node scripts/freeze-heritage-corpus.mjs');
       process.exit(1);
     }

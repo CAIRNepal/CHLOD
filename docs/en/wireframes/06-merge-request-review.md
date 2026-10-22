@@ -259,7 +259,7 @@ sequenceDiagram
 │  └────────────────────────────────────────────────────────────────┘ │
 │                                                                      │
 │  Nanopublications (11 assertions → 11 nanopubs)                     │
-│  https://w3id.org/heritagegraph/nanopub/np_4f2a...                 │
+│  https://cair-nepal.org/heritagegraph/nanopub/np_4f2a...                 │
 │                                                                      │
 │  Dataset citation                                                    │
 │  ┌────────────────────────────────────────────────────────────────┐ │

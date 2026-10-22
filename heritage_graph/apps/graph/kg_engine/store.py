@@ -239,9 +239,16 @@ class KnowledgeGraphStore:
         datatype: str = "",
         graph_uri: str | None,
     ) -> bool:
-        escaped = lexical.replace("\\", "\\\\").replace('"', '\\"')
-        if datatype:
-            obj = f'"{escaped}"^^<{datatype}>'
+        from apps.cidoc_data.rdf_entity_projection import (
+            _escape_literal_lexical,
+            literal_datatype_iri,
+        )
+
+        escaped = _escape_literal_lexical(lexical)
+        if datatype.startswith("@"):
+            obj = f'"{escaped}"{datatype}'
+        elif datatype:
+            obj = f'"{escaped}"^^<{literal_datatype_iri(datatype)}>'
         else:
             obj = f'"{escaped}"'
         if graph_uri:
@@ -500,7 +507,10 @@ class KnowledgeGraphStore:
         except ImportError:
             return None
 
-        from apps.cidoc_data.rdf_entity_projection import RDF_PREFIXES
+        from apps.cidoc_data.rdf_entity_projection import (
+            RDF_PREFIXES,
+            literal_datatype_iri,
+        )
 
         graph_name = NamedNode(graph_uri) if graph_uri else None
         sub = NamedNode(t.subj)
@@ -518,7 +528,8 @@ class KnowledgeGraphStore:
             return Quad(sub, pred, Literal(lexical, language=datatype[1:]), graph_name)
         if datatype == geo_wkt:
             return Quad(sub, pred, Literal(lexical, datatype=NamedNode(geo_wkt)), graph_name)
-        return Quad(sub, pred, Literal(lexical, datatype=NamedNode(datatype)), graph_name)
+        dt = NamedNode(literal_datatype_iri(datatype))
+        return Quad(sub, pred, Literal(lexical, datatype=dt), graph_name)
 
     def local_replace_named_graph(self, graph_uri: str, triples: list[Any]) -> bool:
         """Replace all triples in a named graph using pyoxigraph quads (local store only)."""

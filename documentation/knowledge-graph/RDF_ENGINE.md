@@ -156,7 +156,7 @@ from apps.graph.kg_engine import get_kg_engine
 
 engine = get_kg_engine()
 engine.publish_metadata_instance(person_row)
-engine.neighborhood("https://w3id.org/heritagegraph/resource/person/1")
+engine.neighborhood("https://cair-nepal.org/heritagegraph/resource/person/1")
 engine.rebuild_public_graph()
 ```
 

@@ -17,9 +17,10 @@ logger = logging.getLogger(__name__)
 
 # Generated from ontology/HeritageGraph.yaml (prefixes section).
 # To change a namespace: edit the schema, run python3 tools/gen_heritage_viz_config.py.
-from apps.graph.ontology_config import RDF_PREFIXES  # noqa: E402
+from apps.graph.ontology_config import RDF_PREFIXES, expand_curie  # noqa: E402
 
 RDF_TYPE_URI = RDF_PREFIXES["rdf"] + "type"
+HG_NS = RDF_PREFIXES.get("heritageGraph", "https://cair-nepal.org/heritagegraph/")
 # External-authority identity links use skos:exactMatch rather than owl:sameAs.
 # owl:sameAs forces full bidirectional property identity under OWL reasoning
 # ("sameAs disease"): a consumer that also loads Wikidata/Getty would conflate
@@ -76,9 +77,7 @@ def expand_curie(curie: str) -> str:
     if raw.startswith(("http://", "https://")):
         return raw
     if ":" not in raw:
-        return (
-            RDF_PREFIXES.get("heritageGraph", "https://w3id.org/heritagegraph/") + raw
-        )
+        return HG_NS + raw
     prefix, _, local = raw.partition(":")
     base = RDF_PREFIXES.get(prefix)
     if not base:
@@ -88,7 +87,18 @@ def expand_curie(curie: str) -> str:
 
 
 def _escape_literal_lexical(value: str) -> str:
-    return value.replace("\\", "\\\\").replace('"', '\\"')
+    # Short-quoted SPARQL/N-Triples strings may not hold raw line breaks.
+    return (
+        value.replace("\\", "\\\\")
+        .replace('"', '\\"')
+        .replace("\n", "\\n")
+        .replace("\r", "\\r")
+    )
+
+
+def literal_datatype_iri(datatype: str) -> str:
+    """Full datatype IRI for a projection datatype such as ``xsd:string``."""
+    return expand_curie(datatype)
 
 
 def _parse_relation_scalar_or_list(raw: Any, *, multivalued: bool) -> list[int | str]:
@@ -299,6 +309,7 @@ def _triple_to_line(t: _Triple) -> str:
             return f'  {sub} {pred} "{escaped}"{datatype} .'
         if not datatype:
             return f'  {sub} {pred} "{escaped}" .'
+        datatype = literal_datatype_iri(datatype)
         geo_wkt = RDF_PREFIXES["geo"] + "wktLiteral"
         if datatype == geo_wkt:
             return f'  {sub} {pred} "{escaped}"^^geo:wktLiteral .'
@@ -617,9 +628,7 @@ def project_entity_to_rdf(entity) -> tuple[str, set[str]] | None:
 
     uri = cultural_entity_uri(entity.entity_id)
     label = (entity.name or str(entity.entity_id)).strip()
-    type_uri = RDF_PREFIXES.get("heritageGraph", "https://w3id.org/heritagegraph/") + (
-        entity.category or "Entity"
-    )
+    type_uri = HG_NS + (entity.category or "Entity")
     triples = [
         _Triple(uri, RDF_TYPE_URI, type_uri, None),
         _Triple(uri, RDF_PREFIXES["rdfs"] + "label", None, (label, "xsd:string")),

@@ -31,7 +31,7 @@ SCHEMA_PATH = ROOT / "ontology" / "HeritageGraph.yaml"
 OUT = ROOT / "ontology" / "lod" / "skos-vocabularies.ttl"
 
 AAT = "http://vocab.getty.edu/aat/"
-HG = "https://w3id.org/heritagegraph/"
+HG = "https://cair-nepal.org/heritagegraph/"
 
 
 def _expand(curie: str, prefixes: dict[str, str]) -> str:
@@ -63,7 +63,7 @@ def generate(schema: dict) -> str:
         "@prefix skos: <http://www.w3.org/2004/02/skos/core#> .",
         "@prefix crm:  <http://www.cidoc-crm.org/cidoc-crm/> .",
         "@prefix aat:  <http://vocab.getty.edu/aat/> .",
-        "@prefix hg:   <https://w3id.org/heritagegraph/> .",
+        "@prefix hg:   <https://cair-nepal.org/heritagegraph/> .",
         "",
     ]
 

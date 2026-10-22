@@ -51,7 +51,7 @@ class Command(BaseCommand):
         graph_uri = (
             options["graph_uri"]
             or getattr(settings, "RDF_SCHEMA_GRAPH_URI", "")
-            or "https://w3id.org/heritagegraph/graph/schema"
+            or "https://cair-nepal.org/heritagegraph/graph/schema"
         )
 
         endpoint = str(getattr(settings, "RDF_ENDPOINT_URL", "") or "").strip()

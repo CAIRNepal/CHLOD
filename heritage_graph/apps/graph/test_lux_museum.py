@@ -12,39 +12,41 @@ from apps.graph.kg_engine.lux_museum import (
 )
 from django.test import SimpleTestCase, override_settings
 
+HG = "https://cair-nepal.org/heritagegraph/"
+
 
 class LuxMuseumHelpersTest(SimpleTestCase):
     def test_is_lux_stub_uri(self):
         self.assertTrue(
             is_lux_stub_uri(
-                "https://w3id.org/heritagegraph/imported/lux/place/abc-123"
+                "https://cair-nepal.org/heritagegraph/imported/lux/place/abc-123"
             )
         )
         self.assertFalse(
-            is_lux_stub_uri("https://w3id.org/heritagegraph/resource/person/1")
+            is_lux_stub_uri("https://cair-nepal.org/heritagegraph/resource/person/1")
         )
 
     @override_settings(
-        RDF_RESOURCE_BASE_URI="https://w3id.org/heritagegraph/resource/",
-        RDF_PUBLIC_GRAPH_URI="https://w3id.org/heritagegraph/graph/public",
-        RDF_LUX_IMPORTED_GRAPH_URI="https://w3id.org/heritagegraph/imported/lux",
+        RDF_RESOURCE_BASE_URI="https://cair-nepal.org/heritagegraph/resource/",
+        RDF_PUBLIC_GRAPH_URI="https://cair-nepal.org/heritagegraph/graph/public",
+        RDF_LUX_IMPORTED_GRAPH_URI="https://cair-nepal.org/heritagegraph/imported/lux",
     )
     def test_discover_lux_links_exact_match(self):
         store = MagicMock()
         store.select.side_effect = [
             [
                 {
-                    "curated": "https://w3id.org/heritagegraph/resource/person/1",
-                    "lux": "https://w3id.org/heritagegraph/imported/lux/person/p1",
+                    "curated": "https://cair-nepal.org/heritagegraph/resource/person/1",
+                    "lux": "https://cair-nepal.org/heritagegraph/imported/lux/person/p1",
                     "external": "https://lux.collections.yale.edu/person/abc",
                 }
             ],
         ]
         links = discover_lux_links(
             store=store,
-            curated_iris={"https://w3id.org/heritagegraph/resource/person/1"},
+            curated_iris={"https://cair-nepal.org/heritagegraph/resource/person/1"},
             curated_labels={
-                "https://w3id.org/heritagegraph/resource/person/1": "Test Person"
+                "https://cair-nepal.org/heritagegraph/resource/person/1": "Test Person"
             },
             link_limit=10,
             label_match_limit=0,
@@ -53,13 +55,13 @@ class LuxMuseumHelpersTest(SimpleTestCase):
         self.assertEqual(links[0].method, "exactMatch")
         self.assertEqual(
             links[0].lux,
-            "https://w3id.org/heritagegraph/imported/lux/person/p1",
+            "https://cair-nepal.org/heritagegraph/imported/lux/person/p1",
         )
 
     @override_settings(
-        RDF_RESOURCE_BASE_URI="https://w3id.org/heritagegraph/resource/",
-        RDF_PUBLIC_GRAPH_URI="https://w3id.org/heritagegraph/graph/public",
-        RDF_LUX_IMPORTED_GRAPH_URI="https://w3id.org/heritagegraph/imported/lux",
+        RDF_RESOURCE_BASE_URI="https://cair-nepal.org/heritagegraph/resource/",
+        RDF_PUBLIC_GRAPH_URI="https://cair-nepal.org/heritagegraph/graph/public",
+        RDF_LUX_IMPORTED_GRAPH_URI="https://cair-nepal.org/heritagegraph/imported/lux",
         RDF_LUX_LINKED_NODE_LIMIT=10,
         RDF_LUX_LABEL_MATCH_LIMIT=0,
         RDF_LUX_SAMPLE_LIMIT=0,  # this test covers the linked-merge path only
@@ -72,8 +74,8 @@ class LuxMuseumHelpersTest(SimpleTestCase):
         mock_curated.return_value = {
             "nodes": [
                 {
-                    "s": "https://w3id.org/heritagegraph/resource/person/1",
-                    "type": "https://w3id.org/heritagegraph/Person",
+                    "s": "https://cair-nepal.org/heritagegraph/resource/person/1",
+                    "type": "https://cair-nepal.org/heritagegraph/Person",
                     "label": "Curated",
                 }
             ],
@@ -81,8 +83,8 @@ class LuxMuseumHelpersTest(SimpleTestCase):
         }
         mock_discover.return_value = [
             LuxLink(
-                curated="https://w3id.org/heritagegraph/resource/person/1",
-                lux="https://w3id.org/heritagegraph/imported/lux/person/p1",
+                curated="https://cair-nepal.org/heritagegraph/resource/person/1",
+                lux="https://cair-nepal.org/heritagegraph/imported/lux/person/p1",
                 external="https://lux.collections.yale.edu/person/abc",
                 method="exactMatch",
             )
@@ -91,8 +93,8 @@ class LuxMuseumHelpersTest(SimpleTestCase):
         store.select.side_effect = [
             [
                 {
-                    "s": "https://w3id.org/heritagegraph/imported/lux/person/p1",
-                    "type": "https://w3id.org/heritagegraph/Person",
+                    "s": "https://cair-nepal.org/heritagegraph/imported/lux/person/p1",
+                    "type": "https://cair-nepal.org/heritagegraph/Person",
                     "label": "LUX Person",
                     "external": "https://lux.collections.yale.edu/person/abc",
                 }
@@ -106,9 +108,9 @@ class LuxMuseumHelpersTest(SimpleTestCase):
         self.assertIn("exactMatch", out["edges"][0]["p"])
 
     @override_settings(
-        RDF_RESOURCE_BASE_URI="https://w3id.org/heritagegraph/resource/",
-        RDF_PUBLIC_GRAPH_URI="https://w3id.org/heritagegraph/graph/public",
-        RDF_LUX_IMPORTED_GRAPH_URI="https://w3id.org/heritagegraph/imported/lux",
+        RDF_RESOURCE_BASE_URI="https://cair-nepal.org/heritagegraph/resource/",
+        RDF_PUBLIC_GRAPH_URI="https://cair-nepal.org/heritagegraph/graph/public",
+        RDF_LUX_IMPORTED_GRAPH_URI="https://cair-nepal.org/heritagegraph/imported/lux",
         RDF_LUX_SAMPLE_LIMIT=50,
     )
     @patch("apps.graph.kg_engine.lux_museum.fetch_graph_projection")
@@ -120,16 +122,16 @@ class LuxMuseumHelpersTest(SimpleTestCase):
         (tagged as an external layer) so the museum can show Yale LUX."""
         mock_curated.return_value = {"nodes": [], "edges": []}
         mock_discover.return_value = []  # zero exactMatch links
-        a = "https://w3id.org/heritagegraph/imported/lux/person/a"
-        b = "https://w3id.org/heritagegraph/imported/lux/group/b"
+        a = "https://cair-nepal.org/heritagegraph/imported/lux/person/a"
+        b = "https://cair-nepal.org/heritagegraph/imported/lux/group/b"
         store = MagicMock()
         store.select.side_effect = [
             # 1) connected-sample edges query
             [{"s": a, "p": "https://linked.art/ns/terms/member_of", "o": b, "plabel": None}],
             # 2) batched node-detail fetch (<=30 IRIs -> single batch)
             [
-                {"s": a, "type": "https://w3id.org/heritagegraph/Person", "label": "A"},
-                {"s": b, "type": "https://w3id.org/heritagegraph/Group", "label": "B"},
+                {"s": a, "type": f"{HG}Person", "label": "A"},
+                {"s": b, "type": f"{HG}Group", "label": "B"},
             ],
         ]
         out = fetch_museum_projection_with_lux(store=store)

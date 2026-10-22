@@ -234,7 +234,7 @@ def remove_cultural_entity_from_public_graph(sender, instance, **kwargs):
 
 @receiver(post_save, sender="heritage_data.Project")
 def mint_project_pid(sender, instance, created, **kwargs):
-    """Mint a w3id.org PID for a newly created Project and write PROV-O triples
+    """Mint a cair-nepal.org PID for a newly created Project and write PROV-O triples
     to the RDF outbox so Oxigraph records the creation provenance activity.
     Skips if pid is already set (idempotent re-save guard).
     """

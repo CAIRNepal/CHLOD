@@ -12,7 +12,7 @@ These are not "things to fix later." Any one of them, unfixed at submission, mat
 | # | Blocker | Why it desk-rejects | Fix before submission |
 |---|---|---|---|
 | **B1** | No declared license on code, data, or ontology | Nature portfolio is OA; FAIR-compliance is a stated review criterion; *npj HS* explicitly requires a data availability statement with an open license. README literally says "license is yet to be finalized." | Adopt **CC-BY-4.0** for data + ontology, **Apache-2.0** for code, commit `LICENSE` + `LICENSE-DATA`, embed `dct:license` in the ontology IRI metadata. Do this in week 1. |
-| **B2** | No data availability statement with persistent identifier | *npj HS* requires a Zenodo/Dryad/Figshare DOI for data and code. Personal GitHub URLs are not acceptable as the only deposit. | Cut a `paper-v1.0` tag; archive on Zenodo; cite the DOI. Mint a **w3id.org/heritagegraph/** prefix for the ontology — vendor-neutral, community-resolvable. |
+| **B2** | No data availability statement with persistent identifier | *npj HS* requires a Zenodo/Dryad/Figshare DOI for data and code. Personal GitHub URLs are not acceptable as the only deposit. | Cut a `paper-v1.0` tag; archive on Zenodo; cite the DOI. Mint a **cair-nepal.org/heritagegraph/** prefix for the ontology — vendor-neutral, community-resolvable. |
 | **B3** | No ethics statement on community heritage data | Nature portfolio enforces ethics review on community/indigenous data. Newar heritage qualifies. Without an FPIC/CARE/TK Labels statement, expect editor pushback before review. | See §7 of this document. Even a brief, honest "consultation is in progress with X stakeholders" is better than silence. |
 | **B4** | Documentation drift visible in the public repo | Reviewers read the repo. Three schema files (`schema.yaml`, `new_schema.yaml`, `final_schema.yaml`), two cache strategy docs, three auth docs, empty `new.owl` and `Dockerfile.keycloak`. This signals unfrozen artifact. | One-week submission-hardening sprint: collapse to one canonical schema, delete dead files, archive `deleted/`, pin one auth approach, declare it in `SCHEMA.md` and `AUTH.md`. |
 | **B5** | Claims without evaluation numbers | "We demonstrate X" with no F1/conformance/κ is desk-rejectable at a Nature venue. The 17,894 triples figure is engineering output, not evaluation. | See §5 of this document. Run the four evaluations. Without them, you cannot defend the contribution. |
@@ -181,7 +181,7 @@ The query must traverse three endpoints and return a single resolved entity with
 
 ```sparql
 PREFIX crm:     <http://www.cidoc-crm.org/cidoc-crm/>
-PREFIX hg:      <https://w3id.org/heritagegraph/entity/>
+PREFIX hg:      <https://cair-nepal.org/heritagegraph/entity/>
 PREFIX aat:     <http://vocab.getty.edu/aat/>
 PREFIX wd:      <http://www.wikidata.org/entity/>
 PREFIX wdt:     <http://www.wikidata.org/prop/direct/>
@@ -196,7 +196,7 @@ WHERE {
             rdfs:label ?label ;
             crm:P2_has_type ?aatType ;
             owl:sameAs ?wdItem .
-    FILTER(STRSTARTS(STR(?entity), "https://w3id.org/heritagegraph/"))
+    FILTER(STRSTARTS(STR(?entity), "https://cair-nepal.org/heritagegraph/"))
   }
 
   # Federated: Getty AAT
@@ -217,7 +217,7 @@ WHERE {
 
 **Pre-flight checks before you commit this query to the paper:**
 1. Your Fuseki endpoint must be publicly resolvable at a **stable URL** (not `localhost`, not an IP). Mint a subdomain.
-2. The HG entity IRI must be a `w3id.org/heritagegraph/...` PURL that 303-redirects to your Fuseki content-negotiable endpoint. *Do not use bare backend.localhost URIs in the paper.*
+2. The HG entity IRI must be a `cair-nepal.org/heritagegraph/...` PURL that 303-redirects to your Fuseki content-negotiable endpoint. *Do not use bare backend.localhost URIs in the paper.*
 3. The `owl:sameAs` link to Wikidata must be asserted in your graph and serialized.
 4. The Getty AAT type IRI must actually exist (verify against vocab.getty.edu).
 5. The query must execute end-to-end in under 30s against live endpoints. Test it from a fresh machine.

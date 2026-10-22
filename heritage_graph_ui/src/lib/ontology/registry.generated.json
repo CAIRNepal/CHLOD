@@ -1,5 +1,5 @@
 {
-  "schema_version": "d84b6d240ed8a66eab871d9e01b5131257c873d731966ea9559e02ecba607c2f",
+  "schema_version": "9ac8232262a547b6a7b092fa6fd5aeffc2d15ad3efc77025dd34b6847cf735fb",
   "tenant_id": null,
   "degraded": false,
   "classes": {
@@ -743,7 +743,7 @@
           "order": 3,
           "required": false,
           "multivalued": true,
-          "description": "Religious tradition(s) within which this deity is venerated",
+          "description": "Religious tradition(s) within which this deity is venerated, or which use this religious structure",
           "slot_uri": "heritageGraph:hasReligiousTradition",
           "relationTo": "ReligiousTradition",
           "relationEndpoint": "/cidoc/traditions/",
@@ -1058,22 +1058,11 @@
           "slot_uri": "crm:P3_has_note"
         },
         {
-          "key": "place_coordinates",
-          "label": "Place Coordinates",
-          "type": "geo_point",
-          "section": "basic",
-          "order": 3,
-          "required": false,
-          "multivalued": false,
-          "description": "Coordinates as WKT literal",
-          "slot_uri": "geo:asWKT"
-        },
-        {
           "key": "was_produced_by_event",
           "label": "Was Produced By Event",
           "type": "relation",
           "section": "basic",
-          "order": 4,
+          "order": 3,
           "required": false,
           "multivalued": false,
           "description": "Event that created this object or structure",
@@ -1087,7 +1076,7 @@
           "label": "Has Current Location",
           "type": "relation",
           "section": "basic",
-          "order": 5,
+          "order": 4,
           "required": false,
           "multivalued": false,
           "description": "Current location of object or structure",
@@ -1103,7 +1092,7 @@
           "label": "Has Condition Assessment",
           "type": "relation",
           "section": "basic",
-          "order": 6,
+          "order": 5,
           "required": false,
           "multivalued": true,
           "description": "Condition assessment events for this structure",
@@ -1115,7 +1104,7 @@
           "label": "Has Component",
           "type": "relation",
           "section": "basic",
-          "order": 7,
+          "order": 6,
           "required": false,
           "multivalued": true,
           "description": "Architectural elements composing structure",
@@ -1127,7 +1116,7 @@
           "label": "Has Architectural Style",
           "type": "select",
           "section": "basic",
-          "order": 8,
+          "order": 7,
           "required": false,
           "multivalued": false,
           "description": "Architectural style classification",
@@ -1166,7 +1155,7 @@
           "label": "Existence Status",
           "type": "select",
           "section": "basic",
-          "order": 9,
+          "order": 8,
           "required": false,
           "multivalued": false,
           "description": "Current physical status of the structure",
@@ -1210,7 +1199,7 @@
           "label": "Last Known Existence Date",
           "type": "date",
           "section": "basic",
-          "order": 10,
+          "order": 9,
           "required": false,
           "multivalued": false,
           "description": "Latest date when this structure is documented as existing (ISO 8601)",
@@ -1221,7 +1210,7 @@
           "label": "Destruction Event",
           "type": "relation",
           "section": "basic",
-          "order": 11,
+          "order": 10,
           "required": false,
           "multivalued": false,
           "description": "Event that destroyed this structure (if known)",
@@ -1233,7 +1222,7 @@
           "label": "Hypothesized Location",
           "type": "relation",
           "section": "basic",
-          "order": 12,
+          "order": 11,
           "required": false,
           "multivalued": true,
           "description": "Possible locations if the structure is lost",
@@ -1247,7 +1236,7 @@
           "label": "Documented In Source",
           "type": "relation",
           "section": "basic",
-          "order": 13,
+          "order": 12,
           "required": false,
           "multivalued": true,
           "description": "Source(s) that mention/document this entity. Distinct from was_derived_from (which is prov:wasDerivedFrom for assertions). Entity-mention is not logical derivation.",
@@ -1255,6 +1244,20 @@
           "relationTo": "DataSource",
           "relationEndpoint": "/cidoc/data_sources/",
           "relationRegistryKey": "data_source"
+        },
+        {
+          "key": "managed_by_guthi",
+          "label": "Managed By Guthi",
+          "type": "relation",
+          "section": "basic",
+          "order": 13,
+          "required": false,
+          "multivalued": true,
+          "description": "Guthi organization managing this structure or ritual",
+          "slot_uri": "heritageGraph:managedByGuthi",
+          "relationTo": "Guthi",
+          "relationEndpoint": "/cidoc/guthis/",
+          "relationRegistryKey": "guthi"
         },
         {
           "key": "has_assertion",
@@ -1269,11 +1272,22 @@
           "relationTo": "Assertion"
         },
         {
+          "key": "place_coordinates",
+          "label": "Place Coordinates",
+          "type": "geo_point",
+          "section": "basic",
+          "order": 15,
+          "required": false,
+          "multivalued": false,
+          "description": "Coordinates as WKT literal",
+          "slot_uri": "geo:asWKT"
+        },
+        {
           "key": "participates_in_ritual",
           "label": "Participates In Ritual",
           "type": "relation",
           "section": "basic",
-          "order": 15,
+          "order": 16,
           "required": false,
           "multivalued": true,
           "description": "Rituals in which this structure participates",
@@ -1287,7 +1301,7 @@
           "label": "Has Custody Event",
           "type": "relation",
           "section": "basic",
-          "order": 16,
+          "order": 17,
           "required": false,
           "multivalued": true,
           "description": "Custody transfer events for this structure",
@@ -1301,7 +1315,7 @@
           "label": "Was Documented By",
           "type": "relation",
           "section": "basic",
-          "order": 17,
+          "order": 18,
           "required": false,
           "multivalued": true,
           "description": "Documentation event that recorded this (pre-existing) entity or event. Uses heritageGraph:documentedBy (aligned to prov:wasInfluencedBy). NOTE: prov:wasGeneratedBy was incorrect: a stupa is not *generated by* the survey that records it.",
@@ -1320,13 +1334,6 @@
         {
           "key": "note",
           "label": "Note",
-          "sortable": true,
-          "visible": true,
-          "format": "text"
-        },
-        {
-          "key": "place_coordinates",
-          "label": "Place Coordinates",
           "sortable": true,
           "visible": true,
           "format": "text"
@@ -1362,6 +1369,13 @@
         {
           "key": "has_architectural_style",
           "label": "Has Architectural Style",
+          "sortable": true,
+          "visible": true,
+          "format": "text"
+        },
+        {
+          "key": "existence_status",
+          "label": "Existence Status",
           "sortable": true,
           "visible": true,
           "format": "text"
@@ -1529,11 +1543,37 @@
           "relationTo": "PhysicalHeritageThing"
         },
         {
+          "key": "took_place_at",
+          "label": "Took Place At",
+          "type": "relation",
+          "section": "basic",
+          "order": 5,
+          "required": false,
+          "multivalued": false,
+          "description": "Place where the event occurred",
+          "slot_uri": "crm:P7_took_place_at",
+          "relationTo": "Place",
+          "relationEndpoint": "/cidoc/locations/",
+          "relationRegistryKey": "location"
+        },
+        {
+          "key": "had_participant",
+          "label": "Had Participant",
+          "type": "relation",
+          "section": "basic",
+          "order": 6,
+          "required": false,
+          "multivalued": true,
+          "description": "Actor(s) participating in this period, situation or ritual without carrying it out (e.g. the girl holding a Kumari tenure, or the Kumari in a chariot procession).",
+          "slot_uri": "heritageGraph:hadParticipant",
+          "relationTo": "Actor"
+        },
+        {
           "key": "lunar_date_tithi",
           "label": "Lunar Date Tithi",
           "type": "text",
           "section": "basic",
-          "order": 6,
+          "order": 8,
           "required": false,
           "multivalued": false,
           "description": "Lunar day (Tithi) for ritual timing",
@@ -1544,7 +1584,7 @@
           "label": "Recurrence Pattern",
           "type": "text",
           "section": "basic",
-          "order": 7,
+          "order": 9,
           "required": false,
           "multivalued": false,
           "description": "Frequency of recurring ritual (e.g., annual, monthly)",
@@ -1555,7 +1595,7 @@
           "label": "Invokes Deity",
           "type": "relation",
           "section": "basic",
-          "order": 8,
+          "order": 10,
           "required": false,
           "multivalued": true,
           "description": "Deity invoked or made present through ritual",
@@ -1569,7 +1609,7 @@
           "label": "Carried Out By",
           "type": "relation",
           "section": "basic",
-          "order": 9,
+          "order": 11,
           "required": false,
           "multivalued": true,
           "description": "Actor(s) who performed this event",
@@ -1581,7 +1621,7 @@
           "label": "Performed By Group",
           "type": "relation",
           "section": "basic",
-          "order": 10,
+          "order": 12,
           "required": false,
           "multivalued": true,
           "description": "Group (Guthi, caste) responsible for ritual",
@@ -1593,7 +1633,7 @@
           "label": "Is Part Of Festival",
           "type": "relation",
           "section": "basic",
-          "order": 11,
+          "order": 13,
           "required": false,
           "multivalued": false,
           "description": "Larger festival this ritual is part of",
@@ -1607,7 +1647,7 @@
           "label": "Managed By Guthi",
           "type": "relation",
           "section": "basic",
-          "order": 12,
+          "order": 14,
           "required": false,
           "multivalued": true,
           "description": "Guthi organization managing this structure or ritual",
@@ -1621,7 +1661,7 @@
           "label": "Was Documented By",
           "type": "relation",
           "section": "basic",
-          "order": 13,
+          "order": 15,
           "required": false,
           "multivalued": true,
           "description": "Documentation event that recorded this (pre-existing) entity or event. Uses heritageGraph:documentedBy (aligned to prov:wasInfluencedBy). NOTE: prov:wasGeneratedBy was incorrect: a stupa is not *generated by* the survey that records it.",
@@ -1633,7 +1673,7 @@
           "label": "Has Assertion",
           "type": "relation",
           "section": "basic",
-          "order": 14,
+          "order": 16,
           "required": false,
           "multivalued": true,
           "description": "Provenance-bearing assertion made about this entity or event.",
@@ -1645,11 +1685,11 @@
           "label": "Occurs Before",
           "type": "relation",
           "section": "basic",
-          "order": 15,
+          "order": 17,
           "required": false,
           "multivalued": false,
           "description": "Points to the next ritual in the canonical sequence.",
-          "slot_uri": "crm:P120_occurs_before",
+          "slot_uri": "crm:P183_ends_before_the_start_of",
           "relationTo": "RitualEvent",
           "relationEndpoint": "/cidoc/rituals/",
           "relationRegistryKey": "ritual"
@@ -1659,11 +1699,11 @@
           "label": "Occurs After",
           "type": "relation",
           "section": "basic",
-          "order": 16,
+          "order": 18,
           "required": false,
           "multivalued": false,
           "description": "Points to the prerequisite ritual.",
-          "slot_uri": "crm:P120i_occurs_after",
+          "slot_uri": "crm:P183i_starts_after_the_end_of",
           "relationTo": "RitualEvent",
           "relationEndpoint": "/cidoc/rituals/",
           "relationRegistryKey": "ritual"
@@ -1673,7 +1713,7 @@
           "label": "Used Materials",
           "type": "relation",
           "section": "basic",
-          "order": 17,
+          "order": 19,
           "required": false,
           "multivalued": true,
           "description": "Ephemeral materials consumed during the ritual (e.g., oil, rice).",
@@ -1685,7 +1725,7 @@
           "label": "Route Places",
           "type": "relation",
           "section": "basic",
-          "order": 18,
+          "order": 20,
           "required": false,
           "multivalued": true,
           "description": "Ordered list of places visited during movement ritual",
@@ -1699,7 +1739,7 @@
           "label": "Start Place",
           "type": "relation",
           "section": "basic",
-          "order": 19,
+          "order": 21,
           "required": false,
           "multivalued": false,
           "description": "Starting location of movement ritual",
@@ -1713,7 +1753,7 @@
           "label": "End Place",
           "type": "relation",
           "section": "basic",
-          "order": 20,
+          "order": 22,
           "required": false,
           "multivalued": false,
           "description": "Ending location of movement ritual",
@@ -1727,7 +1767,7 @@
           "label": "Route Description",
           "type": "text",
           "section": "basic",
-          "order": 21,
+          "order": 23,
           "required": false,
           "multivalued": false,
           "description": "Text description of the procession route",
@@ -1764,6 +1804,20 @@
           "format": "text"
         },
         {
+          "key": "took_place_at",
+          "label": "Took Place At",
+          "sortable": true,
+          "visible": true,
+          "format": "text"
+        },
+        {
+          "key": "had_participant",
+          "label": "Had Participant",
+          "sortable": true,
+          "visible": true,
+          "format": "text"
+        },
+        {
           "key": "lunar_date_tithi",
           "label": "Lunar Date Tithi",
           "sortable": true,
@@ -1773,20 +1827,6 @@
         {
           "key": "recurrence_pattern",
           "label": "Recurrence Pattern",
-          "sortable": true,
-          "visible": true,
-          "format": "text"
-        },
-        {
-          "key": "invokes_deity",
-          "label": "Invokes Deity",
-          "sortable": true,
-          "visible": true,
-          "format": "text"
-        },
-        {
-          "key": "carried_out_by",
-          "label": "Carried Out By",
           "sortable": true,
           "visible": true,
           "format": "text"
@@ -1968,11 +2008,37 @@
           "relationTo": "PhysicalHeritageThing"
         },
         {
+          "key": "took_place_at",
+          "label": "Took Place At",
+          "type": "relation",
+          "section": "basic",
+          "order": 6,
+          "required": false,
+          "multivalued": false,
+          "description": "Place where the event occurred",
+          "slot_uri": "crm:P7_took_place_at",
+          "relationTo": "Place",
+          "relationEndpoint": "/cidoc/locations/",
+          "relationRegistryKey": "location"
+        },
+        {
+          "key": "had_participant",
+          "label": "Had Participant",
+          "type": "relation",
+          "section": "basic",
+          "order": 7,
+          "required": false,
+          "multivalued": true,
+          "description": "Actor(s) participating in this period, situation or ritual without carrying it out (e.g. the girl holding a Kumari tenure, or the Kumari in a chariot procession).",
+          "slot_uri": "heritageGraph:hadParticipant",
+          "relationTo": "Actor"
+        },
+        {
           "key": "lunar_date_tithi",
           "label": "Lunar Date Tithi",
           "type": "text",
           "section": "basic",
-          "order": 7,
+          "order": 9,
           "required": false,
           "multivalued": false,
           "description": "Lunar day (Tithi) for ritual timing",
@@ -1983,7 +2049,7 @@
           "label": "Recurrence Pattern",
           "type": "text",
           "section": "basic",
-          "order": 8,
+          "order": 10,
           "required": false,
           "multivalued": false,
           "description": "Frequency of recurring ritual (e.g., annual, monthly)",
@@ -1994,7 +2060,7 @@
           "label": "Invokes Deity",
           "type": "relation",
           "section": "basic",
-          "order": 9,
+          "order": 11,
           "required": false,
           "multivalued": true,
           "description": "Deity invoked or made present through ritual",
@@ -2008,7 +2074,7 @@
           "label": "Carried Out By",
           "type": "relation",
           "section": "basic",
-          "order": 10,
+          "order": 12,
           "required": false,
           "multivalued": true,
           "description": "Actor(s) who performed this event",
@@ -2020,7 +2086,7 @@
           "label": "Performed By Group",
           "type": "relation",
           "section": "basic",
-          "order": 11,
+          "order": 13,
           "required": false,
           "multivalued": true,
           "description": "Group (Guthi, caste) responsible for ritual",
@@ -2032,7 +2098,7 @@
           "label": "Is Part Of Festival",
           "type": "relation",
           "section": "basic",
-          "order": 12,
+          "order": 14,
           "required": false,
           "multivalued": false,
           "description": "Larger festival this ritual is part of",
@@ -2046,7 +2112,7 @@
           "label": "Managed By Guthi",
           "type": "relation",
           "section": "basic",
-          "order": 13,
+          "order": 15,
           "required": false,
           "multivalued": true,
           "description": "Guthi organization managing this structure or ritual",
@@ -2060,7 +2126,7 @@
           "label": "Was Documented By",
           "type": "relation",
           "section": "basic",
-          "order": 14,
+          "order": 16,
           "required": false,
           "multivalued": true,
           "description": "Documentation event that recorded this (pre-existing) entity or event. Uses heritageGraph:documentedBy (aligned to prov:wasInfluencedBy). NOTE: prov:wasGeneratedBy was incorrect: a stupa is not *generated by* the survey that records it.",
@@ -2072,7 +2138,7 @@
           "label": "Has Assertion",
           "type": "relation",
           "section": "basic",
-          "order": 15,
+          "order": 17,
           "required": false,
           "multivalued": true,
           "description": "Provenance-bearing assertion made about this entity or event.",
@@ -2084,11 +2150,11 @@
           "label": "Occurs Before",
           "type": "relation",
           "section": "basic",
-          "order": 16,
+          "order": 18,
           "required": false,
           "multivalued": false,
           "description": "Points to the next ritual in the canonical sequence.",
-          "slot_uri": "crm:P120_occurs_before",
+          "slot_uri": "crm:P183_ends_before_the_start_of",
           "relationTo": "RitualEvent",
           "relationEndpoint": "/cidoc/rituals/",
           "relationRegistryKey": "ritual"
@@ -2098,11 +2164,11 @@
           "label": "Occurs After",
           "type": "relation",
           "section": "basic",
-          "order": 17,
+          "order": 19,
           "required": false,
           "multivalued": false,
           "description": "Points to the prerequisite ritual.",
-          "slot_uri": "crm:P120i_occurs_after",
+          "slot_uri": "crm:P183i_starts_after_the_end_of",
           "relationTo": "RitualEvent",
           "relationEndpoint": "/cidoc/rituals/",
           "relationRegistryKey": "ritual"
@@ -2112,7 +2178,7 @@
           "label": "Used Materials",
           "type": "relation",
           "section": "basic",
-          "order": 18,
+          "order": 20,
           "required": false,
           "multivalued": true,
           "description": "Ephemeral materials consumed during the ritual (e.g., oil, rice).",
@@ -2124,7 +2190,7 @@
           "label": "Route Places",
           "type": "relation",
           "section": "basic",
-          "order": 19,
+          "order": 21,
           "required": false,
           "multivalued": true,
           "description": "Ordered list of places visited during movement ritual",
@@ -2138,7 +2204,7 @@
           "label": "Start Place",
           "type": "relation",
           "section": "basic",
-          "order": 20,
+          "order": 22,
           "required": false,
           "multivalued": false,
           "description": "Starting location of movement ritual",
@@ -2152,7 +2218,7 @@
           "label": "End Place",
           "type": "relation",
           "section": "basic",
-          "order": 21,
+          "order": 23,
           "required": false,
           "multivalued": false,
           "description": "Ending location of movement ritual",
@@ -2166,7 +2232,7 @@
           "label": "Route Description",
           "type": "text",
           "section": "basic",
-          "order": 22,
+          "order": 24,
           "required": false,
           "multivalued": false,
           "description": "Text description of the procession route",
@@ -2210,22 +2276,22 @@
           "format": "text"
         },
         {
+          "key": "took_place_at",
+          "label": "Took Place At",
+          "sortable": true,
+          "visible": true,
+          "format": "text"
+        },
+        {
+          "key": "had_participant",
+          "label": "Had Participant",
+          "sortable": true,
+          "visible": true,
+          "format": "text"
+        },
+        {
           "key": "lunar_date_tithi",
           "label": "Lunar Date Tithi",
-          "sortable": true,
-          "visible": true,
-          "format": "text"
-        },
-        {
-          "key": "recurrence_pattern",
-          "label": "Recurrence Pattern",
-          "sortable": true,
-          "visible": true,
-          "format": "text"
-        },
-        {
-          "key": "invokes_deity",
-          "label": "Invokes Deity",
           "sortable": true,
           "visible": true,
           "format": "text"
@@ -2590,6 +2656,20 @@
           "description": "Actor(s) who performed this event",
           "slot_uri": "crm:P14_carried_out_by",
           "relationTo": "Actor"
+        },
+        {
+          "key": "took_place_at",
+          "label": "Took Place At",
+          "type": "relation",
+          "section": "basic",
+          "order": 5,
+          "required": false,
+          "multivalued": false,
+          "description": "Place where the event occurred",
+          "slot_uri": "crm:P7_took_place_at",
+          "relationTo": "Place",
+          "relationEndpoint": "/cidoc/locations/",
+          "relationRegistryKey": "location"
         }
       ],
       "columns": [
@@ -2617,6 +2697,13 @@
         {
           "key": "carried_out_by",
           "label": "Carried Out By",
+          "sortable": true,
+          "visible": true,
+          "format": "text"
+        },
+        {
+          "key": "took_place_at",
+          "label": "Took Place At",
           "sortable": true,
           "visible": true,
           "format": "text"
@@ -3007,22 +3094,11 @@
           "slot_uri": "crm:P3_has_note"
         },
         {
-          "key": "place_coordinates",
-          "label": "Place Coordinates",
-          "type": "geo_point",
-          "section": "basic",
-          "order": 3,
-          "required": false,
-          "multivalued": false,
-          "description": "Coordinates as WKT literal",
-          "slot_uri": "geo:asWKT"
-        },
-        {
           "key": "was_produced_by_event",
           "label": "Was Produced By Event",
           "type": "relation",
           "section": "basic",
-          "order": 4,
+          "order": 3,
           "required": false,
           "multivalued": false,
           "description": "Event that created this object or structure",
@@ -3036,7 +3112,7 @@
           "label": "Has Current Location",
           "type": "relation",
           "section": "basic",
-          "order": 5,
+          "order": 4,
           "required": false,
           "multivalued": false,
           "description": "Current location of object or structure",
@@ -3052,7 +3128,7 @@
           "label": "Has Condition Assessment",
           "type": "relation",
           "section": "basic",
-          "order": 6,
+          "order": 5,
           "required": false,
           "multivalued": true,
           "description": "Condition assessment events for this structure",
@@ -3064,7 +3140,7 @@
           "label": "Has Component",
           "type": "relation",
           "section": "basic",
-          "order": 7,
+          "order": 6,
           "required": false,
           "multivalued": true,
           "description": "Architectural elements composing structure",
@@ -3076,7 +3152,7 @@
           "label": "Has Architectural Style",
           "type": "select",
           "section": "basic",
-          "order": 8,
+          "order": 7,
           "required": false,
           "multivalued": false,
           "description": "Architectural style classification",
@@ -3115,7 +3191,7 @@
           "label": "Existence Status",
           "type": "select",
           "section": "basic",
-          "order": 9,
+          "order": 8,
           "required": false,
           "multivalued": false,
           "description": "Current physical status of the structure",
@@ -3159,7 +3235,7 @@
           "label": "Last Known Existence Date",
           "type": "date",
           "section": "basic",
-          "order": 10,
+          "order": 9,
           "required": false,
           "multivalued": false,
           "description": "Latest date when this structure is documented as existing (ISO 8601)",
@@ -3170,7 +3246,7 @@
           "label": "Destruction Event",
           "type": "relation",
           "section": "basic",
-          "order": 11,
+          "order": 10,
           "required": false,
           "multivalued": false,
           "description": "Event that destroyed this structure (if known)",
@@ -3182,7 +3258,7 @@
           "label": "Hypothesized Location",
           "type": "relation",
           "section": "basic",
-          "order": 12,
+          "order": 11,
           "required": false,
           "multivalued": true,
           "description": "Possible locations if the structure is lost",
@@ -3196,7 +3272,7 @@
           "label": "Documented In Source",
           "type": "relation",
           "section": "basic",
-          "order": 13,
+          "order": 12,
           "required": false,
           "multivalued": true,
           "description": "Source(s) that mention/document this entity. Distinct from was_derived_from (which is prov:wasDerivedFrom for assertions). Entity-mention is not logical derivation.",
@@ -3204,6 +3280,20 @@
           "relationTo": "DataSource",
           "relationEndpoint": "/cidoc/data_sources/",
           "relationRegistryKey": "data_source"
+        },
+        {
+          "key": "managed_by_guthi",
+          "label": "Managed By Guthi",
+          "type": "relation",
+          "section": "basic",
+          "order": 13,
+          "required": false,
+          "multivalued": true,
+          "description": "Guthi organization managing this structure or ritual",
+          "slot_uri": "heritageGraph:managedByGuthi",
+          "relationTo": "Guthi",
+          "relationEndpoint": "/cidoc/guthis/",
+          "relationRegistryKey": "guthi"
         },
         {
           "key": "has_assertion",
@@ -3218,11 +3308,22 @@
           "relationTo": "Assertion"
         },
         {
+          "key": "place_coordinates",
+          "label": "Place Coordinates",
+          "type": "geo_point",
+          "section": "basic",
+          "order": 15,
+          "required": false,
+          "multivalued": false,
+          "description": "Coordinates as WKT literal",
+          "slot_uri": "geo:asWKT"
+        },
+        {
           "key": "participates_in_ritual",
           "label": "Participates In Ritual",
           "type": "relation",
           "section": "basic",
-          "order": 15,
+          "order": 16,
           "required": false,
           "multivalued": true,
           "description": "Rituals in which this structure participates",
@@ -3236,7 +3337,7 @@
           "label": "Has Custody Event",
           "type": "relation",
           "section": "basic",
-          "order": 16,
+          "order": 17,
           "required": false,
           "multivalued": true,
           "description": "Custody transfer events for this structure",
@@ -3250,7 +3351,7 @@
           "label": "Was Documented By",
           "type": "relation",
           "section": "basic",
-          "order": 17,
+          "order": 18,
           "required": false,
           "multivalued": true,
           "description": "Documentation event that recorded this (pre-existing) entity or event. Uses heritageGraph:documentedBy (aligned to prov:wasInfluencedBy). NOTE: prov:wasGeneratedBy was incorrect: a stupa is not *generated by* the survey that records it.",
@@ -3269,13 +3370,6 @@
         {
           "key": "note",
           "label": "Note",
-          "sortable": true,
-          "visible": true,
-          "format": "text"
-        },
-        {
-          "key": "place_coordinates",
-          "label": "Place Coordinates",
           "sortable": true,
           "visible": true,
           "format": "text"
@@ -3311,6 +3405,13 @@
         {
           "key": "has_architectural_style",
           "label": "Has Architectural Style",
+          "sortable": true,
+          "visible": true,
+          "format": "text"
+        },
+        {
+          "key": "existence_status",
+          "label": "Existence Status",
           "sortable": true,
           "visible": true,
           "format": "text"
@@ -3767,11 +3868,23 @@
           "relationTo": "PhysicalHeritageThing"
         },
         {
+          "key": "had_participant",
+          "label": "Had Participant",
+          "type": "relation",
+          "section": "basic",
+          "order": 15,
+          "required": false,
+          "multivalued": true,
+          "description": "Actor(s) participating in this period, situation or ritual without carrying it out (e.g. the girl holding a Kumari tenure, or the Kumari in a chariot procession).",
+          "slot_uri": "heritageGraph:hadParticipant",
+          "relationTo": "Actor"
+        },
+        {
           "key": "lunar_date_tithi",
           "label": "Lunar Date Tithi",
           "type": "text",
           "section": "basic",
-          "order": 15,
+          "order": 16,
           "required": false,
           "multivalued": false,
           "description": "Lunar day (Tithi) for ritual timing",
@@ -3782,7 +3895,7 @@
           "label": "Recurrence Pattern",
           "type": "text",
           "section": "basic",
-          "order": 16,
+          "order": 17,
           "required": false,
           "multivalued": false,
           "description": "Frequency of recurring ritual (e.g., annual, monthly)",
@@ -3793,7 +3906,7 @@
           "label": "Invokes Deity",
           "type": "relation",
           "section": "basic",
-          "order": 17,
+          "order": 18,
           "required": false,
           "multivalued": true,
           "description": "Deity invoked or made present through ritual",
@@ -3807,7 +3920,7 @@
           "label": "Is Part Of Festival",
           "type": "relation",
           "section": "basic",
-          "order": 18,
+          "order": 19,
           "required": false,
           "multivalued": false,
           "description": "Larger festival this ritual is part of",
@@ -3821,7 +3934,7 @@
           "label": "Managed By Guthi",
           "type": "relation",
           "section": "basic",
-          "order": 19,
+          "order": 20,
           "required": false,
           "multivalued": true,
           "description": "Guthi organization managing this structure or ritual",
@@ -3835,7 +3948,7 @@
           "label": "Has Assertion",
           "type": "relation",
           "section": "basic",
-          "order": 20,
+          "order": 21,
           "required": false,
           "multivalued": true,
           "description": "Provenance-bearing assertion made about this entity or event.",
@@ -3847,11 +3960,11 @@
           "label": "Occurs Before",
           "type": "relation",
           "section": "basic",
-          "order": 21,
+          "order": 22,
           "required": false,
           "multivalued": false,
           "description": "Points to the next ritual in the canonical sequence.",
-          "slot_uri": "crm:P120_occurs_before",
+          "slot_uri": "crm:P183_ends_before_the_start_of",
           "relationTo": "RitualEvent",
           "relationEndpoint": "/cidoc/rituals/",
           "relationRegistryKey": "ritual"
@@ -3861,11 +3974,11 @@
           "label": "Occurs After",
           "type": "relation",
           "section": "basic",
-          "order": 22,
+          "order": 23,
           "required": false,
           "multivalued": false,
           "description": "Points to the prerequisite ritual.",
-          "slot_uri": "crm:P120i_occurs_after",
+          "slot_uri": "crm:P183i_starts_after_the_end_of",
           "relationTo": "RitualEvent",
           "relationEndpoint": "/cidoc/rituals/",
           "relationRegistryKey": "ritual"
@@ -3875,7 +3988,7 @@
           "label": "Used Materials",
           "type": "relation",
           "section": "basic",
-          "order": 23,
+          "order": 24,
           "required": false,
           "multivalued": true,
           "description": "Ephemeral materials consumed during the ritual (e.g., oil, rice).",
@@ -3887,7 +4000,7 @@
           "label": "Route Places",
           "type": "relation",
           "section": "basic",
-          "order": 24,
+          "order": 25,
           "required": false,
           "multivalued": true,
           "description": "Ordered list of places visited during movement ritual",
@@ -3901,7 +4014,7 @@
           "label": "Start Place",
           "type": "relation",
           "section": "basic",
-          "order": 25,
+          "order": 26,
           "required": false,
           "multivalued": false,
           "description": "Starting location of movement ritual",
@@ -3915,7 +4028,7 @@
           "label": "End Place",
           "type": "relation",
           "section": "basic",
-          "order": 26,
+          "order": 27,
           "required": false,
           "multivalued": false,
           "description": "Ending location of movement ritual",
@@ -3929,7 +4042,7 @@
           "label": "Route Description",
           "type": "text",
           "section": "basic",
-          "order": 27,
+          "order": 28,
           "required": false,
           "multivalued": false,
           "description": "Text description of the procession route",
@@ -4240,11 +4353,23 @@
           "relationTo": "PhysicalHeritageThing"
         },
         {
+          "key": "had_participant",
+          "label": "Had Participant",
+          "type": "relation",
+          "section": "basic",
+          "order": 12,
+          "required": false,
+          "multivalued": true,
+          "description": "Actor(s) participating in this period, situation or ritual without carrying it out (e.g. the girl holding a Kumari tenure, or the Kumari in a chariot procession).",
+          "slot_uri": "heritageGraph:hadParticipant",
+          "relationTo": "Actor"
+        },
+        {
           "key": "lunar_date_tithi",
           "label": "Lunar Date Tithi",
           "type": "text",
           "section": "basic",
-          "order": 12,
+          "order": 13,
           "required": false,
           "multivalued": false,
           "description": "Lunar day (Tithi) for ritual timing",
@@ -4255,7 +4380,7 @@
           "label": "Recurrence Pattern",
           "type": "text",
           "section": "basic",
-          "order": 13,
+          "order": 14,
           "required": false,
           "multivalued": false,
           "description": "Frequency of recurring ritual (e.g., annual, monthly)",
@@ -4266,7 +4391,7 @@
           "label": "Invokes Deity",
           "type": "relation",
           "section": "basic",
-          "order": 14,
+          "order": 15,
           "required": false,
           "multivalued": true,
           "description": "Deity invoked or made present through ritual",
@@ -4280,7 +4405,7 @@
           "label": "Is Part Of Festival",
           "type": "relation",
           "section": "basic",
-          "order": 15,
+          "order": 16,
           "required": false,
           "multivalued": false,
           "description": "Larger festival this ritual is part of",
@@ -4294,7 +4419,7 @@
           "label": "Managed By Guthi",
           "type": "relation",
           "section": "basic",
-          "order": 16,
+          "order": 17,
           "required": false,
           "multivalued": true,
           "description": "Guthi organization managing this structure or ritual",
@@ -4308,7 +4433,7 @@
           "label": "Has Assertion",
           "type": "relation",
           "section": "basic",
-          "order": 17,
+          "order": 18,
           "required": false,
           "multivalued": true,
           "description": "Provenance-bearing assertion made about this entity or event.",
@@ -4320,11 +4445,11 @@
           "label": "Occurs Before",
           "type": "relation",
           "section": "basic",
-          "order": 18,
+          "order": 19,
           "required": false,
           "multivalued": false,
           "description": "Points to the next ritual in the canonical sequence.",
-          "slot_uri": "crm:P120_occurs_before",
+          "slot_uri": "crm:P183_ends_before_the_start_of",
           "relationTo": "RitualEvent",
           "relationEndpoint": "/cidoc/rituals/",
           "relationRegistryKey": "ritual"
@@ -4334,11 +4459,11 @@
           "label": "Occurs After",
           "type": "relation",
           "section": "basic",
-          "order": 19,
+          "order": 20,
           "required": false,
           "multivalued": false,
           "description": "Points to the prerequisite ritual.",
-          "slot_uri": "crm:P120i_occurs_after",
+          "slot_uri": "crm:P183i_starts_after_the_end_of",
           "relationTo": "RitualEvent",
           "relationEndpoint": "/cidoc/rituals/",
           "relationRegistryKey": "ritual"
@@ -4348,7 +4473,7 @@
           "label": "Used Materials",
           "type": "relation",
           "section": "basic",
-          "order": 20,
+          "order": 21,
           "required": false,
           "multivalued": true,
           "description": "Ephemeral materials consumed during the ritual (e.g., oil, rice).",
@@ -4360,7 +4485,7 @@
           "label": "Route Places",
           "type": "relation",
           "section": "basic",
-          "order": 21,
+          "order": 22,
           "required": false,
           "multivalued": true,
           "description": "Ordered list of places visited during movement ritual",
@@ -4374,7 +4499,7 @@
           "label": "Start Place",
           "type": "relation",
           "section": "basic",
-          "order": 22,
+          "order": 23,
           "required": false,
           "multivalued": false,
           "description": "Starting location of movement ritual",
@@ -4388,7 +4513,7 @@
           "label": "End Place",
           "type": "relation",
           "section": "basic",
-          "order": 23,
+          "order": 24,
           "required": false,
           "multivalued": false,
           "description": "Ending location of movement ritual",
@@ -4402,7 +4527,7 @@
           "label": "Route Description",
           "type": "text",
           "section": "basic",
-          "order": 24,
+          "order": 25,
           "required": false,
           "multivalued": false,
           "description": "Text description of the procession route",
@@ -6666,7 +6791,10 @@
             "type": "string"
           },
           "note": {
-            "type": "string"
+            "type": [
+              "string",
+              "null"
+            ]
           },
           "birth_timespan": {
             "type": [
@@ -6674,7 +6802,8 @@
               "number",
               "integer",
               "object",
-              "array"
+              "array",
+              "null"
             ]
           },
           "death_timespan": {
@@ -6683,7 +6812,8 @@
               "number",
               "integer",
               "object",
-              "array"
+              "array",
+              "null"
             ]
           },
           "member_of_group": {
@@ -6692,7 +6822,8 @@
               "number",
               "integer",
               "object",
-              "array"
+              "array",
+              "null"
             ]
           },
           "carried_out_activity": {
@@ -6701,14 +6832,21 @@
               "number",
               "integer",
               "object",
-              "array"
+              "array",
+              "null"
             ]
           },
           "institutional_affiliation": {
-            "type": "string"
+            "type": [
+              "string",
+              "null"
+            ]
           },
           "expertise_area": {
-            "type": "string"
+            "type": [
+              "string",
+              "null"
+            ]
           }
         },
         "required": [
@@ -6745,11 +6883,17 @@
               },
               {
                 "type": "string"
+              },
+              {
+                "type": "null"
               }
             ]
           },
           "place_type": {
-            "type": "string"
+            "type": [
+              "string",
+              "null"
+            ]
           },
           "contains_structure": {
             "type": [
@@ -6757,7 +6901,8 @@
               "number",
               "integer",
               "object",
-              "array"
+              "array",
+              "null"
             ]
           }
         },
@@ -6774,7 +6919,10 @@
             "type": "string"
           },
           "note": {
-            "type": "string"
+            "type": [
+              "string",
+              "null"
+            ]
           },
           "took_place_at": {
             "type": [
@@ -6782,7 +6930,8 @@
               "number",
               "integer",
               "object",
-              "array"
+              "array",
+              "null"
             ]
           },
           "architectural_structures": {
@@ -6791,7 +6940,8 @@
               "number",
               "integer",
               "object",
-              "array"
+              "array",
+              "null"
             ]
           },
           "includes_ritual_event": {
@@ -6800,7 +6950,8 @@
               "number",
               "integer",
               "object",
-              "array"
+              "array",
+              "null"
             ]
           }
         },
@@ -6817,7 +6968,10 @@
             "type": "string"
           },
           "note": {
-            "type": "string"
+            "type": [
+              "string",
+              "null"
+            ]
           }
         },
         "required": [
@@ -6838,7 +6992,8 @@
               "number",
               "integer",
               "object",
-              "array"
+              "array",
+              "null"
             ]
           },
           "was_documented_by": {
@@ -6847,23 +7002,39 @@
               "number",
               "integer",
               "object",
-              "array"
+              "array",
+              "null"
             ]
           },
           "source_language": {
-            "type": "string"
+            "type": [
+              "string",
+              "null"
+            ]
           },
           "source_type": {
-            "type": "string"
+            "type": [
+              "string",
+              "null"
+            ]
           },
           "archival_location": {
-            "type": "string"
+            "type": [
+              "string",
+              "null"
+            ]
           },
           "datacite_identifier": {
-            "type": "string"
+            "type": [
+              "string",
+              "null"
+            ]
           },
           "datacite_identifier_type": {
-            "type": "string"
+            "type": [
+              "string",
+              "null"
+            ]
           },
           "datacite_creator": {
             "type": [
@@ -6871,7 +7042,8 @@
               "number",
               "integer",
               "object",
-              "array"
+              "array",
+              "null"
             ]
           },
           "datacite_publisher": {
@@ -6880,11 +7052,15 @@
               "number",
               "integer",
               "object",
-              "array"
+              "array",
+              "null"
             ]
           },
           "datacite_resource_type": {
-            "type": "string"
+            "type": [
+              "string",
+              "null"
+            ]
           },
           "publication_timespan": {
             "type": [
@@ -6892,17 +7068,27 @@
               "number",
               "integer",
               "object",
-              "array"
+              "array",
+              "null"
             ]
           },
           "source_citation": {
-            "type": "string"
+            "type": [
+              "string",
+              "null"
+            ]
           },
           "source_url": {
-            "type": "string"
+            "type": [
+              "string",
+              "null"
+            ]
           },
           "note": {
-            "type": "string"
+            "type": [
+              "string",
+              "null"
+            ]
           }
         },
         "required": [
@@ -6918,7 +7104,10 @@
             "type": "string"
           },
           "note": {
-            "type": "string"
+            "type": [
+              "string",
+              "null"
+            ]
           },
           "has_religious_tradition": {
             "type": [
@@ -6926,7 +7115,8 @@
               "number",
               "integer",
               "object",
-              "array"
+              "array",
+              "null"
             ]
           },
           "is_depicted_in": {
@@ -6935,7 +7125,8 @@
               "number",
               "integer",
               "object",
-              "array"
+              "array",
+              "null"
             ]
           },
           "is_invoked_in_ritual": {
@@ -6944,7 +7135,8 @@
               "number",
               "integer",
               "object",
-              "array"
+              "array",
+              "null"
             ]
           },
           "is_enshrined_through_event": {
@@ -6953,7 +7145,8 @@
               "number",
               "integer",
               "object",
-              "array"
+              "array",
+              "null"
             ]
           }
         },
@@ -6970,7 +7163,10 @@
             "type": "string"
           },
           "note": {
-            "type": "string"
+            "type": [
+              "string",
+              "null"
+            ]
           },
           "guthi_type": {
             "type": "string",
@@ -6991,7 +7187,8 @@
               "number",
               "integer",
               "object",
-              "array"
+              "array",
+              "null"
             ]
           },
           "holds_custody_of": {
@@ -7000,7 +7197,8 @@
               "number",
               "integer",
               "object",
-              "array"
+              "array",
+              "null"
             ]
           },
           "has_membership": {
@@ -7009,7 +7207,8 @@
               "number",
               "integer",
               "object",
-              "array"
+              "array",
+              "null"
             ]
           }
         },
@@ -7027,31 +7226,9 @@
             "type": "string"
           },
           "note": {
-            "type": "string"
-          },
-          "place_coordinates": {
-            "anyOf": [
-              {
-                "type": "object",
-                "properties": {
-                  "lat": {
-                    "type": [
-                      "string",
-                      "number"
-                    ]
-                  },
-                  "lng": {
-                    "type": [
-                      "string",
-                      "number"
-                    ]
-                  }
-                },
-                "additionalProperties": false
-              },
-              {
-                "type": "string"
-              }
+            "type": [
+              "string",
+              "null"
             ]
           },
           "was_produced_by_event": {
@@ -7060,7 +7237,8 @@
               "number",
               "integer",
               "object",
-              "array"
+              "array",
+              "null"
             ]
           },
           "has_current_location": {
@@ -7069,7 +7247,8 @@
               "number",
               "integer",
               "object",
-              "array"
+              "array",
+              "null"
             ]
           },
           "has_condition_assessment": {
@@ -7078,7 +7257,8 @@
               "number",
               "integer",
               "object",
-              "array"
+              "array",
+              "null"
             ]
           },
           "has_component": {
@@ -7087,7 +7267,8 @@
               "number",
               "integer",
               "object",
-              "array"
+              "array",
+              "null"
             ]
           },
           "has_architectural_style": {
@@ -7136,7 +7317,10 @@
             ]
           },
           "last_known_existence_date": {
-            "type": "string"
+            "type": [
+              "string",
+              "null"
+            ]
           },
           "destruction_event": {
             "type": [
@@ -7144,7 +7328,8 @@
               "number",
               "integer",
               "object",
-              "array"
+              "array",
+              "null"
             ]
           },
           "hypothesized_location": {
@@ -7153,7 +7338,8 @@
               "number",
               "integer",
               "object",
-              "array"
+              "array",
+              "null"
             ]
           },
           "documented_in_source": {
@@ -7162,7 +7348,18 @@
               "number",
               "integer",
               "object",
-              "array"
+              "array",
+              "null"
+            ]
+          },
+          "managed_by_guthi": {
+            "type": [
+              "string",
+              "number",
+              "integer",
+              "object",
+              "array",
+              "null"
             ]
           },
           "has_assertion": {
@@ -7171,7 +7368,36 @@
               "number",
               "integer",
               "object",
-              "array"
+              "array",
+              "null"
+            ]
+          },
+          "place_coordinates": {
+            "anyOf": [
+              {
+                "type": "object",
+                "properties": {
+                  "lat": {
+                    "type": [
+                      "string",
+                      "number"
+                    ]
+                  },
+                  "lng": {
+                    "type": [
+                      "string",
+                      "number"
+                    ]
+                  }
+                },
+                "additionalProperties": false
+              },
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
             ]
           },
           "participates_in_ritual": {
@@ -7180,7 +7406,8 @@
               "number",
               "integer",
               "object",
-              "array"
+              "array",
+              "null"
             ]
           },
           "has_custody_event": {
@@ -7189,7 +7416,8 @@
               "number",
               "integer",
               "object",
-              "array"
+              "array",
+              "null"
             ]
           },
           "was_documented_by": {
@@ -7198,7 +7426,8 @@
               "number",
               "integer",
               "object",
-              "array"
+              "array",
+              "null"
             ]
           }
         },
@@ -7215,7 +7444,10 @@
             "type": "string"
           },
           "note": {
-            "type": "string"
+            "type": [
+              "string",
+              "null"
+            ]
           },
           "ritual_type": {
             "type": "string",
@@ -7259,14 +7491,41 @@
               "number",
               "integer",
               "object",
-              "array"
+              "array",
+              "null"
+            ]
+          },
+          "took_place_at": {
+            "type": [
+              "string",
+              "number",
+              "integer",
+              "object",
+              "array",
+              "null"
+            ]
+          },
+          "had_participant": {
+            "type": [
+              "string",
+              "number",
+              "integer",
+              "object",
+              "array",
+              "null"
             ]
           },
           "lunar_date_tithi": {
-            "type": "string"
+            "type": [
+              "string",
+              "null"
+            ]
           },
           "recurrence_pattern": {
-            "type": "string"
+            "type": [
+              "string",
+              "null"
+            ]
           },
           "invokes_deity": {
             "type": [
@@ -7274,7 +7533,8 @@
               "number",
               "integer",
               "object",
-              "array"
+              "array",
+              "null"
             ]
           },
           "carried_out_by": {
@@ -7283,7 +7543,8 @@
               "number",
               "integer",
               "object",
-              "array"
+              "array",
+              "null"
             ]
           },
           "performed_by_group": {
@@ -7292,7 +7553,8 @@
               "number",
               "integer",
               "object",
-              "array"
+              "array",
+              "null"
             ]
           },
           "is_part_of_festival": {
@@ -7301,7 +7563,8 @@
               "number",
               "integer",
               "object",
-              "array"
+              "array",
+              "null"
             ]
           },
           "managed_by_guthi": {
@@ -7310,7 +7573,8 @@
               "number",
               "integer",
               "object",
-              "array"
+              "array",
+              "null"
             ]
           },
           "was_documented_by": {
@@ -7319,7 +7583,8 @@
               "number",
               "integer",
               "object",
-              "array"
+              "array",
+              "null"
             ]
           },
           "has_assertion": {
@@ -7328,7 +7593,8 @@
               "number",
               "integer",
               "object",
-              "array"
+              "array",
+              "null"
             ]
           },
           "occurs_before": {
@@ -7337,7 +7603,8 @@
               "number",
               "integer",
               "object",
-              "array"
+              "array",
+              "null"
             ]
           },
           "occurs_after": {
@@ -7346,7 +7613,8 @@
               "number",
               "integer",
               "object",
-              "array"
+              "array",
+              "null"
             ]
           },
           "used_materials": {
@@ -7355,7 +7623,8 @@
               "number",
               "integer",
               "object",
-              "array"
+              "array",
+              "null"
             ]
           },
           "route_places": {
@@ -7364,7 +7633,8 @@
               "number",
               "integer",
               "object",
-              "array"
+              "array",
+              "null"
             ]
           },
           "start_place": {
@@ -7373,7 +7643,8 @@
               "number",
               "integer",
               "object",
-              "array"
+              "array",
+              "null"
             ]
           },
           "end_place": {
@@ -7382,11 +7653,15 @@
               "number",
               "integer",
               "object",
-              "array"
+              "array",
+              "null"
             ]
           },
           "route_description": {
-            "type": "string"
+            "type": [
+              "string",
+              "null"
+            ]
           }
         },
         "required": [
@@ -7404,14 +7679,18 @@
               "number",
               "integer",
               "object",
-              "array"
+              "array",
+              "null"
             ]
           },
           "name": {
             "type": "string"
           },
           "note": {
-            "type": "string"
+            "type": [
+              "string",
+              "null"
+            ]
           },
           "ritual_type": {
             "type": "string",
@@ -7455,14 +7734,41 @@
               "number",
               "integer",
               "object",
-              "array"
+              "array",
+              "null"
+            ]
+          },
+          "took_place_at": {
+            "type": [
+              "string",
+              "number",
+              "integer",
+              "object",
+              "array",
+              "null"
+            ]
+          },
+          "had_participant": {
+            "type": [
+              "string",
+              "number",
+              "integer",
+              "object",
+              "array",
+              "null"
             ]
           },
           "lunar_date_tithi": {
-            "type": "string"
+            "type": [
+              "string",
+              "null"
+            ]
           },
           "recurrence_pattern": {
-            "type": "string"
+            "type": [
+              "string",
+              "null"
+            ]
           },
           "invokes_deity": {
             "type": [
@@ -7470,7 +7776,8 @@
               "number",
               "integer",
               "object",
-              "array"
+              "array",
+              "null"
             ]
           },
           "carried_out_by": {
@@ -7479,7 +7786,8 @@
               "number",
               "integer",
               "object",
-              "array"
+              "array",
+              "null"
             ]
           },
           "performed_by_group": {
@@ -7488,7 +7796,8 @@
               "number",
               "integer",
               "object",
-              "array"
+              "array",
+              "null"
             ]
           },
           "is_part_of_festival": {
@@ -7497,7 +7806,8 @@
               "number",
               "integer",
               "object",
-              "array"
+              "array",
+              "null"
             ]
           },
           "managed_by_guthi": {
@@ -7506,7 +7816,8 @@
               "number",
               "integer",
               "object",
-              "array"
+              "array",
+              "null"
             ]
           },
           "was_documented_by": {
@@ -7515,7 +7826,8 @@
               "number",
               "integer",
               "object",
-              "array"
+              "array",
+              "null"
             ]
           },
           "has_assertion": {
@@ -7524,7 +7836,8 @@
               "number",
               "integer",
               "object",
-              "array"
+              "array",
+              "null"
             ]
           },
           "occurs_before": {
@@ -7533,7 +7846,8 @@
               "number",
               "integer",
               "object",
-              "array"
+              "array",
+              "null"
             ]
           },
           "occurs_after": {
@@ -7542,7 +7856,8 @@
               "number",
               "integer",
               "object",
-              "array"
+              "array",
+              "null"
             ]
           },
           "used_materials": {
@@ -7551,7 +7866,8 @@
               "number",
               "integer",
               "object",
-              "array"
+              "array",
+              "null"
             ]
           },
           "route_places": {
@@ -7560,7 +7876,8 @@
               "number",
               "integer",
               "object",
-              "array"
+              "array",
+              "null"
             ]
           },
           "start_place": {
@@ -7569,7 +7886,8 @@
               "number",
               "integer",
               "object",
-              "array"
+              "array",
+              "null"
             ]
           },
           "end_place": {
@@ -7578,11 +7896,15 @@
               "number",
               "integer",
               "object",
-              "array"
+              "array",
+              "null"
             ]
           },
           "route_description": {
-            "type": "string"
+            "type": [
+              "string",
+              "null"
+            ]
           }
         },
         "required": [
@@ -7612,7 +7934,8 @@
               "number",
               "integer",
               "object",
-              "array"
+              "array",
+              "null"
             ]
           },
           "used_technique": {
@@ -7621,7 +7944,8 @@
               "number",
               "integer",
               "object",
-              "array"
+              "array",
+              "null"
             ]
           },
           "took_place_at": {
@@ -7630,7 +7954,8 @@
               "number",
               "integer",
               "object",
-              "array"
+              "array",
+              "null"
             ]
           },
           "commissioned_by": {
@@ -7639,7 +7964,8 @@
               "number",
               "integer",
               "object",
-              "array"
+              "array",
+              "null"
             ]
           },
           "was_documented_by": {
@@ -7648,7 +7974,8 @@
               "number",
               "integer",
               "object",
-              "array"
+              "array",
+              "null"
             ]
           },
           "has_assertion": {
@@ -7657,7 +7984,8 @@
               "number",
               "integer",
               "object",
-              "array"
+              "array",
+              "null"
             ]
           }
         },
@@ -7689,7 +8017,8 @@
               "number",
               "integer",
               "object",
-              "array"
+              "array",
+              "null"
             ]
           },
           "took_place_at": {
@@ -7698,7 +8027,8 @@
               "number",
               "integer",
               "object",
-              "array"
+              "array",
+              "null"
             ]
           },
           "makes_deity_present": {
@@ -7707,7 +8037,8 @@
               "number",
               "integer",
               "object",
-              "array"
+              "array",
+              "null"
             ]
           }
         },
@@ -7748,7 +8079,18 @@
               "number",
               "integer",
               "object",
-              "array"
+              "array",
+              "null"
+            ]
+          },
+          "took_place_at": {
+            "type": [
+              "string",
+              "number",
+              "integer",
+              "object",
+              "array",
+              "null"
             ]
           }
         },
@@ -7781,7 +8123,8 @@
               "number",
               "integer",
               "object",
-              "array"
+              "array",
+              "null"
             ]
           },
           "transferred_to_actor": {
@@ -7790,7 +8133,8 @@
               "number",
               "integer",
               "object",
-              "array"
+              "array",
+              "null"
             ]
           },
           "transferred_to_guthi": {
@@ -7799,7 +8143,8 @@
               "number",
               "integer",
               "object",
-              "array"
+              "array",
+              "null"
             ]
           },
           "took_place_at": {
@@ -7808,7 +8153,8 @@
               "number",
               "integer",
               "object",
-              "array"
+              "array",
+              "null"
             ]
           }
         },
@@ -7826,7 +8172,10 @@
             "type": "string"
           },
           "note": {
-            "type": "string"
+            "type": [
+              "string",
+              "null"
+            ]
           },
           "depicts_deity": {
             "type": [
@@ -7834,7 +8183,8 @@
               "number",
               "integer",
               "object",
-              "array"
+              "array",
+              "null"
             ]
           },
           "was_produced_by_event": {
@@ -7843,7 +8193,8 @@
               "number",
               "integer",
               "object",
-              "array"
+              "array",
+              "null"
             ]
           },
           "participates_in_ritual": {
@@ -7852,7 +8203,8 @@
               "number",
               "integer",
               "object",
-              "array"
+              "array",
+              "null"
             ]
           },
           "has_current_location": {
@@ -7861,7 +8213,8 @@
               "number",
               "integer",
               "object",
-              "array"
+              "array",
+              "null"
             ]
           },
           "used_by": {
@@ -7870,7 +8223,8 @@
               "number",
               "integer",
               "object",
-              "array"
+              "array",
+              "null"
             ]
           },
           "has_condition_assessment": {
@@ -7879,7 +8233,8 @@
               "number",
               "integer",
               "object",
-              "array"
+              "array",
+              "null"
             ]
           },
           "has_custody_event": {
@@ -7888,7 +8243,8 @@
               "number",
               "integer",
               "object",
-              "array"
+              "array",
+              "null"
             ]
           },
           "was_documented_by": {
@@ -7897,7 +8253,8 @@
               "number",
               "integer",
               "object",
-              "array"
+              "array",
+              "null"
             ]
           }
         },
@@ -7914,31 +8271,9 @@
             "type": "string"
           },
           "note": {
-            "type": "string"
-          },
-          "place_coordinates": {
-            "anyOf": [
-              {
-                "type": "object",
-                "properties": {
-                  "lat": {
-                    "type": [
-                      "string",
-                      "number"
-                    ]
-                  },
-                  "lng": {
-                    "type": [
-                      "string",
-                      "number"
-                    ]
-                  }
-                },
-                "additionalProperties": false
-              },
-              {
-                "type": "string"
-              }
+            "type": [
+              "string",
+              "null"
             ]
           },
           "was_produced_by_event": {
@@ -7947,7 +8282,8 @@
               "number",
               "integer",
               "object",
-              "array"
+              "array",
+              "null"
             ]
           },
           "has_current_location": {
@@ -7956,7 +8292,8 @@
               "number",
               "integer",
               "object",
-              "array"
+              "array",
+              "null"
             ]
           },
           "has_condition_assessment": {
@@ -7965,7 +8302,8 @@
               "number",
               "integer",
               "object",
-              "array"
+              "array",
+              "null"
             ]
           },
           "has_component": {
@@ -7974,7 +8312,8 @@
               "number",
               "integer",
               "object",
-              "array"
+              "array",
+              "null"
             ]
           },
           "has_architectural_style": {
@@ -8023,7 +8362,10 @@
             ]
           },
           "last_known_existence_date": {
-            "type": "string"
+            "type": [
+              "string",
+              "null"
+            ]
           },
           "destruction_event": {
             "type": [
@@ -8031,7 +8373,8 @@
               "number",
               "integer",
               "object",
-              "array"
+              "array",
+              "null"
             ]
           },
           "hypothesized_location": {
@@ -8040,7 +8383,8 @@
               "number",
               "integer",
               "object",
-              "array"
+              "array",
+              "null"
             ]
           },
           "documented_in_source": {
@@ -8049,7 +8393,18 @@
               "number",
               "integer",
               "object",
-              "array"
+              "array",
+              "null"
+            ]
+          },
+          "managed_by_guthi": {
+            "type": [
+              "string",
+              "number",
+              "integer",
+              "object",
+              "array",
+              "null"
             ]
           },
           "has_assertion": {
@@ -8058,7 +8413,36 @@
               "number",
               "integer",
               "object",
-              "array"
+              "array",
+              "null"
+            ]
+          },
+          "place_coordinates": {
+            "anyOf": [
+              {
+                "type": "object",
+                "properties": {
+                  "lat": {
+                    "type": [
+                      "string",
+                      "number"
+                    ]
+                  },
+                  "lng": {
+                    "type": [
+                      "string",
+                      "number"
+                    ]
+                  }
+                },
+                "additionalProperties": false
+              },
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
             ]
           },
           "participates_in_ritual": {
@@ -8067,7 +8451,8 @@
               "number",
               "integer",
               "object",
-              "array"
+              "array",
+              "null"
             ]
           },
           "has_custody_event": {
@@ -8076,7 +8461,8 @@
               "number",
               "integer",
               "object",
-              "array"
+              "array",
+              "null"
             ]
           },
           "was_documented_by": {
@@ -8085,7 +8471,8 @@
               "number",
               "integer",
               "object",
-              "array"
+              "array",
+              "null"
             ]
           }
         },
@@ -8134,7 +8521,8 @@
               "number",
               "integer",
               "object",
-              "array"
+              "array",
+              "null"
             ]
           },
           "has_retirement_event": {
@@ -8143,7 +8531,8 @@
               "number",
               "integer",
               "object",
-              "array"
+              "array",
+              "null"
             ]
           },
           "was_documented_by": {
@@ -8152,7 +8541,8 @@
               "number",
               "integer",
               "object",
-              "array"
+              "array",
+              "null"
             ]
           }
         },
@@ -8195,7 +8585,8 @@
               "number",
               "integer",
               "object",
-              "array"
+              "array",
+              "null"
             ]
           },
           "performed_by_group": {
@@ -8204,7 +8595,8 @@
               "number",
               "integer",
               "object",
-              "array"
+              "array",
+              "null"
             ]
           },
           "took_place_at": {
@@ -8213,11 +8605,15 @@
               "number",
               "integer",
               "object",
-              "array"
+              "array",
+              "null"
             ]
           },
           "selection_criteria_met": {
-            "type": "string"
+            "type": [
+              "string",
+              "null"
+            ]
           },
           "has_provenance_assertion": {
             "type": [
@@ -8225,7 +8621,8 @@
               "number",
               "integer",
               "object",
-              "array"
+              "array",
+              "null"
             ]
           },
           "was_documented_by": {
@@ -8234,14 +8631,21 @@
               "number",
               "integer",
               "object",
-              "array"
+              "array",
+              "null"
             ]
           },
           "is_critical_for_festival": {
-            "type": "boolean"
+            "type": [
+              "boolean",
+              "null"
+            ]
           },
           "note": {
-            "type": "string"
+            "type": [
+              "string",
+              "null"
+            ]
           },
           "ritual_type": {
             "type": "string",
@@ -8285,14 +8689,31 @@
               "number",
               "integer",
               "object",
-              "array"
+              "array",
+              "null"
+            ]
+          },
+          "had_participant": {
+            "type": [
+              "string",
+              "number",
+              "integer",
+              "object",
+              "array",
+              "null"
             ]
           },
           "lunar_date_tithi": {
-            "type": "string"
+            "type": [
+              "string",
+              "null"
+            ]
           },
           "recurrence_pattern": {
-            "type": "string"
+            "type": [
+              "string",
+              "null"
+            ]
           },
           "invokes_deity": {
             "type": [
@@ -8300,7 +8721,8 @@
               "number",
               "integer",
               "object",
-              "array"
+              "array",
+              "null"
             ]
           },
           "is_part_of_festival": {
@@ -8309,7 +8731,8 @@
               "number",
               "integer",
               "object",
-              "array"
+              "array",
+              "null"
             ]
           },
           "managed_by_guthi": {
@@ -8318,7 +8741,8 @@
               "number",
               "integer",
               "object",
-              "array"
+              "array",
+              "null"
             ]
           },
           "has_assertion": {
@@ -8327,7 +8751,8 @@
               "number",
               "integer",
               "object",
-              "array"
+              "array",
+              "null"
             ]
           },
           "occurs_before": {
@@ -8336,7 +8761,8 @@
               "number",
               "integer",
               "object",
-              "array"
+              "array",
+              "null"
             ]
           },
           "occurs_after": {
@@ -8345,7 +8771,8 @@
               "number",
               "integer",
               "object",
-              "array"
+              "array",
+              "null"
             ]
           },
           "used_materials": {
@@ -8354,7 +8781,8 @@
               "number",
               "integer",
               "object",
-              "array"
+              "array",
+              "null"
             ]
           },
           "route_places": {
@@ -8363,7 +8791,8 @@
               "number",
               "integer",
               "object",
-              "array"
+              "array",
+              "null"
             ]
           },
           "start_place": {
@@ -8372,7 +8801,8 @@
               "number",
               "integer",
               "object",
-              "array"
+              "array",
+              "null"
             ]
           },
           "end_place": {
@@ -8381,11 +8811,15 @@
               "number",
               "integer",
               "object",
-              "array"
+              "array",
+              "null"
             ]
           },
           "route_description": {
-            "type": "string"
+            "type": [
+              "string",
+              "null"
+            ]
           }
         },
         "required": [
@@ -8412,7 +8846,10 @@
             ]
           },
           "note": {
-            "type": "string"
+            "type": [
+              "string",
+              "null"
+            ]
           },
           "carried_out_by": {
             "type": [
@@ -8420,7 +8857,8 @@
               "number",
               "integer",
               "object",
-              "array"
+              "array",
+              "null"
             ]
           },
           "performed_by_group": {
@@ -8429,7 +8867,8 @@
               "number",
               "integer",
               "object",
-              "array"
+              "array",
+              "null"
             ]
           },
           "took_place_at": {
@@ -8438,7 +8877,8 @@
               "number",
               "integer",
               "object",
-              "array"
+              "array",
+              "null"
             ]
           },
           "has_provenance_assertion": {
@@ -8447,7 +8887,8 @@
               "number",
               "integer",
               "object",
-              "array"
+              "array",
+              "null"
             ]
           },
           "was_documented_by": {
@@ -8456,7 +8897,8 @@
               "number",
               "integer",
               "object",
-              "array"
+              "array",
+              "null"
             ]
           },
           "ritual_type": {
@@ -8501,14 +8943,31 @@
               "number",
               "integer",
               "object",
-              "array"
+              "array",
+              "null"
+            ]
+          },
+          "had_participant": {
+            "type": [
+              "string",
+              "number",
+              "integer",
+              "object",
+              "array",
+              "null"
             ]
           },
           "lunar_date_tithi": {
-            "type": "string"
+            "type": [
+              "string",
+              "null"
+            ]
           },
           "recurrence_pattern": {
-            "type": "string"
+            "type": [
+              "string",
+              "null"
+            ]
           },
           "invokes_deity": {
             "type": [
@@ -8516,7 +8975,8 @@
               "number",
               "integer",
               "object",
-              "array"
+              "array",
+              "null"
             ]
           },
           "is_part_of_festival": {
@@ -8525,7 +8985,8 @@
               "number",
               "integer",
               "object",
-              "array"
+              "array",
+              "null"
             ]
           },
           "managed_by_guthi": {
@@ -8534,7 +8995,8 @@
               "number",
               "integer",
               "object",
-              "array"
+              "array",
+              "null"
             ]
           },
           "has_assertion": {
@@ -8543,7 +9005,8 @@
               "number",
               "integer",
               "object",
-              "array"
+              "array",
+              "null"
             ]
           },
           "occurs_before": {
@@ -8552,7 +9015,8 @@
               "number",
               "integer",
               "object",
-              "array"
+              "array",
+              "null"
             ]
           },
           "occurs_after": {
@@ -8561,7 +9025,8 @@
               "number",
               "integer",
               "object",
-              "array"
+              "array",
+              "null"
             ]
           },
           "used_materials": {
@@ -8570,7 +9035,8 @@
               "number",
               "integer",
               "object",
-              "array"
+              "array",
+              "null"
             ]
           },
           "route_places": {
@@ -8579,7 +9045,8 @@
               "number",
               "integer",
               "object",
-              "array"
+              "array",
+              "null"
             ]
           },
           "start_place": {
@@ -8588,7 +9055,8 @@
               "number",
               "integer",
               "object",
-              "array"
+              "array",
+              "null"
             ]
           },
           "end_place": {
@@ -8597,11 +9065,15 @@
               "number",
               "integer",
               "object",
-              "array"
+              "array",
+              "null"
             ]
           },
           "route_description": {
-            "type": "string"
+            "type": [
+              "string",
+              "null"
+            ]
           }
         },
         "required": [
@@ -8615,10 +9087,16 @@
         "type": "object",
         "properties": {
           "name": {
-            "type": "string"
+            "type": [
+              "string",
+              "null"
+            ]
           },
           "note": {
-            "type": "string"
+            "type": [
+              "string",
+              "null"
+            ]
           },
           "assigned_to_deity": {
             "type": [
@@ -8665,7 +9143,8 @@
               "number",
               "integer",
               "object",
-              "array"
+              "array",
+              "null"
             ]
           },
           "documented_in_source": {
@@ -8674,7 +9153,8 @@
               "number",
               "integer",
               "object",
-              "array"
+              "array",
+              "null"
             ]
           }
         },
@@ -8692,10 +9172,16 @@
             "type": "string"
           },
           "note": {
-            "type": "string"
+            "type": [
+              "string",
+              "null"
+            ]
           },
           "traditional_role": {
-            "type": "string"
+            "type": [
+              "string",
+              "null"
+            ]
           }
         },
         "required": [
@@ -8711,7 +9197,10 @@
             "type": "string"
           },
           "epoch_date_gregorian": {
-            "type": "string"
+            "type": [
+              "string",
+              "null"
+            ]
           },
           "is_primary_for_tradition": {
             "type": [
@@ -8719,14 +9208,21 @@
               "number",
               "integer",
               "object",
-              "array"
+              "array",
+              "null"
             ]
           },
           "year_offset_from_gregorian": {
-            "type": "integer"
+            "type": [
+              "integer",
+              "null"
+            ]
           },
           "note": {
-            "type": "string"
+            "type": [
+              "string",
+              "null"
+            ]
           }
         },
         "required": [
@@ -8742,7 +9238,10 @@
             "type": "string"
           },
           "note": {
-            "type": "string"
+            "type": [
+              "string",
+              "null"
+            ]
           }
         },
         "required": [
@@ -8755,7 +9254,10 @@
         "type": "object",
         "properties": {
           "assertion_content": {
-            "type": "string"
+            "type": [
+              "string",
+              "null"
+            ]
           },
           "asserts_about_entity": {
             "type": [
@@ -8763,7 +9265,8 @@
               "number",
               "integer",
               "object",
-              "array"
+              "array",
+              "null"
             ]
           },
           "asserts_about_event": {
@@ -8772,7 +9275,8 @@
               "number",
               "integer",
               "object",
-              "array"
+              "array",
+              "null"
             ]
           },
           "was_derived_from_source": {
@@ -8781,7 +9285,8 @@
               "number",
               "integer",
               "object",
-              "array"
+              "array",
+              "null"
             ]
           },
           "was_attributed_to_agent": {
@@ -8790,25 +9295,41 @@
               "number",
               "integer",
               "object",
-              "array"
+              "array",
+              "null"
             ]
           },
           "confidence_score": {
-            "type": "number",
+            "type": [
+              "number",
+              "null"
+            ],
             "minimum": 0,
             "maximum": 1
           },
           "data_quality_note": {
-            "type": "string"
+            "type": [
+              "string",
+              "null"
+            ]
           },
           "reconciliation_status": {
-            "type": "string"
+            "type": [
+              "string",
+              "null"
+            ]
           },
           "justification_note": {
-            "type": "string"
+            "type": [
+              "string",
+              "null"
+            ]
           },
           "crminf_conclusion": {
-            "type": "string"
+            "type": [
+              "string",
+              "null"
+            ]
           },
           "asserted_property": {
             "type": "string"
@@ -8822,7 +9343,8 @@
               "number",
               "integer",
               "object",
-              "array"
+              "array",
+              "null"
             ]
           }
         },
@@ -8840,10 +9362,16 @@
             "type": "string"
           },
           "datacite_identifier": {
-            "type": "string"
+            "type": [
+              "string",
+              "null"
+            ]
           },
           "datacite_identifier_type": {
-            "type": "string"
+            "type": [
+              "string",
+              "null"
+            ]
           },
           "datacite_creator": {
             "type": [
@@ -8851,7 +9379,8 @@
               "number",
               "integer",
               "object",
-              "array"
+              "array",
+              "null"
             ]
           },
           "datacite_publisher": {
@@ -8860,11 +9389,15 @@
               "number",
               "integer",
               "object",
-              "array"
+              "array",
+              "null"
             ]
           },
           "datacite_resource_type": {
-            "type": "string"
+            "type": [
+              "string",
+              "null"
+            ]
           },
           "publication_timespan": {
             "type": [
@@ -8872,26 +9405,45 @@
               "number",
               "integer",
               "object",
-              "array"
+              "array",
+              "null"
             ]
           },
           "source_citation": {
-            "type": "string"
+            "type": [
+              "string",
+              "null"
+            ]
           },
           "source_url": {
-            "type": "string"
+            "type": [
+              "string",
+              "null"
+            ]
           },
           "source_language": {
-            "type": "string"
+            "type": [
+              "string",
+              "null"
+            ]
           },
           "note": {
-            "type": "string"
+            "type": [
+              "string",
+              "null"
+            ]
           },
           "source_type": {
-            "type": "string"
+            "type": [
+              "string",
+              "null"
+            ]
           },
           "archival_location": {
-            "type": "string"
+            "type": [
+              "string",
+              "null"
+            ]
           }
         },
         "required": [

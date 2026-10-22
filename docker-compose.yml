@@ -142,8 +142,8 @@ services:
       RDF_SYNC_ENABLED: ${RDF_SYNC_ENABLED:-true}
       RDF_ENDPOINT_URL: ${RDF_ENDPOINT_URL:-http://oxigraph:7878/update}
       RDF_QUERY_URL: ${RDF_QUERY_URL:-http://oxigraph:7878/query}
-      RDF_PUBLIC_GRAPH_URI: ${RDF_PUBLIC_GRAPH_URI:-https://w3id.org/heritagegraph/graph/public}
-      RDF_RESOURCE_BASE_URI: ${RDF_RESOURCE_BASE_URI:-https://w3id.org/heritagegraph/resource/}
+      RDF_PUBLIC_GRAPH_URI: ${RDF_PUBLIC_GRAPH_URI:-https://cair-nepal.org/heritagegraph/graph/public}
+      RDF_RESOURCE_BASE_URI: ${RDF_RESOURCE_BASE_URI:-https://cair-nepal.org/heritagegraph/resource/}
       RDF_SHACL_VALIDATE_ON_WRITE: ${RDF_SHACL_VALIDATE_ON_WRITE:-false}
       HERITAGEGRAPH_SHACL_SHAPES_PATH: /app/ontology/shapes/generated-heritagegraph-minimal-shacl.ttl
       # KG ingestion pipeline (Agent 2): host-side Ollama
@@ -203,8 +203,7 @@ services:
         NEXT_PUBLIC_API_URL: ${NEXT_PUBLIC_API_URL:-http://backend.localhost/api}
         NEXT_PUBLIC_APP_URL: ${NEXT_PUBLIC_APP_URL:-http://frontend.localhost}
         NEXT_PUBLIC_DEV_AUTH: ${HERITAGEGRAPH_DEV_AUTH:-true}
-        NEXT_PUBLIC_RDF_RESOURCE_BASE_URI: ${NEXT_PUBLIC_RDF_RESOURCE_BASE_URI:-https://w3id.org/heritagegraph/resource/}
-        NEXT_PUBLIC_CESIUM_ION_ACCESS_TOKEN: ${NEXT_PUBLIC_CESIUM_ION_ACCESS_TOKEN:-}
+        NEXT_PUBLIC_RDF_RESOURCE_BASE_URI: ${NEXT_PUBLIC_RDF_RESOURCE_BASE_URI:-https://cair-nepal.org/heritagegraph/resource/}
         NEXT_PUBLIC_ATLAS_SHOW_ERROR_DETAIL: ${NEXT_PUBLIC_ATLAS_SHOW_ERROR_DETAIL:-false}
         NEXT_PUBLIC_SHOW_FORM_GRAPH: ${NEXT_PUBLIC_SHOW_FORM_GRAPH:-false}
     container_name: heritage-frontend

@@ -60,9 +60,9 @@ class MockSparqlClient:
 
     def exact_label_lookup(self, label: str, class_uri: str | None = None, **kwargs) -> list[str]:
         known = {
-            "pashupatinath": "https://w3id.org/heritagegraph/entity/pashupatinath",
-            "king manadeva": "https://w3id.org/heritagegraph/entity/manadeva",
-            "amshuverma": "https://w3id.org/heritagegraph/entity/amshuverma",
+            "pashupatinath": "https://cair-nepal.org/heritagegraph/entity/pashupatinath",
+            "king manadeva": "https://cair-nepal.org/heritagegraph/entity/manadeva",
+            "amshuverma": "https://cair-nepal.org/heritagegraph/entity/amshuverma",
         }
         return [known[label.lower()]] if label.lower() in known else []
 

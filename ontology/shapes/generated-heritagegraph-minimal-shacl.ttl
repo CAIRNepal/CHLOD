@@ -1,21 +1,21 @@
 @prefix sh: <http://www.w3.org/ns/shacl#> .
 @prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
 @prefix crm: <http://www.cidoc-crm.org/cidoc-crm/> .
-@prefix hg: <https://w3id.org/heritagegraph/shacl#> .
+@prefix hg: <https://cair-nepal.org/heritagegraph/shacl#> .
 
 hg:assertionShape a sh:NodeShape ;
   rdfs:label "Shape for registry class assertion" ;
-  sh:targetClass <https://w3id.org/heritagegraph/I2_Belief> ;
+  sh:targetClass <https://cair-nepal.org/heritagegraph/I2_Belief> ;
     sh:property [
       sh:path <http://www.w3.org/ns/prov#value> ;
       sh:nodeKind sh:Literal ;
     ] ;
     sh:property [
-      sh:path <https://w3id.org/heritagegraph/asserts_about_entity> ;
+      sh:path <https://cair-nepal.org/heritagegraph/asserts_about_entity> ;
       sh:nodeKind sh:IRI ;
     ] ;
     sh:property [
-      sh:path <https://w3id.org/heritagegraph/asserts_about_event> ;
+      sh:path <https://cair-nepal.org/heritagegraph/asserts_about_event> ;
       sh:nodeKind sh:IRI ;
     ] ;
     sh:property [
@@ -28,32 +28,32 @@ hg:assertionShape a sh:NodeShape ;
       sh:nodeKind sh:IRI ;
     ] ;
     sh:property [
-      sh:path <https://w3id.org/heritagegraph/confidenceScore> ;
+      sh:path <https://cair-nepal.org/heritagegraph/confidenceScore> ;
       sh:nodeKind sh:Literal ;
     ] ;
     sh:property [
-      sh:path <https://w3id.org/heritagegraph/dataQualityNote> ;
+      sh:path <https://cair-nepal.org/heritagegraph/dataQualityNote> ;
       sh:nodeKind sh:Literal ;
     ] ;
     sh:property [
-      sh:path <https://w3id.org/heritagegraph/reconciliationStatus> ;
+      sh:path <https://cair-nepal.org/heritagegraph/reconciliationStatus> ;
       sh:nodeKind sh:Literal ;
     ] ;
     sh:property [
-      sh:path <https://w3id.org/heritagegraph/J4_that> ;
+      sh:path <https://cair-nepal.org/heritagegraph/J4_that> ;
       sh:nodeKind sh:Literal ;
     ] ;
     sh:property [
-      sh:path <https://w3id.org/heritagegraph/J2_concluded_that> ;
+      sh:path <https://cair-nepal.org/heritagegraph/J2_concluded_that> ;
       sh:nodeKind sh:Literal ;
     ] ;
     sh:property [
-      sh:path <https://w3id.org/heritagegraph/asserted_property> ;
+      sh:path <https://cair-nepal.org/heritagegraph/asserted_property> ;
       sh:nodeKind sh:Literal ;
       sh:minCount 1 ;
     ] ;
     sh:property [
-      sh:path <https://w3id.org/heritagegraph/asserted_value> ;
+      sh:path <https://cair-nepal.org/heritagegraph/asserted_value> ;
       sh:nodeKind sh:Literal ;
       sh:minCount 1 ;
     ] ;
@@ -64,22 +64,22 @@ hg:assertionShape a sh:NodeShape ;
 
 hg:calendarShape a sh:NodeShape ;
   rdfs:label "Shape for registry class calendar" ;
-  sh:targetClass <https://w3id.org/heritagegraph/CalendarSystem> ;
+  sh:targetClass <https://cair-nepal.org/heritagegraph/CalendarSystem> ;
     sh:property [
       sh:path <http://www.w3.org/2000/01/rdf-schema#label> ;
       sh:nodeKind sh:Literal ;
       sh:minCount 1 ;
     ] ;
     sh:property [
-      sh:path <https://w3id.org/heritagegraph/epochDateGregorian> ;
+      sh:path <https://cair-nepal.org/heritagegraph/epochDateGregorian> ;
       sh:nodeKind sh:Literal ;
     ] ;
     sh:property [
-      sh:path <https://w3id.org/heritagegraph/isPrimaryForTradition> ;
+      sh:path <https://cair-nepal.org/heritagegraph/isPrimaryForTradition> ;
       sh:nodeKind sh:IRI ;
     ] ;
     sh:property [
-      sh:path <https://w3id.org/heritagegraph/yearOffsetFromGregorian> ;
+      sh:path <https://cair-nepal.org/heritagegraph/yearOffsetFromGregorian> ;
       sh:nodeKind sh:Literal ;
     ] ;
     sh:property [
@@ -89,7 +89,7 @@ hg:calendarShape a sh:NodeShape ;
 
 hg:caste_groupShape a sh:NodeShape ;
   rdfs:label "Shape for registry class caste_group" ;
-  sh:targetClass <https://w3id.org/heritagegraph/CasteGroup> ;
+  sh:targetClass <https://cair-nepal.org/heritagegraph/CasteGroup> ;
     sh:property [
       sh:path <http://www.w3.org/2000/01/rdf-schema#label> ;
       sh:nodeKind sh:Literal ;
@@ -100,13 +100,13 @@ hg:caste_groupShape a sh:NodeShape ;
       sh:nodeKind sh:Literal ;
     ] ;
     sh:property [
-      sh:path <https://w3id.org/heritagegraph/traditionalRole> ;
+      sh:path <https://cair-nepal.org/heritagegraph/traditionalRole> ;
       sh:nodeKind sh:Literal ;
     ]  .
 
 hg:consecrationShape a sh:NodeShape ;
   rdfs:label "Shape for registry class consecration" ;
-  sh:targetClass <https://w3id.org/heritagegraph/Consecration> ;
+  sh:targetClass <https://cair-nepal.org/heritagegraph/Consecration> ;
     sh:property [
       sh:path <http://www.w3.org/2000/01/rdf-schema#label> ;
       sh:nodeKind sh:Literal ;
@@ -126,48 +126,48 @@ hg:consecrationShape a sh:NodeShape ;
       sh:nodeKind sh:IRI ;
     ] ;
     sh:property [
-      sh:path <https://w3id.org/heritagegraph/makesDeityPresent> ;
+      sh:path <https://cair-nepal.org/heritagegraph/makesDeityPresent> ;
       sh:nodeKind sh:IRI ;
     ]  .
 
 hg:data_sourceShape a sh:NodeShape ;
   rdfs:label "Shape for registry class data_source" ;
-  sh:targetClass <https://w3id.org/heritagegraph/DataSource> ;
+  sh:targetClass <https://cair-nepal.org/heritagegraph/DataSource> ;
     sh:property [
       sh:path <http://www.w3.org/2000/01/rdf-schema#label> ;
       sh:nodeKind sh:Literal ;
       sh:minCount 1 ;
     ] ;
     sh:property [
-      sh:path <https://w3id.org/heritagegraph/persistentIdentifier> ;
+      sh:path <https://cair-nepal.org/heritagegraph/persistentIdentifier> ;
       sh:nodeKind sh:Literal ;
     ] ;
     sh:property [
-      sh:path <https://w3id.org/heritagegraph/identifierScheme> ;
+      sh:path <https://cair-nepal.org/heritagegraph/identifierScheme> ;
       sh:nodeKind sh:Literal ;
     ] ;
     sh:property [
-      sh:path <https://w3id.org/heritagegraph/sourceCreator> ;
+      sh:path <https://cair-nepal.org/heritagegraph/sourceCreator> ;
       sh:nodeKind sh:IRI ;
     ] ;
     sh:property [
-      sh:path <https://w3id.org/heritagegraph/sourcePublisher> ;
+      sh:path <https://cair-nepal.org/heritagegraph/sourcePublisher> ;
       sh:nodeKind sh:IRI ;
     ] ;
     sh:property [
-      sh:path <https://w3id.org/heritagegraph/resourceType> ;
+      sh:path <https://cair-nepal.org/heritagegraph/resourceType> ;
       sh:nodeKind sh:Literal ;
     ] ;
     sh:property [
-      sh:path <https://w3id.org/heritagegraph/publicationTimespan> ;
+      sh:path <https://cair-nepal.org/heritagegraph/publicationTimespan> ;
       sh:nodeKind sh:IRI ;
     ] ;
     sh:property [
-      sh:path <https://w3id.org/heritagegraph/sourceCitation> ;
+      sh:path <https://cair-nepal.org/heritagegraph/sourceCitation> ;
       sh:nodeKind sh:Literal ;
     ] ;
     sh:property [
-      sh:path <https://w3id.org/heritagegraph/sourceUrl> ;
+      sh:path <https://cair-nepal.org/heritagegraph/sourceUrl> ;
       sh:nodeKind sh:Literal ;
     ] ;
     sh:property [
@@ -179,17 +179,17 @@ hg:data_sourceShape a sh:NodeShape ;
       sh:nodeKind sh:Literal ;
     ] ;
     sh:property [
-      sh:path <https://w3id.org/heritagegraph/source_type> ;
+      sh:path <https://cair-nepal.org/heritagegraph/source_type> ;
       sh:nodeKind sh:Literal ;
     ] ;
     sh:property [
-      sh:path <https://w3id.org/heritagegraph/archival_location> ;
+      sh:path <https://cair-nepal.org/heritagegraph/archival_location> ;
       sh:nodeKind sh:Literal ;
     ]  .
 
 hg:deityShape a sh:NodeShape ;
   rdfs:label "Shape for registry class deity" ;
-  sh:targetClass <https://w3id.org/heritagegraph/Deity> ;
+  sh:targetClass <https://cair-nepal.org/heritagegraph/Deity> ;
     sh:property [
       sh:path <http://www.w3.org/2000/01/rdf-schema#label> ;
       sh:nodeKind sh:Literal ;
@@ -200,7 +200,7 @@ hg:deityShape a sh:NodeShape ;
       sh:nodeKind sh:Literal ;
     ] ;
     sh:property [
-      sh:path <https://w3id.org/heritagegraph/hasReligiousTradition> ;
+      sh:path <https://cair-nepal.org/heritagegraph/hasReligiousTradition> ;
       sh:nodeKind sh:IRI ;
     ] ;
     sh:property [
@@ -208,47 +208,51 @@ hg:deityShape a sh:NodeShape ;
       sh:nodeKind sh:IRI ;
     ] ;
     sh:property [
-      sh:path <https://w3id.org/heritagegraph/isInvokedInRitual> ;
+      sh:path <https://cair-nepal.org/heritagegraph/isInvokedInRitual> ;
       sh:nodeKind sh:IRI ;
     ] ;
     sh:property [
-      sh:path <https://w3id.org/heritagegraph/isEnshrinedThroughEvent> ;
+      sh:path <https://cair-nepal.org/heritagegraph/isEnshrinedThroughEvent> ;
       sh:nodeKind sh:IRI ;
     ]  .
 
 hg:enshrinementShape a sh:NodeShape ;
   rdfs:label "Shape for registry class enshrinement" ;
-  sh:targetClass <https://w3id.org/heritagegraph/Enshrinement> ;
+  sh:targetClass <https://cair-nepal.org/heritagegraph/Enshrinement> ;
     sh:property [
       sh:path <http://www.w3.org/2000/01/rdf-schema#label> ;
       sh:nodeKind sh:Literal ;
       sh:minCount 1 ;
     ] ;
     sh:property [
-      sh:path <https://w3id.org/heritagegraph/enshrinedDeity> ;
+      sh:path <https://cair-nepal.org/heritagegraph/enshrinedDeity> ;
       sh:nodeKind sh:IRI ;
       sh:minCount 1 ;
     ] ;
     sh:property [
-      sh:path <https://w3id.org/heritagegraph/enshrinedInStructure> ;
+      sh:path <https://cair-nepal.org/heritagegraph/enshrinedInStructure> ;
       sh:nodeKind sh:IRI ;
       sh:minCount 1 ;
     ] ;
     sh:property [
       sh:path <http://www.cidoc-crm.org/cidoc-crm/P14_carried_out_by> ;
       sh:nodeKind sh:IRI ;
+    ] ;
+    sh:property [
+      sh:path <http://www.cidoc-crm.org/cidoc-crm/P7_took_place_at> ;
+      sh:nodeKind sh:IRI ;
     ]  .
 
 hg:entityShape a sh:NodeShape ;
   rdfs:label "Shape for registry class entity" ;
-  sh:targetClass <https://w3id.org/heritagegraph/CulturalEntity> ;
+  sh:targetClass <https://cair-nepal.org/heritagegraph/CulturalEntity> ;
     sh:property [
       sh:path <http://www.w3.org/2000/01/rdf-schema#label> ;
       sh:nodeKind sh:Literal ;
       sh:minCount 1 ;
     ] ;
     sh:property [
-      sh:path <https://w3id.org/heritagegraph/entity_category> ;
+      sh:path <https://cair-nepal.org/heritagegraph/entity_category> ;
       sh:nodeKind sh:Literal ;
       sh:minCount 1 ;
     ] ;
@@ -260,7 +264,7 @@ hg:entityShape a sh:NodeShape ;
 
 hg:eventShape a sh:NodeShape ;
   rdfs:label "Shape for registry class event" ;
-  sh:targetClass <https://w3id.org/heritagegraph/HistoricalEvent> ;
+  sh:targetClass <https://cair-nepal.org/heritagegraph/HistoricalEvent> ;
     sh:property [
       sh:path <http://www.w3.org/2000/01/rdf-schema#label> ;
       sh:nodeKind sh:Literal ;
@@ -275,7 +279,7 @@ hg:eventShape a sh:NodeShape ;
       sh:nodeKind sh:IRI ;
     ] ;
     sh:property [
-      sh:path <https://w3id.org/heritagegraph/architecturalStructures> ;
+      sh:path <https://cair-nepal.org/heritagegraph/architecturalStructures> ;
       sh:nodeKind sh:IRI ;
     ] ;
     sh:property [
@@ -285,7 +289,7 @@ hg:eventShape a sh:NodeShape ;
 
 hg:festivalShape a sh:NodeShape ;
   rdfs:label "Shape for registry class festival" ;
-  sh:targetClass <https://w3id.org/heritagegraph/Festival> ;
+  sh:targetClass <https://cair-nepal.org/heritagegraph/Festival> ;
     sh:property [
       sh:path <http://www.cidoc-crm.org/cidoc-crm/P9_consists_of> ;
       sh:nodeKind sh:IRI ;
@@ -300,7 +304,7 @@ hg:festivalShape a sh:NodeShape ;
       sh:nodeKind sh:Literal ;
     ] ;
     sh:property [
-      sh:path <https://w3id.org/heritagegraph/ritualType> ;
+      sh:path <https://cair-nepal.org/heritagegraph/ritualType> ;
       sh:nodeKind sh:Literal ;
     ] ;
     sh:property [
@@ -308,15 +312,23 @@ hg:festivalShape a sh:NodeShape ;
       sh:nodeKind sh:IRI ;
     ] ;
     sh:property [
-      sh:path <https://w3id.org/heritagegraph/lunarDateTithi> ;
+      sh:path <http://www.cidoc-crm.org/cidoc-crm/P7_took_place_at> ;
+      sh:nodeKind sh:IRI ;
+    ] ;
+    sh:property [
+      sh:path <https://cair-nepal.org/heritagegraph/hadParticipant> ;
+      sh:nodeKind sh:IRI ;
+    ] ;
+    sh:property [
+      sh:path <https://cair-nepal.org/heritagegraph/lunarDateTithi> ;
       sh:nodeKind sh:Literal ;
     ] ;
     sh:property [
-      sh:path <https://w3id.org/heritagegraph/recurrencePattern> ;
+      sh:path <https://cair-nepal.org/heritagegraph/recurrencePattern> ;
       sh:nodeKind sh:Literal ;
     ] ;
     sh:property [
-      sh:path <https://w3id.org/heritagegraph/invokesDeity> ;
+      sh:path <https://cair-nepal.org/heritagegraph/invokesDeity> ;
       sh:nodeKind sh:IRI ;
     ] ;
     sh:property [
@@ -324,7 +336,7 @@ hg:festivalShape a sh:NodeShape ;
       sh:nodeKind sh:IRI ;
     ] ;
     sh:property [
-      sh:path <https://w3id.org/heritagegraph/performedByGroup> ;
+      sh:path <https://cair-nepal.org/heritagegraph/performedByGroup> ;
       sh:nodeKind sh:IRI ;
     ] ;
     sh:property [
@@ -332,23 +344,23 @@ hg:festivalShape a sh:NodeShape ;
       sh:nodeKind sh:IRI ;
     ] ;
     sh:property [
-      sh:path <https://w3id.org/heritagegraph/managedByGuthi> ;
+      sh:path <https://cair-nepal.org/heritagegraph/managedByGuthi> ;
       sh:nodeKind sh:IRI ;
     ] ;
     sh:property [
-      sh:path <https://w3id.org/heritagegraph/documentedBy> ;
+      sh:path <https://cair-nepal.org/heritagegraph/documentedBy> ;
       sh:nodeKind sh:IRI ;
     ] ;
     sh:property [
-      sh:path <https://w3id.org/heritagegraph/hasAssertion> ;
+      sh:path <https://cair-nepal.org/heritagegraph/hasAssertion> ;
       sh:nodeKind sh:IRI ;
     ] ;
     sh:property [
-      sh:path <http://www.cidoc-crm.org/cidoc-crm/P120_occurs_before> ;
+      sh:path <http://www.cidoc-crm.org/cidoc-crm/P183_ends_before_the_start_of> ;
       sh:nodeKind sh:IRI ;
     ] ;
     sh:property [
-      sh:path <http://www.cidoc-crm.org/cidoc-crm/P120i_occurs_after> ;
+      sh:path <http://www.cidoc-crm.org/cidoc-crm/P183i_starts_after_the_end_of> ;
       sh:nodeKind sh:IRI ;
     ] ;
     sh:property [
@@ -356,25 +368,25 @@ hg:festivalShape a sh:NodeShape ;
       sh:nodeKind sh:IRI ;
     ] ;
     sh:property [
-      sh:path <https://w3id.org/heritagegraph/routePlaces> ;
+      sh:path <https://cair-nepal.org/heritagegraph/routePlaces> ;
       sh:nodeKind sh:IRI ;
     ] ;
     sh:property [
-      sh:path <https://w3id.org/heritagegraph/startPlace> ;
+      sh:path <https://cair-nepal.org/heritagegraph/startPlace> ;
       sh:nodeKind sh:IRI ;
     ] ;
     sh:property [
-      sh:path <https://w3id.org/heritagegraph/endPlace> ;
+      sh:path <https://cair-nepal.org/heritagegraph/endPlace> ;
       sh:nodeKind sh:IRI ;
     ] ;
     sh:property [
-      sh:path <https://w3id.org/heritagegraph/routeDescription> ;
+      sh:path <https://cair-nepal.org/heritagegraph/routeDescription> ;
       sh:nodeKind sh:Literal ;
     ]  .
 
 hg:guthiShape a sh:NodeShape ;
   rdfs:label "Shape for registry class guthi" ;
-  sh:targetClass <https://w3id.org/heritagegraph/Guthi> ;
+  sh:targetClass <https://cair-nepal.org/heritagegraph/Guthi> ;
     sh:property [
       sh:path <http://www.w3.org/2000/01/rdf-schema#label> ;
       sh:nodeKind sh:Literal ;
@@ -385,12 +397,12 @@ hg:guthiShape a sh:NodeShape ;
       sh:nodeKind sh:Literal ;
     ] ;
     sh:property [
-      sh:path <https://w3id.org/heritagegraph/guthiType> ;
+      sh:path <https://cair-nepal.org/heritagegraph/guthiType> ;
       sh:nodeKind sh:Literal ;
       sh:minCount 1 ;
     ] ;
     sh:property [
-      sh:path <https://w3id.org/heritagegraph/performsRitual> ;
+      sh:path <https://cair-nepal.org/heritagegraph/performsRitual> ;
       sh:nodeKind sh:IRI ;
     ] ;
     sh:property [
@@ -404,7 +416,7 @@ hg:guthiShape a sh:NodeShape ;
 
 hg:iconographyShape a sh:NodeShape ;
   rdfs:label "Shape for registry class iconography" ;
-  sh:targetClass <https://w3id.org/heritagegraph/IconographicObject> ;
+  sh:targetClass <https://cair-nepal.org/heritagegraph/IconographicObject> ;
     sh:property [
       sh:path <http://www.w3.org/2000/01/rdf-schema#label> ;
       sh:nodeKind sh:Literal ;
@@ -423,7 +435,7 @@ hg:iconographyShape a sh:NodeShape ;
       sh:nodeKind sh:IRI ;
     ] ;
     sh:property [
-      sh:path <https://w3id.org/heritagegraph/participatesInRitual> ;
+      sh:path <https://cair-nepal.org/heritagegraph/participatesInRitual> ;
       sh:nodeKind sh:IRI ;
     ] ;
     sh:property [
@@ -431,7 +443,7 @@ hg:iconographyShape a sh:NodeShape ;
       sh:nodeKind sh:IRI ;
     ] ;
     sh:property [
-      sh:path <https://w3id.org/heritagegraph/usedBy> ;
+      sh:path <https://cair-nepal.org/heritagegraph/usedBy> ;
       sh:nodeKind sh:IRI ;
     ] ;
     sh:property [
@@ -443,20 +455,20 @@ hg:iconographyShape a sh:NodeShape ;
       sh:nodeKind sh:IRI ;
     ] ;
     sh:property [
-      sh:path <https://w3id.org/heritagegraph/documentedBy> ;
+      sh:path <https://cair-nepal.org/heritagegraph/documentedBy> ;
       sh:nodeKind sh:IRI ;
     ]  .
 
 hg:kumari_retirementShape a sh:NodeShape ;
   rdfs:label "Shape for registry class kumari_retirement" ;
-  sh:targetClass <https://w3id.org/heritagegraph/LivingGoddessRetirement> ;
+  sh:targetClass <https://cair-nepal.org/heritagegraph/LivingGoddessRetirement> ;
     sh:property [
       sh:path <http://www.w3.org/2000/01/rdf-schema#label> ;
       sh:nodeKind sh:Literal ;
       sh:minCount 1 ;
     ] ;
     sh:property [
-      sh:path <https://w3id.org/heritagegraph/endedTenureOf> ;
+      sh:path <https://cair-nepal.org/heritagegraph/endedTenureOf> ;
       sh:nodeKind sh:IRI ;
       sh:minCount 1 ;
     ] ;
@@ -469,7 +481,7 @@ hg:kumari_retirementShape a sh:NodeShape ;
       sh:nodeKind sh:IRI ;
     ] ;
     sh:property [
-      sh:path <https://w3id.org/heritagegraph/performedByGroup> ;
+      sh:path <https://cair-nepal.org/heritagegraph/performedByGroup> ;
       sh:nodeKind sh:IRI ;
     ] ;
     sh:property [
@@ -477,15 +489,15 @@ hg:kumari_retirementShape a sh:NodeShape ;
       sh:nodeKind sh:IRI ;
     ] ;
     sh:property [
-      sh:path <https://w3id.org/heritagegraph/has_provenance_assertion> ;
+      sh:path <https://cair-nepal.org/heritagegraph/has_provenance_assertion> ;
       sh:nodeKind sh:IRI ;
     ] ;
     sh:property [
-      sh:path <https://w3id.org/heritagegraph/documentedBy> ;
+      sh:path <https://cair-nepal.org/heritagegraph/documentedBy> ;
       sh:nodeKind sh:IRI ;
     ] ;
     sh:property [
-      sh:path <https://w3id.org/heritagegraph/ritualType> ;
+      sh:path <https://cair-nepal.org/heritagegraph/ritualType> ;
       sh:nodeKind sh:Literal ;
     ] ;
     sh:property [
@@ -493,15 +505,19 @@ hg:kumari_retirementShape a sh:NodeShape ;
       sh:nodeKind sh:IRI ;
     ] ;
     sh:property [
-      sh:path <https://w3id.org/heritagegraph/lunarDateTithi> ;
+      sh:path <https://cair-nepal.org/heritagegraph/hadParticipant> ;
+      sh:nodeKind sh:IRI ;
+    ] ;
+    sh:property [
+      sh:path <https://cair-nepal.org/heritagegraph/lunarDateTithi> ;
       sh:nodeKind sh:Literal ;
     ] ;
     sh:property [
-      sh:path <https://w3id.org/heritagegraph/recurrencePattern> ;
+      sh:path <https://cair-nepal.org/heritagegraph/recurrencePattern> ;
       sh:nodeKind sh:Literal ;
     ] ;
     sh:property [
-      sh:path <https://w3id.org/heritagegraph/invokesDeity> ;
+      sh:path <https://cair-nepal.org/heritagegraph/invokesDeity> ;
       sh:nodeKind sh:IRI ;
     ] ;
     sh:property [
@@ -509,19 +525,19 @@ hg:kumari_retirementShape a sh:NodeShape ;
       sh:nodeKind sh:IRI ;
     ] ;
     sh:property [
-      sh:path <https://w3id.org/heritagegraph/managedByGuthi> ;
+      sh:path <https://cair-nepal.org/heritagegraph/managedByGuthi> ;
       sh:nodeKind sh:IRI ;
     ] ;
     sh:property [
-      sh:path <https://w3id.org/heritagegraph/hasAssertion> ;
+      sh:path <https://cair-nepal.org/heritagegraph/hasAssertion> ;
       sh:nodeKind sh:IRI ;
     ] ;
     sh:property [
-      sh:path <http://www.cidoc-crm.org/cidoc-crm/P120_occurs_before> ;
+      sh:path <http://www.cidoc-crm.org/cidoc-crm/P183_ends_before_the_start_of> ;
       sh:nodeKind sh:IRI ;
     ] ;
     sh:property [
-      sh:path <http://www.cidoc-crm.org/cidoc-crm/P120i_occurs_after> ;
+      sh:path <http://www.cidoc-crm.org/cidoc-crm/P183i_starts_after_the_end_of> ;
       sh:nodeKind sh:IRI ;
     ] ;
     sh:property [
@@ -529,37 +545,37 @@ hg:kumari_retirementShape a sh:NodeShape ;
       sh:nodeKind sh:IRI ;
     ] ;
     sh:property [
-      sh:path <https://w3id.org/heritagegraph/routePlaces> ;
+      sh:path <https://cair-nepal.org/heritagegraph/routePlaces> ;
       sh:nodeKind sh:IRI ;
     ] ;
     sh:property [
-      sh:path <https://w3id.org/heritagegraph/startPlace> ;
+      sh:path <https://cair-nepal.org/heritagegraph/startPlace> ;
       sh:nodeKind sh:IRI ;
     ] ;
     sh:property [
-      sh:path <https://w3id.org/heritagegraph/endPlace> ;
+      sh:path <https://cair-nepal.org/heritagegraph/endPlace> ;
       sh:nodeKind sh:IRI ;
     ] ;
     sh:property [
-      sh:path <https://w3id.org/heritagegraph/routeDescription> ;
+      sh:path <https://cair-nepal.org/heritagegraph/routeDescription> ;
       sh:nodeKind sh:Literal ;
     ]  .
 
 hg:kumari_selectionShape a sh:NodeShape ;
   rdfs:label "Shape for registry class kumari_selection" ;
-  sh:targetClass <https://w3id.org/heritagegraph/LivingGoddessSelection> ;
+  sh:targetClass <https://cair-nepal.org/heritagegraph/LivingGoddessSelection> ;
     sh:property [
       sh:path <http://www.w3.org/2000/01/rdf-schema#label> ;
       sh:nodeKind sh:Literal ;
       sh:minCount 1 ;
     ] ;
     sh:property [
-      sh:path <https://w3id.org/heritagegraph/selectedPerson> ;
+      sh:path <https://cair-nepal.org/heritagegraph/selectedPerson> ;
       sh:nodeKind sh:IRI ;
       sh:minCount 1 ;
     ] ;
     sh:property [
-      sh:path <https://w3id.org/heritagegraph/initiatedTenure> ;
+      sh:path <https://cair-nepal.org/heritagegraph/initiatedTenure> ;
       sh:nodeKind sh:IRI ;
       sh:minCount 1 ;
     ] ;
@@ -568,7 +584,7 @@ hg:kumari_selectionShape a sh:NodeShape ;
       sh:nodeKind sh:IRI ;
     ] ;
     sh:property [
-      sh:path <https://w3id.org/heritagegraph/performedByGroup> ;
+      sh:path <https://cair-nepal.org/heritagegraph/performedByGroup> ;
       sh:nodeKind sh:IRI ;
     ] ;
     sh:property [
@@ -576,19 +592,19 @@ hg:kumari_selectionShape a sh:NodeShape ;
       sh:nodeKind sh:IRI ;
     ] ;
     sh:property [
-      sh:path <https://w3id.org/heritagegraph/selectionCriteriaMet> ;
+      sh:path <https://cair-nepal.org/heritagegraph/selectionCriteriaMet> ;
       sh:nodeKind sh:Literal ;
     ] ;
     sh:property [
-      sh:path <https://w3id.org/heritagegraph/has_provenance_assertion> ;
+      sh:path <https://cair-nepal.org/heritagegraph/has_provenance_assertion> ;
       sh:nodeKind sh:IRI ;
     ] ;
     sh:property [
-      sh:path <https://w3id.org/heritagegraph/documentedBy> ;
+      sh:path <https://cair-nepal.org/heritagegraph/documentedBy> ;
       sh:nodeKind sh:IRI ;
     ] ;
     sh:property [
-      sh:path <https://w3id.org/heritagegraph/isCriticalForFestival> ;
+      sh:path <https://cair-nepal.org/heritagegraph/isCriticalForFestival> ;
       sh:nodeKind sh:Literal ;
     ] ;
     sh:property [
@@ -596,7 +612,7 @@ hg:kumari_selectionShape a sh:NodeShape ;
       sh:nodeKind sh:Literal ;
     ] ;
     sh:property [
-      sh:path <https://w3id.org/heritagegraph/ritualType> ;
+      sh:path <https://cair-nepal.org/heritagegraph/ritualType> ;
       sh:nodeKind sh:Literal ;
     ] ;
     sh:property [
@@ -604,15 +620,19 @@ hg:kumari_selectionShape a sh:NodeShape ;
       sh:nodeKind sh:IRI ;
     ] ;
     sh:property [
-      sh:path <https://w3id.org/heritagegraph/lunarDateTithi> ;
+      sh:path <https://cair-nepal.org/heritagegraph/hadParticipant> ;
+      sh:nodeKind sh:IRI ;
+    ] ;
+    sh:property [
+      sh:path <https://cair-nepal.org/heritagegraph/lunarDateTithi> ;
       sh:nodeKind sh:Literal ;
     ] ;
     sh:property [
-      sh:path <https://w3id.org/heritagegraph/recurrencePattern> ;
+      sh:path <https://cair-nepal.org/heritagegraph/recurrencePattern> ;
       sh:nodeKind sh:Literal ;
     ] ;
     sh:property [
-      sh:path <https://w3id.org/heritagegraph/invokesDeity> ;
+      sh:path <https://cair-nepal.org/heritagegraph/invokesDeity> ;
       sh:nodeKind sh:IRI ;
     ] ;
     sh:property [
@@ -620,19 +640,19 @@ hg:kumari_selectionShape a sh:NodeShape ;
       sh:nodeKind sh:IRI ;
     ] ;
     sh:property [
-      sh:path <https://w3id.org/heritagegraph/managedByGuthi> ;
+      sh:path <https://cair-nepal.org/heritagegraph/managedByGuthi> ;
       sh:nodeKind sh:IRI ;
     ] ;
     sh:property [
-      sh:path <https://w3id.org/heritagegraph/hasAssertion> ;
+      sh:path <https://cair-nepal.org/heritagegraph/hasAssertion> ;
       sh:nodeKind sh:IRI ;
     ] ;
     sh:property [
-      sh:path <http://www.cidoc-crm.org/cidoc-crm/P120_occurs_before> ;
+      sh:path <http://www.cidoc-crm.org/cidoc-crm/P183_ends_before_the_start_of> ;
       sh:nodeKind sh:IRI ;
     ] ;
     sh:property [
-      sh:path <http://www.cidoc-crm.org/cidoc-crm/P120i_occurs_after> ;
+      sh:path <http://www.cidoc-crm.org/cidoc-crm/P183i_starts_after_the_end_of> ;
       sh:nodeKind sh:IRI ;
     ] ;
     sh:property [
@@ -640,19 +660,19 @@ hg:kumari_selectionShape a sh:NodeShape ;
       sh:nodeKind sh:IRI ;
     ] ;
     sh:property [
-      sh:path <https://w3id.org/heritagegraph/routePlaces> ;
+      sh:path <https://cair-nepal.org/heritagegraph/routePlaces> ;
       sh:nodeKind sh:IRI ;
     ] ;
     sh:property [
-      sh:path <https://w3id.org/heritagegraph/startPlace> ;
+      sh:path <https://cair-nepal.org/heritagegraph/startPlace> ;
       sh:nodeKind sh:IRI ;
     ] ;
     sh:property [
-      sh:path <https://w3id.org/heritagegraph/endPlace> ;
+      sh:path <https://cair-nepal.org/heritagegraph/endPlace> ;
       sh:nodeKind sh:IRI ;
     ] ;
     sh:property [
-      sh:path <https://w3id.org/heritagegraph/routeDescription> ;
+      sh:path <https://cair-nepal.org/heritagegraph/routeDescription> ;
       sh:nodeKind sh:Literal ;
     ]  .
 
@@ -665,30 +685,30 @@ hg:kumari_tenureShape a sh:NodeShape ;
       sh:minCount 1 ;
     ] ;
     sh:property [
-      sh:path <https://w3id.org/heritagegraph/hadParticipant> ;
+      sh:path <https://cair-nepal.org/heritagegraph/hadParticipant> ;
       sh:nodeKind sh:IRI ;
       sh:minCount 1 ;
     ] ;
     sh:property [
-      sh:path <https://w3id.org/heritagegraph/embodiedDeity> ;
+      sh:path <https://cair-nepal.org/heritagegraph/embodiedDeity> ;
       sh:nodeKind sh:IRI ;
       sh:minCount 1 ;
     ] ;
     sh:property [
-      sh:path <https://w3id.org/heritagegraph/residenceStructure> ;
+      sh:path <https://cair-nepal.org/heritagegraph/residenceStructure> ;
       sh:nodeKind sh:IRI ;
       sh:minCount 1 ;
     ] ;
     sh:property [
-      sh:path <https://w3id.org/heritagegraph/supportedByInstitution> ;
+      sh:path <https://cair-nepal.org/heritagegraph/supportedByInstitution> ;
       sh:nodeKind sh:IRI ;
     ] ;
     sh:property [
-      sh:path <https://w3id.org/heritagegraph/has_retirement_event> ;
+      sh:path <https://cair-nepal.org/heritagegraph/has_retirement_event> ;
       sh:nodeKind sh:IRI ;
     ] ;
     sh:property [
-      sh:path <https://w3id.org/heritagegraph/documentedBy> ;
+      sh:path <https://cair-nepal.org/heritagegraph/documentedBy> ;
       sh:nodeKind sh:IRI ;
     ]  .
 
@@ -705,7 +725,7 @@ hg:locationShape a sh:NodeShape ;
       sh:nodeKind sh:Literal ;
     ] ;
     sh:property [
-      sh:path <https://w3id.org/heritagegraph/placeType> ;
+      sh:path <https://cair-nepal.org/heritagegraph/placeType> ;
       sh:nodeKind sh:Literal ;
     ] ;
     sh:property [
@@ -715,7 +735,7 @@ hg:locationShape a sh:NodeShape ;
 
 hg:monumentShape a sh:NodeShape ;
   rdfs:label "Shape for registry class monument" ;
-  sh:targetClass <https://w3id.org/heritagegraph/BuddhistMonument> ;
+  sh:targetClass <https://cair-nepal.org/heritagegraph/BuddhistMonument> ;
     sh:property [
       sh:path <http://www.w3.org/2000/01/rdf-schema#label> ;
       sh:nodeKind sh:Literal ;
@@ -723,10 +743,6 @@ hg:monumentShape a sh:NodeShape ;
     ] ;
     sh:property [
       sh:path <http://www.cidoc-crm.org/cidoc-crm/P3_has_note> ;
-      sh:nodeKind sh:Literal ;
-    ] ;
-    sh:property [
-      sh:path <http://www.opengis.net/ont/geosparql#asWKT> ;
       sh:nodeKind sh:Literal ;
     ] ;
     sh:property [
@@ -746,35 +762,43 @@ hg:monumentShape a sh:NodeShape ;
       sh:nodeKind sh:IRI ;
     ] ;
     sh:property [
-      sh:path <https://w3id.org/heritagegraph/hasArchitecturalStyle> ;
+      sh:path <https://cair-nepal.org/heritagegraph/hasArchitecturalStyle> ;
       sh:nodeKind sh:Literal ;
     ] ;
     sh:property [
-      sh:path <https://w3id.org/heritagegraph/existenceStatus> ;
+      sh:path <https://cair-nepal.org/heritagegraph/existenceStatus> ;
       sh:nodeKind sh:Literal ;
     ] ;
     sh:property [
-      sh:path <https://w3id.org/heritagegraph/lastKnownExistenceDate> ;
+      sh:path <https://cair-nepal.org/heritagegraph/lastKnownExistenceDate> ;
       sh:nodeKind sh:Literal ;
     ] ;
     sh:property [
-      sh:path <https://w3id.org/heritagegraph/destructionEvent> ;
+      sh:path <https://cair-nepal.org/heritagegraph/destructionEvent> ;
       sh:nodeKind sh:IRI ;
     ] ;
     sh:property [
-      sh:path <https://w3id.org/heritagegraph/hypothesizedLocation> ;
+      sh:path <https://cair-nepal.org/heritagegraph/hypothesizedLocation> ;
       sh:nodeKind sh:IRI ;
     ] ;
     sh:property [
-      sh:path <https://w3id.org/heritagegraph/mentionedInSource> ;
+      sh:path <https://cair-nepal.org/heritagegraph/mentionedInSource> ;
       sh:nodeKind sh:IRI ;
     ] ;
     sh:property [
-      sh:path <https://w3id.org/heritagegraph/hasAssertion> ;
+      sh:path <https://cair-nepal.org/heritagegraph/managedByGuthi> ;
       sh:nodeKind sh:IRI ;
     ] ;
     sh:property [
-      sh:path <https://w3id.org/heritagegraph/participatesInRitual> ;
+      sh:path <https://cair-nepal.org/heritagegraph/hasAssertion> ;
+      sh:nodeKind sh:IRI ;
+    ] ;
+    sh:property [
+      sh:path <http://www.opengis.net/ont/geosparql#asWKT> ;
+      sh:nodeKind sh:Literal ;
+    ] ;
+    sh:property [
+      sh:path <https://cair-nepal.org/heritagegraph/participatesInRitual> ;
       sh:nodeKind sh:IRI ;
     ] ;
     sh:property [
@@ -782,13 +806,13 @@ hg:monumentShape a sh:NodeShape ;
       sh:nodeKind sh:IRI ;
     ] ;
     sh:property [
-      sh:path <https://w3id.org/heritagegraph/documentedBy> ;
+      sh:path <https://cair-nepal.org/heritagegraph/documentedBy> ;
       sh:nodeKind sh:IRI ;
     ]  .
 
 hg:periodShape a sh:NodeShape ;
   rdfs:label "Shape for registry class period" ;
-  sh:targetClass <https://w3id.org/heritagegraph/HistoricalPeriod> ;
+  sh:targetClass <https://cair-nepal.org/heritagegraph/HistoricalPeriod> ;
     sh:property [
       sh:path <http://www.w3.org/2000/01/rdf-schema#label> ;
       sh:nodeKind sh:Literal ;
@@ -812,11 +836,11 @@ hg:personShape a sh:NodeShape ;
       sh:nodeKind sh:Literal ;
     ] ;
     sh:property [
-      sh:path <https://w3id.org/heritagegraph/birthTimespan> ;
+      sh:path <https://cair-nepal.org/heritagegraph/birthTimespan> ;
       sh:nodeKind sh:IRI ;
     ] ;
     sh:property [
-      sh:path <https://w3id.org/heritagegraph/deathTimespan> ;
+      sh:path <https://cair-nepal.org/heritagegraph/deathTimespan> ;
       sh:nodeKind sh:IRI ;
     ] ;
     sh:property [
@@ -828,11 +852,11 @@ hg:personShape a sh:NodeShape ;
       sh:nodeKind sh:IRI ;
     ] ;
     sh:property [
-      sh:path <https://w3id.org/heritagegraph/institutionalAffiliation> ;
+      sh:path <https://cair-nepal.org/heritagegraph/institutionalAffiliation> ;
       sh:nodeKind sh:Literal ;
     ] ;
     sh:property [
-      sh:path <https://w3id.org/heritagegraph/expertiseArea> ;
+      sh:path <https://cair-nepal.org/heritagegraph/expertiseArea> ;
       sh:nodeKind sh:Literal ;
     ]  .
 
@@ -862,21 +886,21 @@ hg:productionShape a sh:NodeShape ;
       sh:nodeKind sh:IRI ;
     ] ;
     sh:property [
-      sh:path <https://w3id.org/heritagegraph/commissionedBy> ;
+      sh:path <https://cair-nepal.org/heritagegraph/commissionedBy> ;
       sh:nodeKind sh:IRI ;
     ] ;
     sh:property [
-      sh:path <https://w3id.org/heritagegraph/documentedBy> ;
+      sh:path <https://cair-nepal.org/heritagegraph/documentedBy> ;
       sh:nodeKind sh:IRI ;
     ] ;
     sh:property [
-      sh:path <https://w3id.org/heritagegraph/hasAssertion> ;
+      sh:path <https://cair-nepal.org/heritagegraph/hasAssertion> ;
       sh:nodeKind sh:IRI ;
     ]  .
 
 hg:ritualShape a sh:NodeShape ;
   rdfs:label "Shape for registry class ritual" ;
-  sh:targetClass <https://w3id.org/heritagegraph/RitualEvent> ;
+  sh:targetClass <https://cair-nepal.org/heritagegraph/RitualEvent> ;
     sh:property [
       sh:path <http://www.w3.org/2000/01/rdf-schema#label> ;
       sh:nodeKind sh:Literal ;
@@ -887,7 +911,7 @@ hg:ritualShape a sh:NodeShape ;
       sh:nodeKind sh:Literal ;
     ] ;
     sh:property [
-      sh:path <https://w3id.org/heritagegraph/ritualType> ;
+      sh:path <https://cair-nepal.org/heritagegraph/ritualType> ;
       sh:nodeKind sh:Literal ;
     ] ;
     sh:property [
@@ -895,15 +919,23 @@ hg:ritualShape a sh:NodeShape ;
       sh:nodeKind sh:IRI ;
     ] ;
     sh:property [
-      sh:path <https://w3id.org/heritagegraph/lunarDateTithi> ;
+      sh:path <http://www.cidoc-crm.org/cidoc-crm/P7_took_place_at> ;
+      sh:nodeKind sh:IRI ;
+    ] ;
+    sh:property [
+      sh:path <https://cair-nepal.org/heritagegraph/hadParticipant> ;
+      sh:nodeKind sh:IRI ;
+    ] ;
+    sh:property [
+      sh:path <https://cair-nepal.org/heritagegraph/lunarDateTithi> ;
       sh:nodeKind sh:Literal ;
     ] ;
     sh:property [
-      sh:path <https://w3id.org/heritagegraph/recurrencePattern> ;
+      sh:path <https://cair-nepal.org/heritagegraph/recurrencePattern> ;
       sh:nodeKind sh:Literal ;
     ] ;
     sh:property [
-      sh:path <https://w3id.org/heritagegraph/invokesDeity> ;
+      sh:path <https://cair-nepal.org/heritagegraph/invokesDeity> ;
       sh:nodeKind sh:IRI ;
     ] ;
     sh:property [
@@ -911,7 +943,7 @@ hg:ritualShape a sh:NodeShape ;
       sh:nodeKind sh:IRI ;
     ] ;
     sh:property [
-      sh:path <https://w3id.org/heritagegraph/performedByGroup> ;
+      sh:path <https://cair-nepal.org/heritagegraph/performedByGroup> ;
       sh:nodeKind sh:IRI ;
     ] ;
     sh:property [
@@ -919,23 +951,23 @@ hg:ritualShape a sh:NodeShape ;
       sh:nodeKind sh:IRI ;
     ] ;
     sh:property [
-      sh:path <https://w3id.org/heritagegraph/managedByGuthi> ;
+      sh:path <https://cair-nepal.org/heritagegraph/managedByGuthi> ;
       sh:nodeKind sh:IRI ;
     ] ;
     sh:property [
-      sh:path <https://w3id.org/heritagegraph/documentedBy> ;
+      sh:path <https://cair-nepal.org/heritagegraph/documentedBy> ;
       sh:nodeKind sh:IRI ;
     ] ;
     sh:property [
-      sh:path <https://w3id.org/heritagegraph/hasAssertion> ;
+      sh:path <https://cair-nepal.org/heritagegraph/hasAssertion> ;
       sh:nodeKind sh:IRI ;
     ] ;
     sh:property [
-      sh:path <http://www.cidoc-crm.org/cidoc-crm/P120_occurs_before> ;
+      sh:path <http://www.cidoc-crm.org/cidoc-crm/P183_ends_before_the_start_of> ;
       sh:nodeKind sh:IRI ;
     ] ;
     sh:property [
-      sh:path <http://www.cidoc-crm.org/cidoc-crm/P120i_occurs_after> ;
+      sh:path <http://www.cidoc-crm.org/cidoc-crm/P183i_starts_after_the_end_of> ;
       sh:nodeKind sh:IRI ;
     ] ;
     sh:property [
@@ -943,25 +975,25 @@ hg:ritualShape a sh:NodeShape ;
       sh:nodeKind sh:IRI ;
     ] ;
     sh:property [
-      sh:path <https://w3id.org/heritagegraph/routePlaces> ;
+      sh:path <https://cair-nepal.org/heritagegraph/routePlaces> ;
       sh:nodeKind sh:IRI ;
     ] ;
     sh:property [
-      sh:path <https://w3id.org/heritagegraph/startPlace> ;
+      sh:path <https://cair-nepal.org/heritagegraph/startPlace> ;
       sh:nodeKind sh:IRI ;
     ] ;
     sh:property [
-      sh:path <https://w3id.org/heritagegraph/endPlace> ;
+      sh:path <https://cair-nepal.org/heritagegraph/endPlace> ;
       sh:nodeKind sh:IRI ;
     ] ;
     sh:property [
-      sh:path <https://w3id.org/heritagegraph/routeDescription> ;
+      sh:path <https://cair-nepal.org/heritagegraph/routeDescription> ;
       sh:nodeKind sh:Literal ;
     ]  .
 
 hg:sourceShape a sh:NodeShape ;
   rdfs:label "Shape for registry class source" ;
-  sh:targetClass <https://w3id.org/heritagegraph/InformationObject> ;
+  sh:targetClass <https://cair-nepal.org/heritagegraph/InformationObject> ;
     sh:property [
       sh:path <http://www.w3.org/2000/01/rdf-schema#label> ;
       sh:nodeKind sh:Literal ;
@@ -972,7 +1004,7 @@ hg:sourceShape a sh:NodeShape ;
       sh:nodeKind sh:IRI ;
     ] ;
     sh:property [
-      sh:path <https://w3id.org/heritagegraph/documentedBy> ;
+      sh:path <https://cair-nepal.org/heritagegraph/documentedBy> ;
       sh:nodeKind sh:IRI ;
     ] ;
     sh:property [
@@ -980,43 +1012,43 @@ hg:sourceShape a sh:NodeShape ;
       sh:nodeKind sh:Literal ;
     ] ;
     sh:property [
-      sh:path <https://w3id.org/heritagegraph/source_type> ;
+      sh:path <https://cair-nepal.org/heritagegraph/source_type> ;
       sh:nodeKind sh:Literal ;
     ] ;
     sh:property [
-      sh:path <https://w3id.org/heritagegraph/archival_location> ;
+      sh:path <https://cair-nepal.org/heritagegraph/archival_location> ;
       sh:nodeKind sh:Literal ;
     ] ;
     sh:property [
-      sh:path <https://w3id.org/heritagegraph/persistentIdentifier> ;
+      sh:path <https://cair-nepal.org/heritagegraph/persistentIdentifier> ;
       sh:nodeKind sh:Literal ;
     ] ;
     sh:property [
-      sh:path <https://w3id.org/heritagegraph/identifierScheme> ;
+      sh:path <https://cair-nepal.org/heritagegraph/identifierScheme> ;
       sh:nodeKind sh:Literal ;
     ] ;
     sh:property [
-      sh:path <https://w3id.org/heritagegraph/sourceCreator> ;
+      sh:path <https://cair-nepal.org/heritagegraph/sourceCreator> ;
       sh:nodeKind sh:IRI ;
     ] ;
     sh:property [
-      sh:path <https://w3id.org/heritagegraph/sourcePublisher> ;
+      sh:path <https://cair-nepal.org/heritagegraph/sourcePublisher> ;
       sh:nodeKind sh:IRI ;
     ] ;
     sh:property [
-      sh:path <https://w3id.org/heritagegraph/resourceType> ;
+      sh:path <https://cair-nepal.org/heritagegraph/resourceType> ;
       sh:nodeKind sh:Literal ;
     ] ;
     sh:property [
-      sh:path <https://w3id.org/heritagegraph/publicationTimespan> ;
+      sh:path <https://cair-nepal.org/heritagegraph/publicationTimespan> ;
       sh:nodeKind sh:IRI ;
     ] ;
     sh:property [
-      sh:path <https://w3id.org/heritagegraph/sourceCitation> ;
+      sh:path <https://cair-nepal.org/heritagegraph/sourceCitation> ;
       sh:nodeKind sh:Literal ;
     ] ;
     sh:property [
-      sh:path <https://w3id.org/heritagegraph/sourceUrl> ;
+      sh:path <https://cair-nepal.org/heritagegraph/sourceUrl> ;
       sh:nodeKind sh:Literal ;
     ] ;
     sh:property [
@@ -1026,7 +1058,7 @@ hg:sourceShape a sh:NodeShape ;
 
 hg:structureShape a sh:NodeShape ;
   rdfs:label "Shape for registry class structure" ;
-  sh:targetClass <https://w3id.org/heritagegraph/ArchitecturalStructure> ;
+  sh:targetClass <https://cair-nepal.org/heritagegraph/ArchitecturalStructure> ;
     sh:property [
       sh:path <http://www.w3.org/2000/01/rdf-schema#label> ;
       sh:nodeKind sh:Literal ;
@@ -1034,10 +1066,6 @@ hg:structureShape a sh:NodeShape ;
     ] ;
     sh:property [
       sh:path <http://www.cidoc-crm.org/cidoc-crm/P3_has_note> ;
-      sh:nodeKind sh:Literal ;
-    ] ;
-    sh:property [
-      sh:path <http://www.opengis.net/ont/geosparql#asWKT> ;
       sh:nodeKind sh:Literal ;
     ] ;
     sh:property [
@@ -1057,35 +1085,43 @@ hg:structureShape a sh:NodeShape ;
       sh:nodeKind sh:IRI ;
     ] ;
     sh:property [
-      sh:path <https://w3id.org/heritagegraph/hasArchitecturalStyle> ;
+      sh:path <https://cair-nepal.org/heritagegraph/hasArchitecturalStyle> ;
       sh:nodeKind sh:Literal ;
     ] ;
     sh:property [
-      sh:path <https://w3id.org/heritagegraph/existenceStatus> ;
+      sh:path <https://cair-nepal.org/heritagegraph/existenceStatus> ;
       sh:nodeKind sh:Literal ;
     ] ;
     sh:property [
-      sh:path <https://w3id.org/heritagegraph/lastKnownExistenceDate> ;
+      sh:path <https://cair-nepal.org/heritagegraph/lastKnownExistenceDate> ;
       sh:nodeKind sh:Literal ;
     ] ;
     sh:property [
-      sh:path <https://w3id.org/heritagegraph/destructionEvent> ;
+      sh:path <https://cair-nepal.org/heritagegraph/destructionEvent> ;
       sh:nodeKind sh:IRI ;
     ] ;
     sh:property [
-      sh:path <https://w3id.org/heritagegraph/hypothesizedLocation> ;
+      sh:path <https://cair-nepal.org/heritagegraph/hypothesizedLocation> ;
       sh:nodeKind sh:IRI ;
     ] ;
     sh:property [
-      sh:path <https://w3id.org/heritagegraph/mentionedInSource> ;
+      sh:path <https://cair-nepal.org/heritagegraph/mentionedInSource> ;
       sh:nodeKind sh:IRI ;
     ] ;
     sh:property [
-      sh:path <https://w3id.org/heritagegraph/hasAssertion> ;
+      sh:path <https://cair-nepal.org/heritagegraph/managedByGuthi> ;
       sh:nodeKind sh:IRI ;
     ] ;
     sh:property [
-      sh:path <https://w3id.org/heritagegraph/participatesInRitual> ;
+      sh:path <https://cair-nepal.org/heritagegraph/hasAssertion> ;
+      sh:nodeKind sh:IRI ;
+    ] ;
+    sh:property [
+      sh:path <http://www.opengis.net/ont/geosparql#asWKT> ;
+      sh:nodeKind sh:Literal ;
+    ] ;
+    sh:property [
+      sh:path <https://cair-nepal.org/heritagegraph/participatesInRitual> ;
       sh:nodeKind sh:IRI ;
     ] ;
     sh:property [
@@ -1093,13 +1129,13 @@ hg:structureShape a sh:NodeShape ;
       sh:nodeKind sh:IRI ;
     ] ;
     sh:property [
-      sh:path <https://w3id.org/heritagegraph/documentedBy> ;
+      sh:path <https://cair-nepal.org/heritagegraph/documentedBy> ;
       sh:nodeKind sh:IRI ;
     ]  .
 
 hg:syncretismShape a sh:NodeShape ;
   rdfs:label "Shape for registry class syncretism" ;
-  sh:targetClass <https://w3id.org/heritagegraph/SyncreticRelationship> ;
+  sh:targetClass <https://cair-nepal.org/heritagegraph/SyncreticRelationship> ;
     sh:property [
       sh:path <http://www.w3.org/2000/01/rdf-schema#label> ;
       sh:nodeKind sh:Literal ;
@@ -1119,21 +1155,21 @@ hg:syncretismShape a sh:NodeShape ;
       sh:minCount 1 ;
     ] ;
     sh:property [
-      sh:path <https://w3id.org/heritagegraph/syncreticType> ;
+      sh:path <https://cair-nepal.org/heritagegraph/syncreticType> ;
       sh:nodeKind sh:Literal ;
     ] ;
     sh:property [
-      sh:path <https://w3id.org/heritagegraph/documentedBy> ;
+      sh:path <https://cair-nepal.org/heritagegraph/documentedBy> ;
       sh:nodeKind sh:IRI ;
     ] ;
     sh:property [
-      sh:path <https://w3id.org/heritagegraph/mentionedInSource> ;
+      sh:path <https://cair-nepal.org/heritagegraph/mentionedInSource> ;
       sh:nodeKind sh:IRI ;
     ]  .
 
 hg:traditionShape a sh:NodeShape ;
   rdfs:label "Shape for registry class tradition" ;
-  sh:targetClass <https://w3id.org/heritagegraph/ReligiousTradition> ;
+  sh:targetClass <https://cair-nepal.org/heritagegraph/ReligiousTradition> ;
     sh:property [
       sh:path <http://www.w3.org/2000/01/rdf-schema#label> ;
       sh:nodeKind sh:Literal ;
@@ -1166,7 +1202,7 @@ hg:transfer_of_custodyShape a sh:NodeShape ;
       sh:nodeKind sh:IRI ;
     ] ;
     sh:property [
-      sh:path <https://w3id.org/heritagegraph/transferredToGuthi> ;
+      sh:path <https://cair-nepal.org/heritagegraph/transferredToGuthi> ;
       sh:nodeKind sh:IRI ;
     ] ;
     sh:property [

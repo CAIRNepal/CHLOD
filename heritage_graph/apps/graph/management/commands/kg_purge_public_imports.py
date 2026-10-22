@@ -53,7 +53,7 @@ SELECT (COUNT(*) AS ?n) WHERE {{
     FILTER(
       !STRSTARTS(STR(?s), "{prefix}")
       || (STRSTARTS(STR(?o), "https://lux.")
-          || STRSTARTS(STR(?o), "https://w3id.org/heritagegraph/imported/"))
+          || STRSTARTS(STR(?o), "https://cair-nepal.org/heritagegraph/imported/"))
     )
   }}
 }}
@@ -106,7 +106,7 @@ WHERE {{ GRAPH <{public}> {{ ?s ?p ?o .
   FILTER(
     !STRSTARTS(STR(?s), "{prefix}")
     || STRSTARTS(STR(?o), "https://lux.")
-    || STRSTARTS(STR(?o), "https://w3id.org/heritagegraph/imported/")
+    || STRSTARTS(STR(?o), "https://cair-nepal.org/heritagegraph/imported/")
   )
 }} }}
 """

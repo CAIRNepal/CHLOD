@@ -6,7 +6,7 @@ certifi==2024.8.30
 cffi==1.17.1
 cfgv==3.4.0
 charset-normalizer==3.4.0
-click==8.2.1
+click==8.1.8
 cryptography==43.0.3
 celery==5.4.0
 defusedxml==0.8.0rc2
@@ -54,8 +54,8 @@ inflection==0.5.1
 isort==6.0.1
 jsonschema==4.23.0
 jsonschema-specifications==2024.10.1
-linkml==1.9.3
-linkml-runtime==1.9.4
+linkml==1.9.6
+linkml-runtime==1.9.5
 mypy_extensions==1.1.0
 nodeenv==1.9.1
 oauthlib==3.2.2

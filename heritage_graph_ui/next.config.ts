@@ -28,21 +28,6 @@ function apiMediaRemotePattern(): {
 
 const apiMediaPattern = apiMediaRemotePattern();
 
-// Esri ArcGIS tile hosts back the Atlas globe (Cesium). Cesium fetches tiles via
-// XHR/createImageBitmap, so the host must be allowed in BOTH connect-src (the
-// fetch) and img-src (the <img> fallback) — otherwise the CSP silently blocks
-// every tile and the globe renders as a bare blue sphere with no Earth imagery.
-//
-// Note: ArcGIS endpoints may redirect between subdomains (e.g. server → services),
-// so we allow the common hostnames plus the wildcard.
-const MAP_TILE_HOSTS = [
-  'https://server.arcgisonline.com',
-  'https://services.arcgisonline.com',
-  'https://*.arcgisonline.com',
-  // NASA GIBS serves the Atlas night-lights (VIIRS Black Marble) overlay tiles.
-  'https://gibs.earthdata.nasa.gov',
-];
-
 function buildContentSecurityPolicy(): string {
   const connectSrc = ["'self'", 'https://accounts.google.com', 'https://oauth2.googleapis.com'];
   const apiUrl = process.env.NEXT_PUBLIC_API_URL?.trim();
@@ -53,7 +38,7 @@ function buildContentSecurityPolicy(): string {
       /* ignore invalid URL at build time */
     }
   }
-  connectSrc.push(...MAP_TILE_HOSTS, ...LEAFLET_TILE_CSP_HOSTS);
+  connectSrc.push(...LEAFLET_TILE_CSP_HOSTS);
   // Wikimedia image credits + the XR panorama loader may resolve Special:FilePath
   // URLs via the MediaWiki API to obtain a direct upload.wikimedia.org URL.
   connectSrc.push('https://*.wikipedia.org', 'https://*.wikimedia.org');
@@ -63,21 +48,17 @@ function buildContentSecurityPolicy(): string {
     `connect-src ${connectSrc.join(' ')}`,
     "form-action 'self' https://accounts.google.com",
     "frame-src https://accounts.google.com",
-    // Cesium uses web workers (often from blob: URLs). Without this, some
-    // browsers will block worker startup under default-src 'self', and the globe
-    // can render without imagery/terrain updates.
-    "worker-src 'self' blob:",
+    // The PWA service worker (public/sw.js).
+    "worker-src 'self'",
     // Legacy CSP for some browsers/extensions that still consult child-src.
-    "child-src 'self' blob:",
+    "child-src 'self'",
     // Wikimedia hosts power the heritage-museum demo corpus (Special:FilePath on
     // *.wikipedia.org redirects to upload.wikimedia.org); they feed both the <img>
     // heroes/thumbnails and the WebGL panorama texture in the XR view.
-    // arcgisonline serves the Atlas globe satellite/reference tiles.
-    `img-src 'self' data: blob: https://lh3.googleusercontent.com https://*.googleusercontent.com https://i.imgur.com https://*.wikipedia.org https://*.wikimedia.org ${MAP_TILE_HOSTS.join(' ')} ${LEAFLET_TILE_CSP_HOSTS.join(' ')}`,
+    // LEAFLET_TILE_CSP_HOSTS serve the map basemaps (museum map, atlas Streets).
+    `img-src 'self' data: blob: https://lh3.googleusercontent.com https://*.googleusercontent.com https://i.imgur.com https://*.wikipedia.org https://*.wikimedia.org ${LEAFLET_TILE_CSP_HOSTS.join(' ')}`,
     "style-src 'self' 'unsafe-inline'",
-    // Cesium + Resium can construct worker bootstrap scripts from blob: URLs.
-    // Allow blob: scripts so workers can start in strict CSP environments.
-    "script-src 'self' blob: 'unsafe-inline' 'unsafe-eval'",
+    "script-src 'self' 'unsafe-inline' 'unsafe-eval'",
     "font-src 'self' data:",
   ].join('; ');
 }
@@ -85,7 +66,6 @@ function buildContentSecurityPolicy(): string {
 const nextConfig: NextConfig = {
   /* config options here */
   output: 'standalone',
-  transpilePackages: ['cesium', 'resium'],
   experimental: {
     optimizePackageImports: [
       'lucide-react',
@@ -107,14 +87,6 @@ const nextConfig: NextConfig = {
    * eval-source-map style maps; production is unchanged.
    */
   webpack: (config, { dev }) => {
-    config.resolve = config.resolve ?? {};
-    config.resolve.alias = {
-      ...config.resolve.alias,
-      // Cesium → @cesium/engine → @spz-loader/core ships WASM inside template literals
-      // (`\0asm…`), which throws "Octal escape sequences are not allowed" at runtime.
-      '@spz-loader/core': path.resolve(__dirname, 'src/lib/stubs/spz-loader-core-stub.ts'),
-    };
-
     if (!dev || !config.plugins?.length) return config;
     config.plugins = config.plugins.filter((plugin: { constructor?: { name?: string } }) => {
       const name =
