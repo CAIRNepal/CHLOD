@@ -17,7 +17,7 @@ logger = logging.getLogger(__name__)
 
 # Generated from ontology/HeritageGraph.yaml (prefixes section).
 # To change a namespace: edit the schema, run python3 tools/gen_heritage_viz_config.py.
-from apps.graph.ontology_config import RDF_PREFIXES  # noqa: E402
+from apps.graph.ontology_config import RDF_PREFIXES, expand_curie  # noqa: E402
 
 RDF_TYPE_URI = RDF_PREFIXES["rdf"] + "type"
 HG_NS = RDF_PREFIXES.get("heritageGraph", "https://cair-nepal.org/heritagegraph/")
@@ -87,7 +87,18 @@ def expand_curie(curie: str) -> str:
 
 
 def _escape_literal_lexical(value: str) -> str:
-    return value.replace("\\", "\\\\").replace('"', '\\"')
+    # Short-quoted SPARQL/N-Triples strings may not hold raw line breaks.
+    return (
+        value.replace("\\", "\\\\")
+        .replace('"', '\\"')
+        .replace("\n", "\\n")
+        .replace("\r", "\\r")
+    )
+
+
+def literal_datatype_iri(datatype: str) -> str:
+    """Full datatype IRI for a projection datatype such as ``xsd:string``."""
+    return expand_curie(datatype)
 
 
 def _parse_relation_scalar_or_list(raw: Any, *, multivalued: bool) -> list[int | str]:
@@ -298,6 +309,7 @@ def _triple_to_line(t: _Triple) -> str:
             return f'  {sub} {pred} "{escaped}"{datatype} .'
         if not datatype:
             return f'  {sub} {pred} "{escaped}" .'
+        datatype = literal_datatype_iri(datatype)
         geo_wkt = RDF_PREFIXES["geo"] + "wktLiteral"
         if datatype == geo_wkt:
             return f'  {sub} {pred} "{escaped}"^^geo:wktLiteral .'
