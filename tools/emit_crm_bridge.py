@@ -59,7 +59,7 @@ def _expand(curie: str, prefixes: dict[str, str]) -> str:
     if raw.startswith(("http://", "https://")):
         return raw
     if ":" not in raw:
-        return prefixes.get("heritageGraph", "https://w3id.org/heritagegraph/") + raw
+        return prefixes.get("heritageGraph", "https://cair-nepal.org/heritagegraph/") + raw
     pfx, _, local = raw.partition(":")
     base = prefixes.get(pfx)
     return (base + local) if base else ""
@@ -76,7 +76,7 @@ def _is_aat(curie: str) -> bool:
 def generate(schema: dict) -> str:
     prefixes: dict[str, str] = schema.get("prefixes") or {}
     classes: dict[str, dict] = schema.get("classes") or {}
-    hg = prefixes.get("heritageGraph", "https://w3id.org/heritagegraph/")
+    hg = prefixes.get("heritageGraph", "https://cair-nepal.org/heritagegraph/")
 
     def class_iri(name: str) -> str:
         return f"{hg}{name}"
@@ -150,7 +150,7 @@ def generate(schema: dict) -> str:
         "@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .",
         "@prefix owl:  <http://www.w3.org/2002/07/owl#> .",
         "@prefix skos: <http://www.w3.org/2004/02/skos/core#> .",
-        "@prefix hg:   <https://w3id.org/heritagegraph/> .",
+        "@prefix hg:   <https://cair-nepal.org/heritagegraph/> .",
         "@prefix crm:  <http://www.cidoc-crm.org/cidoc-crm/> .",
         "",
         "# ── rdfs:subClassOf → CIDOC-CRM (sound upward entailment) ──────────────",

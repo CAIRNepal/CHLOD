@@ -14,11 +14,11 @@ def _expand_curie(curie: str, prefixes: dict[str, str]) -> str:
     if curie.startswith(("http://", "https://")):
         return curie
     if ":" not in curie:
-        return prefixes.get("heritageGraph", "https://w3id.org/heritagegraph/") + curie
+        return prefixes.get("heritageGraph", "https://cair-nepal.org/heritagegraph/") + curie
     prefix, rest = curie.split(":", 1)
     base = prefixes.get(prefix)
     if not base:
-        return prefixes.get("heritageGraph", "https://w3id.org/heritagegraph/") + rest
+        return prefixes.get("heritageGraph", "https://cair-nepal.org/heritagegraph/") + rest
     return base + rest
 
 

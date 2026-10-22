@@ -21,7 +21,7 @@ DEFAULT_OUT = ROOT / "ontology" / "shapes" / "generated-heritagegraph-minimal-sh
 TTL_PREFIXES = """@prefix sh: <http://www.w3.org/ns/shacl#> .
 @prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
 @prefix crm: <http://www.cidoc-crm.org/cidoc-crm/> .
-@prefix hg: <https://w3id.org/heritagegraph/shacl#> .
+@prefix hg: <https://cair-nepal.org/heritagegraph/shacl#> .
 
 """
 
@@ -32,12 +32,12 @@ def expand_curie(curie: str) -> str:
         return raw
     prefix, sep, rest = raw.partition(":")
     if not sep:
-        return f"https://w3id.org/heritagegraph/{rest}"
+        return f"https://cair-nepal.org/heritagegraph/{rest}"
     table = {
         "crm": "http://www.cidoc-crm.org/cidoc-crm/",
         "rdfs": "http://www.w3.org/2000/01/rdf-schema#",
         "rdf": "http://www.w3.org/1999/02/22-rdf-syntax-ns#",
-        "heritageGraph": "https://w3id.org/heritagegraph/",
+        "heritageGraph": "https://cair-nepal.org/heritagegraph/",
         "owl": "http://www.w3.org/2002/07/owl#",
         "geo": "http://www.opengis.net/ont/geosparql#",
         "prov": "http://www.w3.org/ns/prov#",
@@ -48,7 +48,7 @@ def expand_curie(curie: str) -> str:
         "wikidata": "http://www.wikidata.org/entity/",
         "rico": "https://www.ica.org/standards/RiC/ontology#",
     }
-    base = table.get(prefix, "https://w3id.org/heritagegraph/")
+    base = table.get(prefix, "https://cair-nepal.org/heritagegraph/")
     return f"{base}{rest}"
 
 

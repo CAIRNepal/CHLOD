@@ -422,11 +422,11 @@ def _gen_py_config(schema: dict, vizmap: dict, source_hash: str) -> str:
     lines.append("    if curie.startswith((\"http://\", \"https://\")):")
     lines.append("        return curie")
     lines.append("    if ':' not in curie:")
-    lines.append("        return RDF_PREFIXES.get('heritageGraph', 'https://w3id.org/heritagegraph/') + curie")
+    lines.append("        return RDF_PREFIXES.get('heritageGraph', 'https://cair-nepal.org/heritagegraph/') + curie")
     lines.append("    prefix, rest = curie.split(':', 1)")
     lines.append("    base = RDF_PREFIXES.get(prefix)")
     lines.append("    if not base:")
-    lines.append("        return RDF_PREFIXES.get('heritageGraph', 'https://w3id.org/heritagegraph/') + rest")
+    lines.append("        return RDF_PREFIXES.get('heritageGraph', 'https://cair-nepal.org/heritagegraph/') + rest")
     lines.append("    return base + rest")
     lines.append("")
 
