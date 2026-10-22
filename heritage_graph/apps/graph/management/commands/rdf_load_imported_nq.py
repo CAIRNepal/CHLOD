@@ -18,7 +18,7 @@ from apps.graph.kg_engine.partitions import GraphPartition
 
 PUBLIC_MARKERS = (
     "/graph/public",
-    "w3id.org/heritagegraph/graph/public",
+    "cair-nepal.org/heritagegraph/graph/public",
 )
 
 
