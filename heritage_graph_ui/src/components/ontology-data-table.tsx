@@ -39,12 +39,13 @@ import {
 } from "lucide-react";
 
 import type { OntologyClass, OntologyColumn } from "@/lib/ontology/types";
+import { apiFetch, getApiErrorMessage } from "@/lib/api-client";
+import { getPublicApiUrl } from "@/lib/api-base";
 
 // ---------------------------------------------------------------------------
 // CONSTANTS
 // ---------------------------------------------------------------------------
-const API_BASE_URL =
-  process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
+const API_BASE_URL = getPublicApiUrl();
 const PAGE_SIZE = 10;
 
 // ---------------------------------------------------------------------------
@@ -228,7 +229,7 @@ function RowHoverCard({
                 e.preventDefault();
                 e.stopPropagation();
                 router.push(
-                  `/dashboard/knowledge/${ontologyClass.key}/view/${record.id}`
+                  `/knowledge/${ontologyClass.key}/view/${record.id}`
                 );
               }}
             >
@@ -270,7 +271,7 @@ export default function OntologyDataTable({
   const baseUrl = apiBaseUrl || API_BASE_URL;
   const endpoint = `${baseUrl}${ontologyClass.apiEndpoint}`;
   const newPath =
-    contributePath || `/dashboard/contribute/${ontologyClass.key}`;
+    contributePath || `/contribute/${ontologyClass.key}`;
 
   const visibleColumns = ontologyClass.columns.filter(
     (c) => c.visible !== false
@@ -296,11 +297,11 @@ export default function OntologyDataTable({
         }
 
         const token = (session as any)?.accessToken;
-        const res = await fetch(url, {
-          headers: token ? { Authorization: `Bearer ${token}` } : {},
+        const res = await apiFetch(url, {
+          headers: token
+            ? { Authorization: `Bearer ${token}`, Accept: "application/json" }
+            : { Accept: "application/json" },
         });
-
-        if (!res.ok) throw new Error("Failed to fetch");
 
         const data = await res.json();
 
@@ -317,8 +318,12 @@ export default function OntologyDataTable({
 
         setCurrentPage(page);
       } catch (err) {
-        console.error("Fetch error:", err);
-        toast.error(`Failed to load ${ontologyClass.labelPlural.toLowerCase()}`);
+        toast.error(
+          getApiErrorMessage(
+            err,
+            `Could not load ${ontologyClass.labelPlural.toLowerCase()}. Please try again.`
+          )
+        );
         setRecords([]);
         setTotalCount(0);
         setTotalPages(1);
@@ -439,7 +444,7 @@ export default function OntologyDataTable({
                                 onClick={(e) => {
                                   e.stopPropagation();
                                   router.push(
-                                    `/dashboard/knowledge/${ontologyClass.key}/view/${record.id}`
+                                    `/knowledge/${ontologyClass.key}/view/${record.id}`
                                   );
                                 }}
                               >

@@ -1,6 +1,7 @@
 from pathlib import Path
 
 from .base import *  # noqa: F403
+from .caching import build_caches_config
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 
@@ -8,7 +9,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 
 SECRET_KEY = "django-insecure-03eebp+*3833bj!9v)r41dvnv8eg%#avt!eyq7s=kk8@&plg^$"
 DEBUG = True
-ALLOWED_HOSTS = ["127.0.0.1", "localhost", "0.0.0.0", "app.localhost","backend.localhost"]
+ALLOWED_HOSTS = ["127.0.0.1", "localhost", "0.0.0.0", "app.localhost","backend.localhost", "backend"]
 
 STATIC_ROOT = os.path.join(BASE_DIR, "staticfiles")  # noqa: F405
 
@@ -19,6 +20,13 @@ DATABASES = {
     }
 }
 
+CACHES = build_caches_config()
+
+# Dev: SHACL off by default unless explicitly enabled (pyshacl optional).
+RDF_SHACL_VALIDATE_ON_WRITE = os.environ.get(
+    "RDF_SHACL_VALIDATE_ON_WRITE", "false"
+).lower() in {"1", "true", "yes", "y", "on"}
+
 # --------------------------------------------------------------------
 # Authentication: Google OAuth (primary) + GitHub (placeholder)
 # --------------------------------------------------------------------
@@ -27,16 +35,18 @@ DATABASES = {
 # GoogleTokenAuthentication returns None (not raises) for non-Google
 # tokens, allowing the chain to continue.
 #
-#   1. GoogleTokenAuthentication — primary: verifies Google id_tokens
-#   2. GitHubTokenAuthentication — secondary: verifies GitHub access_tokens
-#   3. DevSessionAuthentication  — allows Django admin session access
-#   4. JWTAuthentication          — fallback for SimpleJWT tokens
+#   1. DevHeaderAuthentication   — X-Dev-User header (DEBUG + HERITAGEGRAPH_DEV_AUTH)
+#   2. GoogleTokenAuthentication — primary: verifies Google id_tokens
+#   3. GitHubTokenAuthentication — secondary: verifies GitHub access_tokens
+#   4. DevSessionAuthentication  — allows Django admin session access
+#   5. JWTAuthentication          — fallback for SimpleJWT tokens
 # --------------------------------------------------------------------
 REST_FRAMEWORK["DEFAULT_AUTHENTICATION_CLASSES"] = (  # noqa: F405
+    "apps.heritage_data.authentication.DevHeaderAuthentication",
     "apps.heritage_data.authentication.GoogleTokenAuthentication",
     "apps.heritage_data.authentication.GitHubTokenAuthentication",
     "apps.heritage_data.authentication.DevSessionAuthentication",
-    "rest_framework_simplejwt.authentication.JWTAuthentication",
+    "apps.heritage_data.authentication.SafeJWTAuthentication",
 )
 
 
@@ -50,3 +60,11 @@ SIMPLE_JWT.update({
     "ROTATE_REFRESH_TOKENS": True,
     "BLACKLIST_AFTER_ROTATION": False,
 })
+
+# ── Celery Development Configuration ──────────────────────────────────────
+# In development, run tasks synchronously (eager mode) for easier debugging
+CELERY_TASK_ALWAYS_EAGER = True
+CELERY_TASK_EAGER_PROPAGATES = True
+
+# OCR / document processing guardrails (read from environment in `settings.base`)
+# - OCR_ENABLED, OCR_MAX_FILE_BYTES, OCR_MAX_PAGES_PER_DOCUMENT, OCR_CLAUDE_VISION_MAX_CALLS_PER_DOCUMENT, TESSERACT_PATH, ...

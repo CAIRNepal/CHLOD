@@ -100,12 +100,13 @@ services:
     build:
       context: .
       dockerfile: Dockerfile.backend
+      target: runtime-lean
     container_name: heritage-backend
     restart: unless-stopped
     environment:
-      # Django settings
-      DJANGO_ENV: production
-      DJANGO_SETTINGS_MODULE: ${DJANGO_SETTINGS_MODULE:-heritage_graph.settings.production}
+      # Django settings (pipeline_e2e: dev + Postgres, no GDAL)
+      DJANGO_ENV: ${DJANGO_ENV:-development}
+      DJANGO_SETTINGS_MODULE: ${DJANGO_SETTINGS_MODULE:-heritage_graph.settings.pipeline_e2e}
       DEBUG: ${DEBUG:-False}
       DJANGO_SECRET_KEY: ${DJANGO_SECRET_KEY:-dev-key-change-in-production}
       ALLOWED_HOSTS: ${ALLOWED_HOSTS:-localhost,127.0.0.1,backend.localhost}
@@ -118,13 +119,48 @@ services:
       DB_PORT: 5432
       # Google Auth (backend verifies Google ID tokens)
       GOOGLE_CLIENT_ID: ${GOOGLE_CLIENT_ID}
+      REDIS_URL: ${REDIS_URL:-redis://redis:6379/2}
+      HERITAGEGRAPH_DEV_AUTH: ${HERITAGEGRAPH_DEV_AUTH:-true}
       # CORS
       CORS_ALLOWED_ORIGINS: ${CORS_ALLOWED_ORIGINS:-http://localhost:3000,http://frontend.localhost}
+      # OCR: configuration only (actual OCR runs in `ocr-worker`, not this container)
+      OCR_ENABLED: ${OCR_ENABLED:-false}
+      TESSERACT_PATH: ${TESSERACT_PATH:-/usr/bin/tesseract}
+      ANTHROPIC_API_KEY: ${ANTHROPIC_API_KEY}
+      # In-app chat assistant (OpenRouter; tiering: apps/assistant/services/routing.py)
+      OPENROUTER_API_KEY: ${OPENROUTER_API_KEY}
+      OPENROUTER_MODEL_FAST: ${OPENROUTER_MODEL_FAST}
+      OPENROUTER_MODEL_STANDARD: ${OPENROUTER_MODEL_STANDARD}
+      OPENROUTER_MODEL_PREMIUM: ${OPENROUTER_MODEL_PREMIUM}
+      OCR_CONFIDENCE_THRESHOLD: ${OCR_CONFIDENCE_THRESHOLD:-0.6}
+      OCR_MAX_PAGES_PER_DOCUMENT: ${OCR_MAX_PAGES_PER_DOCUMENT:-100}
+      OCR_MAX_FILE_BYTES: ${OCR_MAX_FILE_BYTES:-26214400}
+      OCR_CLAUDE_VISION_MAX_CALLS_PER_DOCUMENT: ${OCR_CLAUDE_VISION_MAX_CALLS_PER_DOCUMENT:-1}
+      # Triplestore
+      OXIGRAPH_URL: http://oxigraph:7878
+      # Project contribution saves to Oxigraph via SPARQL UPDATE; reads use /query.
+      RDF_SYNC_ENABLED: ${RDF_SYNC_ENABLED:-true}
+      RDF_ENDPOINT_URL: ${RDF_ENDPOINT_URL:-http://oxigraph:7878/update}
+      RDF_QUERY_URL: ${RDF_QUERY_URL:-http://oxigraph:7878/query}
+      RDF_PUBLIC_GRAPH_URI: ${RDF_PUBLIC_GRAPH_URI:-https://cair-nepal.org/heritagegraph/graph/public}
+      RDF_RESOURCE_BASE_URI: ${RDF_RESOURCE_BASE_URI:-https://cair-nepal.org/heritagegraph/resource/}
+      RDF_SHACL_VALIDATE_ON_WRITE: ${RDF_SHACL_VALIDATE_ON_WRITE:-false}
+      HERITAGEGRAPH_SHACL_SHAPES_PATH: /app/ontology/shapes/generated-heritagegraph-minimal-shacl.ttl
+      # KG ingestion pipeline (Agent 2): host-side Ollama
+      OLLAMA_HOST: ${OLLAMA_HOST:-http://host.docker.internal:11434}
+      HERITAGEGRAPH_OLLAMA_MODEL: ${HERITAGEGRAPH_OLLAMA_MODEL:-llama3:latest}
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
     depends_on:
       postgres:
         condition: service_healthy
+      redis:
+        condition: service_healthy
     volumes:
       - ./heritage_graph:/app/heritage_graph
+      - ./ontology:/app/ontology
+      - ./tools:/app/tools
+      - ./.cursor:/home/nabin/projects/heritagegraph/.cursor
       - backend-static:/app/heritage_graph/staticfiles
       - backend-media:/app/heritage_graph/media
     networks:
@@ -134,7 +170,9 @@ services:
       - 8000
     labels:
       - "traefik.enable=true"
-      - "traefik.http.routers.backend.rule=Host(`backend.localhost`) || PathPrefix(`/api`)"
+      # Route backend for both host-based API access and path-based access.
+      # The app uses endpoints like /data/* and /cidoc/* (not just /api/*).
+      - "traefik.http.routers.backend.rule=Host(`backend.localhost`) || PathPrefix(`/api`) || PathPrefix(`/data`) || PathPrefix(`/cidoc`) || PathPrefix(`/health`) || PathPrefix(`/docs`) || PathPrefix(`/redoc`) || PathPrefix(`/schema`)"
       - "traefik.http.routers.backend.entrypoints=web"
       - "traefik.http.services.backend.loadbalancer.server.port=8000"
       - "traefik.http.services.backend.loadbalancer.healthcheck.path=/health"
@@ -157,8 +195,17 @@ services:
   # ---------------------------------------------------------------
   frontend:
     build:
-      context: ./heritage_graph_ui
-      dockerfile: Dockerfile
+      context: .
+      dockerfile: heritage_graph_ui/Dockerfile
+      # NEXT_PUBLIC_* must be passed at BUILD time (inlined into the client
+      # bundle); the runtime `environment` block below does not affect them.
+      args:
+        NEXT_PUBLIC_API_URL: ${NEXT_PUBLIC_API_URL:-http://backend.localhost/api}
+        NEXT_PUBLIC_APP_URL: ${NEXT_PUBLIC_APP_URL:-http://frontend.localhost}
+        NEXT_PUBLIC_DEV_AUTH: ${HERITAGEGRAPH_DEV_AUTH:-true}
+        NEXT_PUBLIC_RDF_RESOURCE_BASE_URI: ${NEXT_PUBLIC_RDF_RESOURCE_BASE_URI:-https://cair-nepal.org/heritagegraph/resource/}
+        NEXT_PUBLIC_ATLAS_SHOW_ERROR_DETAIL: ${NEXT_PUBLIC_ATLAS_SHOW_ERROR_DETAIL:-false}
+        NEXT_PUBLIC_SHOW_FORM_GRAPH: ${NEXT_PUBLIC_SHOW_FORM_GRAPH:-false}
     container_name: heritage-frontend
     restart: unless-stopped
     environment:
@@ -169,6 +216,7 @@ services:
       NEXTAUTH_SECRET: ${NEXTAUTH_SECRET:-dev-nextauth-secret-change-in-production}
       GOOGLE_CLIENT_ID: ${GOOGLE_CLIENT_ID}
       GOOGLE_CLIENT_SECRET: ${GOOGLE_CLIENT_SECRET}
+      NEXT_PUBLIC_DEV_AUTH: ${HERITAGEGRAPH_DEV_AUTH:-true}
       # Standalone server must listen on all interfaces
       HOSTNAME: "0.0.0.0"
       PORT: "3000"
@@ -197,17 +245,23 @@ services:
         max-file: "3"
 
   # ---------------------------------------------------------------
-  # Landing Page (Next.js)
-  # Marketing/landing page
+  # Marketing landing (Next.js) — same design tokens as dashboard
   # ---------------------------------------------------------------
   landing:
     build:
       context: ./heritage_graph_landing
       dockerfile: Dockerfile
+      args:
+        NEXT_PUBLIC_APP_URL: ${NEXT_PUBLIC_APP_URL:-http://frontend.localhost}
+        NEXT_PUBLIC_API_URL: ${NEXT_PUBLIC_API_URL:-http://backend.localhost}
     container_name: heritage-landing
     restart: unless-stopped
     environment:
       NODE_ENV: production
+      HOSTNAME: "0.0.0.0"
+      PORT: "3000"
+      NEXT_PUBLIC_APP_URL: ${NEXT_PUBLIC_APP_URL:-http://frontend.localhost}
+      NEXT_PUBLIC_API_URL: ${NEXT_PUBLIC_API_URL:-http://backend.localhost}
     networks:
       - proxy
     expose:
@@ -218,10 +272,69 @@ services:
       - "traefik.http.routers.landing.entrypoints=web"
       - "traefik.http.services.landing.loadbalancer.server.port=3000"
     healthcheck:
-      test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://localhost:3000"]
+      test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://127.0.0.1:3000"]
       interval: 30s
       timeout: 10s
       retries: 3
+      start_period: 40s
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
+
+  # ---------------------------------------------------------------
+  # Redis Cache & Message Broker
+  # Used by Celery for async task queue
+  # ---------------------------------------------------------------
+  redis:
+    image: redis:7-alpine
+    container_name: heritage-redis
+    restart: unless-stopped
+    command: redis-server --maxmemory 512mb --maxmemory-policy allkeys-lru
+    volumes:
+      - redis-data:/data
+    networks:
+      - backend
+    expose:
+      - 6379
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
+
+  # ---------------------------------------------------------------
+  # OCR / document-ingestion worker — SUSPENDED (future functionality)
+  # The OCR + document-to-graph pipeline is currently paused and not part of
+  # the active deployment. The Celery worker service has been removed from the
+  # running stack; its full definition is preserved in git history. To
+  # re-enable: restore the `ocr-worker` service, build the `ocr-worker` image
+  # target, and set OCR_ENABLED=true. (`OCR_ENABLED` defaults to false.)
+  # ---------------------------------------------------------------
+
+  # ---------------------------------------------------------------
+  # Oxigraph Triplestore
+  # SPARQL 1.1 endpoint storing all knowledge graph triples
+  # ---------------------------------------------------------------
+  oxigraph:
+    image: ghcr.io/oxigraph/oxigraph:latest
+    container_name: heritage-oxigraph
+    restart: unless-stopped
+    command: serve --location /data --bind 0.0.0.0:7878
+    volumes:
+      - oxigraph-data:/data
+    networks:
+      - backend
+    expose:
+      - 7878
+    healthcheck:
+      test: ["NONE"]
     logging:
       driver: "json-file"
       options:
@@ -236,11 +349,15 @@ services:
 volumes:
   postgres-data:
     driver: local
+  redis-data:
+    driver: local
   backend-static:
     driver: local
   backend-media:
     driver: local
   traefik-logs:
+    driver: local
+  oxigraph-data:
     driver: local
 
 # ================================================================
@@ -252,4 +369,5 @@ networks:
     driver: bridge
   # Backend network for inter-service communication
   backend:
+    driver: bridge
 

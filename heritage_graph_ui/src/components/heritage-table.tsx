@@ -2,6 +2,9 @@
 
 import * as React from 'react';
 import Link from 'next/link';
+import { dataApiPath } from '@/lib/api-paths';
+import { apiFetchJson, getApiErrorMessage } from '@/lib/api-client';
+import { limitOffsetSearchParams, totalPages } from '@/lib/drf-pagination';
 import {
   closestCenter,
   DndContext,
@@ -101,7 +104,7 @@ import { useState } from 'react';
 
 // --- 1. UPDATED SCHEMA TO MATCH API RESPONSE ---
 export const schema = z.object({
-  id: z.number(),
+  id: z.union([z.number(), z.string()]),
   title: z.string(),
   description: z.string(),
   contributor: z.string(),
@@ -207,7 +210,7 @@ const columns: ColumnDef<z.infer<typeof schema>>[] = [
     cell: ({ row }) => {
       const contributor = row.original.contributor;
       return (
-        <Link href={`/dashboard/users/${contributor}`}>
+        <Link href={`/users/${contributor}`}>
           <Badge variant="secondary" className="cursor-pointer">
             @{contributor}
           </Badge>
@@ -264,7 +267,7 @@ const columns: ColumnDef<z.infer<typeof schema>>[] = [
       const id = row.original.id;
       return (
         <Button variant="ghost" size="sm" asChild>
-           <Link href={`/dashboard/knowledge/entity/view/${id}`}>View</Link>
+           <Link href={`/knowledge/entity/view/${id}`}>View</Link>
         </Button>
       );
     },
@@ -359,26 +362,40 @@ export function DataTable() {
   React.useEffect(() => {
     const fetchData = async () => {
       try {
-        const url = "http://127.0.0.1:8000/cidoc/search/?q=mahadev";
-        const response = await fetch(url);
-        const result = await response.json();
-
-        // The JSON response structure is { persons: [...] }
-        const rows = result.persons || [];
-        
+        const sp = limitOffsetSearchParams(
+          pagination.pageIndex + 1,
+          pagination.pageSize,
+        );
+        const result = await apiFetchJson<{
+          count: number;
+          results: Array<{
+            submission_id: string;
+            title: string;
+            description: string;
+            contributor: number;
+            contributor_username?: string;
+            status: string;
+            created_at: string;
+          }>;
+        }>(`${dataApiPath('submissions')}?${sp}`, {
+          headers: { Accept: 'application/json' },
+        });
+        const rows = (result.results ?? []).map((row) => ({
+          id: row.submission_id,
+          title: row.title,
+          description: row.description ?? '',
+          contributor: String(row.contributor_username ?? row.contributor),
+          status: row.status,
+          created_at: row.created_at,
+          name: row.title,
+        }));
         setData(rows);
-        
-        // Handle count if your API provides it for pagination
-        if (result.count) {
-          setPageCount(Math.ceil(result.count / pagination.pageSize));
-        } else {
-           // Fallback if no count is returned (client side pagination simulation)
-           setPageCount(Math.ceil(rows.length / pagination.pageSize));
-        }
+        setPageCount(totalPages(result.count, pagination.pageSize));
 
       } catch (error) {
-        console.error('Error fetching data:', error);
-        toast.error('Failed to load submissions');
+        toast.error(
+          getApiErrorMessage(error, 'Could not load search results. Please try again.')
+        );
       } finally {
         setLoading(false);
       }
@@ -662,7 +679,7 @@ function TableCellViewer({ item }: { item: z.infer<typeof schema> }) {
             className="text-foreground w-fit px-0 text-left hover:underline"
             onClick={() => {
               setOpen(false);
-              window.location.href = `/dashboard/knowledge/entity/view/${item.id}`;
+              window.location.href = `/knowledge/entity/view/${item.id}`;
             }}
           >
             {item.title}
@@ -675,7 +692,7 @@ function TableCellViewer({ item }: { item: z.infer<typeof schema> }) {
               @{item.contributor}
             </p>
             <Link
-              href={`/dashboard/users/${item.contributor}`}
+              href={`/users/${item.contributor}`}
               className="flex items-center gap-2"
             >
               <Button variant="default" size="sm">
@@ -684,7 +701,7 @@ function TableCellViewer({ item }: { item: z.infer<typeof schema> }) {
             </Link>
           </div>
 
-          <Link href={`/dashboard/knowledge/entity/view/${item.id}`}>
+          <Link href={`/knowledge/entity/view/${item.id}`}>
             <Button variant="secondary" className="w-full" size="sm">
               View Submission
             </Button>
@@ -791,7 +808,7 @@ function TableCellViewer({ item }: { item: z.infer<typeof schema> }) {
           </div>
           <DrawerFooter>
             <Button variant="outline">
-              <a href={`/dashboard/knowledge/entity/view/${item.id}`}>
+              <a href={`/knowledge/entity/view/${item.id}`}>
                 View Detail
               </a>
             </Button>

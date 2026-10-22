@@ -8,6 +8,7 @@ from .models import (
     Contributor,
     CulturalEntity,
     CulturalHeritage,
+    EntityProposal,
     Fork,
     Media,
     Moderation,
@@ -16,18 +17,23 @@ from .models import (
     OrganizationMembership,
     PublicContribution,
     Reaction,
+    RelationshipProposal,
     ReviewDecision,
+    ReviewerApplication,
     ReviewerRole,
     ReviewFlag,
     Revision,
+    SchemaExtensionAuditEvent,
+    SchemaExtensionProposal,
     Share,
     Submission,
     SubmissionEditSuggestion,
     SubmissionVersion,
+    TriagePolicy,
     UserProfile,
     UserStats,
+    UserStatsSnapshot,
 )
-
 
 # =====================================================================
 # CULTURAL ENTITY WORKFLOW (core contribution pipeline)
@@ -271,6 +277,101 @@ class ReviewerRoleAdmin(admin.ModelAdmin):
             return "-"
         return ", ".join(obj.expertise_areas[:3]) + ("..." if len(obj.expertise_areas) > 3 else "")
     expertise_preview.short_description = "Expertise"
+
+
+@admin.register(ReviewerApplication)
+class ReviewerApplicationAdmin(admin.ModelAdmin):
+    list_display = (
+        "user",
+        "status_colored",
+        "message_preview",
+        "created_at",
+        "reviewed_by",
+        "reviewed_at",
+    )
+    list_filter = ("status", "created_at")
+    search_fields = ("user__username", "user__email", "message", "admin_notes")
+    readonly_fields = (
+        "id",
+        "user",
+        "created_at",
+        "updated_at",
+        "reviewed_by",
+        "reviewed_at",
+    )
+    list_select_related = ("user", "reviewed_by")
+    list_per_page = 25
+    actions = ("approve_as_community_reviewer", "reject_applications")
+    ordering = ("-created_at",)
+
+    fieldsets = (
+        (
+            "Application",
+            {
+                "fields": ("id", "user", "message", "status", "admin_notes"),
+            },
+        ),
+        (
+            "Review",
+            {
+                "fields": ("reviewed_by", "reviewed_at"),
+            },
+        ),
+        (
+            "Timestamps",
+            {
+                "fields": ("created_at", "updated_at"),
+            },
+        ),
+    )
+
+    @admin.action(description="Approve — grant community reviewer (via model)")
+    def approve_as_community_reviewer(self, request, queryset):
+        count = 0
+        for app in queryset:
+            if app.approve(request.user):
+                count += 1
+        self.message_user(
+            request,
+            f"Approved {count} application(s). User(s) now have community reviewer + Reviewers group.",
+        )
+
+    @admin.action(description="Reject selected pending applications")
+    def reject_applications(self, request, queryset):
+        count = 0
+        for app in queryset:
+            if app.reject(request.user):
+                count += 1
+        self.message_user(request, f"Rejected {count} application(s).")
+
+    def has_add_permission(self, request):
+        return False
+
+    def status_colored(self, obj):
+        color_map = {
+            "pending": "#DAA520",
+            "approved": "#228B22",
+            "rejected": "#B22222",
+        }
+        color = color_map.get(obj.status, "#000000")
+        return format_html(
+            '<b style="color:{};">{}</b>', color, obj.get_status_display()
+        )
+
+    status_colored.short_description = "Status"
+
+    def message_preview(self, obj):
+        if not obj.message:
+            return "—"
+        t = obj.message.replace("\n", " ")
+        return (t[:80] + "…") if len(t) > 80 else t
+
+    message_preview.short_description = "Message"
+
+    def get_readonly_fields(self, request, obj=None):
+        if obj and obj.status != "pending":
+            return self.readonly_fields + ("message", "status")
+        return self.readonly_fields
 
 
 @admin.register(ReviewDecision)
@@ -527,9 +628,9 @@ class CulturalHeritageAdmin(admin.ModelAdmin):
 
 @admin.register(Media)
 class MediaAdmin(admin.ModelAdmin):
-    list_display = ("submission", "media_type", "file", "description")
+    list_display = ("submission", "cultural_entity", "media_type", "file", "description")
     list_filter = ("media_type",)
-    search_fields = ("file", "description")
+    search_fields = ("file", "description", "submission__submission_id", "cultural_entity__name")
 
 
 @admin.register(Contributor)
@@ -593,13 +694,29 @@ class UserStatsAdmin(admin.ModelAdmin):
     list_display = (
         "user",
         "total_submissions",
+        "total_reviewed",
+        "accepted_count",
         "approval_rate",
         "contributor_rank",
-        "community_impact_score",
         "updated_at",
     )
     search_fields = ("user__username",)
     readonly_fields = ("updated_at",)
+
+
+@admin.register(UserStatsSnapshot)
+class UserStatsSnapshotAdmin(admin.ModelAdmin):
+    list_display = (
+        "user",
+        "period",
+        "total_submissions",
+        "contributor_rank",
+        "approval_rate",
+        "created_at",
+    )
+    list_filter = ("period",)
+    search_fields = ("user__username",)
+    readonly_fields = ("created_at",)
 
 
 @admin.register(UserProfile)
@@ -687,6 +804,54 @@ class PublicContributionAdmin(admin.ModelAdmin):
     def mark_rejected(self, request, queryset):
         from django.utils import timezone
         queryset.update(status='rejected', reviewed_by=request.user, reviewed_at=timezone.now())
+
+
+# =====================================================================
+# TRIAGE + SCHEMA EXTENSION PROPOSALS (006)
+# =====================================================================
+
+
+@admin.register(TriagePolicy)
+class TriagePolicyAdmin(admin.ModelAdmin):
+    list_display = ("id", "is_active", "w_age", "w_flags", "w_conflict", "w_source", "updated_at")
+    list_filter = ("is_active",)
+
+
+class SchemaExtensionAuditInline(admin.TabularInline):
+    model = SchemaExtensionAuditEvent
+    extra = 0
+    readonly_fields = ("id", "actor", "action", "from_status", "to_status", "comment", "created_at")
+    can_delete = False
+
+
+@admin.register(SchemaExtensionProposal)
+class SchemaExtensionProposalAdmin(admin.ModelAdmin):
+    list_display = ("title", "status", "author", "created_at", "submitted_at")
+    list_filter = ("status",)
+    search_fields = ("title", "description")
+    readonly_fields = ("id", "created_at", "updated_at")
+    inlines = (SchemaExtensionAuditInline,)
+
+
+@admin.register(EntityProposal)
+class EntityProposalAdmin(admin.ModelAdmin):
+    list_display = ("canonical_label", "status", "type_scope", "author", "created_at")
+    list_filter = ("status", "type_scope")
+    search_fields = ("canonical_label", "contributor_note")
+    readonly_fields = ("id", "created_at", "updated_at", "materialized_cluster")
+
+
+@admin.register(RelationshipProposal)
+class RelationshipProposalAdmin(admin.ModelAdmin):
+    list_display = ("id", "status", "predicate", "author", "created_at")
+    list_filter = ("status",)
+    readonly_fields = ("id", "created_at", "updated_at", "materialized_assertion")
+
+
+@admin.register(SchemaExtensionAuditEvent)
+class SchemaExtensionAuditEventAdmin(admin.ModelAdmin):
+    list_display = ("proposal", "action", "actor", "created_at")
+    list_filter = ("action",)
 
 
 # =====================================================================

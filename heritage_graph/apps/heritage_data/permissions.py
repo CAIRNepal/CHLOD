@@ -1,5 +1,6 @@
 # heritage_data/permissions.py
 from rest_framework import permissions
+from rest_framework.exceptions import PermissionDenied
 
 
 class IsContributorOrReadOnly(permissions.BasePermission):
@@ -80,3 +81,46 @@ class IsExpertCurator(permissions.BasePermission):
             request.user.reviewer_role.is_active
             and request.user.reviewer_role.role == 'expert_curator'
         )
+
+
+class IsStaffOrExpertCurator(permissions.BasePermission):
+    """
+    Staff or active expert curator — can enumerate reviewer roles (admin UI).
+    """
+
+    def has_permission(self, request, view):
+        if request.user.is_staff:
+            return True
+        if not hasattr(request.user, 'reviewer_role'):
+            return False
+        rr = request.user.reviewer_role
+        return rr.is_active and rr.role == 'expert_curator'
+
+
+class CannotApproveOwnMergeRequest(permissions.BasePermission):
+    """
+    Hard rule: the user who opened a MergeRequest cannot be its approver.
+
+    Applied as an object-level permission on the approve/ action.
+    """
+
+    message = "You cannot approve your own merge request."
+
+    def has_object_permission(self, request, view, obj):
+        if request.user == obj.opened_by:
+            raise PermissionDenied(self.message)
+        return True
+
+
+class IsSchemaExtensionModerator(permissions.BasePermission):
+    """
+    Moderators Django group or staff — approve/reject/publish schema extension proposals.
+    Staff is included for operational parity with other moderator gates in the codebase.
+    """
+
+    def has_permission(self, request, view):
+        if not request.user or not request.user.is_authenticated:
+            return False
+        if request.user.is_staff:
+            return True
+        return request.user.groups.filter(name="Moderators").exists()

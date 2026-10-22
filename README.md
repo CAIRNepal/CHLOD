@@ -32,7 +32,7 @@ Sounds interesting and want to try it out?
 Clone the repository:
 
 ```bash
-git clone https://github.com/CAIRNepal/CHLOD
+git clone https://github.com/CAIRNepal/heritagegraph
 ```
 
 Switch to the working branch (`v1`):
@@ -64,18 +64,22 @@ Once running, access:
 | Authentication | NextAuth (Google OAuth in production) | Authentication provider used by the frontend and backend |
 | Traefik | http://traefik.localhost:8080 | Reverse proxy dashboard |
 
-> 📖 **Full deployment guide**: See [DEPLOYMENT.md](DEPLOYMENT.md) for production setup, SSL, backups, and more.
+> 📖 **Full deployment guide**: See [documentation/deployment/DEPLOYMENT.md](documentation/deployment/DEPLOYMENT.md) for production setup, SSL, backups, and more.
+
+> 📖 **Dokploy**: Compose stack (`docker-compose-dokploy.yml`) and automatic Dokploy redeploy when **`v1`** advances are documented in [DOKPLOY.md](documentation/deployment/DOKPLOY.md) (GitHub Actions hook + optional Git webhook).
 
 ### Useful Commands
 
 ```bash
-make help           # Show all available commands
-make up             # Start services
-make down           # Stop services
-make logs           # View logs
-make health         # Check service health
-make backup         # Backup database
-make prod-up        # Start in production mode
+make help              # Show all available commands
+make docker-up         # Start all Docker services
+make docker-down       # Stop services
+make docker-logs       # View logs
+make backend           # Local Django dev server
+make frontend          # Local Next.js dev server
+make test-e2e          # Platform E2E test suite
+make backup            # Backup database
+make prod-up           # Start in production mode
 ```
 
 ---
@@ -99,26 +103,41 @@ npm run dev
 
 Access the app at:
 
-- Landing page → [http://localhost:3000](http://localhost:3000)
-- Dashboard → [http://localhost:3000/dashboard](http://localhost:3000/dashboard)
+- Main app (authenticated UI) → [http://localhost:3000/](http://localhost:3000/)
+- Marketing landing (Docker + Traefik) → [http://landing.localhost](http://landing.localhost)
+- **Platform admin** (staff or expert curators only) → `/platform-admin/users` — see [Platform admin](#platform-admin-in-app) below
+
+---
+
+## Platform admin (in-app)
+
+The dashboard includes a **platform admin** area for day-to-day user and reviewer access management. It complements the Django admin (`/admin/`): use Django admin for full model access and superuser setup; use the in-app UI for searchable user directory and **reviewer role assignment**.
+
+| | |
+|--|--|
+| **UI routes** | `/platform-admin` (redirects to `/platform-admin/users`), `/platform-admin/users/[id]` for detail and role assignment |
+| **Who can access** | Django **`is_staff`** users, or users with an active **expert curator** reviewer role (`can_manage_roles` in `/api/user/info`) |
+| **User directory API** | `GET /data/api/platform-admin/users/` — list & retrieve; supports `search`, `ordering`, and limit/offset pagination |
+| **Assign reviewer role** | `POST /data/api/reviewer-roles/assign/` — updates `ReviewerRole` and syncs **`Reviewers`** / **`Moderators`** Django groups |
+
+Ensure role groups exist (e.g. `python manage.py setup_roles`). See [AUTH_ROLES_DEVELOPER_GUIDE.md](documentation/auth/AUTH_ROLES_DEVELOPER_GUIDE.md) for how contributor, reviewer, staff, and `ReviewerRole` map to permissions.
 
 ---
 
 ## ⚙️ Backend
 
-The backend is powered by **Django REST Framework** and uses **Keycloak** for authentication (JWT via OIDC).
+The backend is powered by **Django REST Framework** and uses **Google OAuth** for authentication (NextAuth issues a Google ID token that Django verifies via `google-auth`).
 
 > ⚠️ **Note:** Make sure to set up the required `.env` file (see `.env.example`).
 
 Setup:
 
 ```bash
-cd .. # Make sure you are in main directory
-python -m venv .myvenv
-source .myvenv/bin/activate  # Linux/Mac
-pip install uv
-uv pip install -r requirements.txt
-python manage.py makemigrations
+# From repo root — or use: make setup
+python3 -m venv .venv
+source .venv/bin/activate   # Linux/Mac
+pip install -r heritage_graph/requirements.txt
+cd heritage_graph
 python manage.py migrate
 ```
 
@@ -138,6 +157,7 @@ Access the backend at (development):
 
 - API → `http://backend.localhost/api` or `http://localhost:8000`
 - Admin dashboard → `http://backend.localhost/admin` or `http://localhost:8000/admin` (use superuser credentials)
+- Platform admin APIs → under `/data/api/platform-admin/` and `/data/api/reviewer-roles/` (Bearer token; staff or expert curator as documented above)
 
 ---
 
@@ -150,22 +170,23 @@ Access the backend at (development):
 
 ## 📚 Documentation for AI Agents & Developers
 
-This project includes comprehensive documentation designed to help both human developers and AI coding assistants work effectively:
+This project includes comprehensive documentation designed to help both human developers and AI coding assistants work effectively. **See [DOCS.md](DOCS.md) for the full categorized index;** the most-used docs are listed below.
 
-**Documentation site:** A consolidated MkDocs site lives in the `docs/` folder and is configured to publish to GitHub Pages via CI. Visit the published site at: https://cairnepal.github.io/heritagegraph/ (update if your org URL differs).
+**Documentation hub:** [`documentation/README.md`](documentation/README.md) — topic guides, testing, deployment, and internal notes.
 
 | Document | Purpose |
 |----------|---------|
 | [AGENTS.md](AGENTS.md) | 🤖 **Start here** — Master guide for AI agents. Project overview, critical rules, directory structure, API summary |
-| [FORMS.md](FORMS.md) | 📋 **How forms work** — Add fields, enums, sections, and new entity types. Registry-driven form system guide |
-| [AUTH.md](AUTH.md) | 🔐 Authentication system — NextAuth + Google OAuth + Django token verification |
-| [CLAUDE.md](CLAUDE.md) | 📝 Coding conventions and patterns for both Python/Django and TypeScript/Next.js |
-| [SKILLS.md](SKILLS.md) | 🗺️ Feature capability matrix — maps every feature to exact files with status indicators |
-| [ARCHITECTURE.md](ARCHITECTURE.md) | 🏗️ System design with ASCII diagrams — network topology, auth flow, data models, Docker lifecycle |
-| [CONVENTIONS.md](CONVENTIONS.md) | 📏 Naming rules, import ordering, code style patterns for all languages in the project |
-| [PLATFORM_PLAN.md](PLATFORM_PLAN.md) | 🗺️ Contributing platform vision — phased roadmap, data flow, API contracts |
-| [TROUBLESHOOTING.md](TROUBLESHOOTING.md) | 🔧 Known issues, gotchas, debugging tips, and deployment checklist |
-| [DEPLOYMENT.md](DEPLOYMENT.md) | 🚀 Full deployment guide — Docker setup, production config, SSL, backups, monitoring |
+| [documentation/ontology/ONTOLOGY.md](documentation/ontology/ONTOLOGY.md) | 🧬 **Ontology v1.0.0** — registry types, lifecycle events, enums, LUX interop |
+| [documentation/contribution/FORMS.md](documentation/contribution/FORMS.md) | 📋 **How forms work** — Add fields, enums, sections, and new entity types |
+| [documentation/auth/AUTH.md](documentation/auth/AUTH.md) | 🔐 Authentication — NextAuth + Google OAuth + Django token verification |
+| [documentation/auth/AUTH_ROLES_DEVELOPER_GUIDE.md](documentation/auth/AUTH_ROLES_DEVELOPER_GUIDE.md) | 👥 Roles & permissions — contributor / reviewer / staff |
+| [CLAUDE.md](CLAUDE.md) | 📝 Coding conventions for Python/Django and TypeScript/Next.js |
+| [documentation/developer/SKILLS.md](documentation/developer/SKILLS.md) | 🗺️ Feature capability matrix |
+| [ARCHITECTURE.md](ARCHITECTURE.md) | 🏗️ System design — topology, auth flow, data models, Docker |
+| [documentation/testing/TESTING.md](documentation/testing/TESTING.md) | ✅ E2E tests and validation (`make test-e2e`, `tests/`) |
+| [documentation/TROUBLESHOOTING.md](documentation/TROUBLESHOOTING.md) | 🔧 Known issues, debugging, deploy checklist |
+| [documentation/deployment/DEPLOYMENT.md](documentation/deployment/DEPLOYMENT.md) | 🚀 Production Docker, SSL, backups |
 
 > **AI agents:** Read `AGENTS.md` first, then consult other files as needed for your task.
 
@@ -173,10 +194,13 @@ This project includes comprehensive documentation designed to help both human de
 
 ## 📜 License
 
-Apache 2.0
+HeritageGraph is released under the [MIT License](LICENSE) — code, ontology, and data. If you
+use it in your research, please cite it (see [`CITATION.cff`](CITATION.cff)).
 
 
-# Nepal Cultural heritage Linked Open Data (NCHLOD)
-This repository contains the LinkML code for NCHLOD. It includes the following components:
+## Nepal Cultural Heritage Linked Open Data (NCHLOD)
 
-1. `schema.yaml`: Defines the schema for NCHLOD.
+The canonical LinkML schema is [`ontology/HeritageGraph.yaml`](ontology/HeritageGraph.yaml) (**v1.0.0**,
+event-centric CIDOC-CRM + PROV-O). UI types are listed in `tools/ui-classmap.yaml` (see
+[`documentation/ontology/ONTOLOGY.md`](documentation/ontology/ONTOLOGY.md)). Regenerate derived
+artifacts with `make generate` or `make ontology`.

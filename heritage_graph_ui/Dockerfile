@@ -1,51 +1,74 @@
 # ================================================================
 # Multi-stage build for Next.js Frontend (heritage_graph_ui)
+# Build context MUST be the repository root (see docker-compose files).
 # ================================================================
 
-# Stage 1: Dependencies
+# Stage 1: Dependencies (optional layer cache; runner uses builder standalone)
 FROM node:20-alpine AS dependencies
 
-WORKDIR /app
+WORKDIR /repo/heritage_graph_ui
 
 ARG NEXT_PUBLIC_API_URL
 ENV NEXT_PUBLIC_API_URL=$NEXT_PUBLIC_API_URL
 
+COPY heritage_graph_ui/package.json heritage_graph_ui/package-lock.json* heritage_graph_ui/pnpm-lock.yaml* ./
+COPY heritage_graph_ui/scripts/ ./scripts/
 
-# Copy package files
-COPY package.json package-lock.json* pnpm-lock.yaml* ./
-
-# Install production dependencies
 RUN npm ci --only=production 2>/dev/null || npm install --only=production
 
 # ================================================================
 # Stage 2: Builder
 FROM node:20-alpine AS builder
 
-WORKDIR /app
+# prebuild runs: python3 ../tools/gen_heritage_viz_config.py (needs PyYAML + repo ontology/tools)
+RUN apk add --no-cache python3 py3-yaml
 
-# Copy package files and install all deps (including dev)
-COPY package.json package-lock.json* pnpm-lock.yaml* ./
-RUN npm ci 2>/dev/null || npm install
+WORKDIR /repo
 
-# Copy source code
-COPY . .
+# Install deps before full source copy (better layer cache)
+COPY heritage_graph_ui/package.json heritage_graph_ui/package-lock.json* heritage_graph_ui/pnpm-lock.yaml* heritage_graph_ui/
+COPY heritage_graph_ui/scripts/ heritage_graph_ui/scripts/
+RUN cd heritage_graph_ui && (npm ci 2>/dev/null || npm install)
+
+COPY ontology/ ontology/
+COPY tools/ tools/
+COPY heritage_graph_ui/ heritage_graph_ui/
+
+WORKDIR /repo/heritage_graph_ui
 
 # Build-time arguments (for Next.js to pick up env variables during build)
+# NOTE: NEXT_PUBLIC_* vars are inlined into the client bundle at BUILD time,
+# so they MUST be passed as build args (compose `build.args`), not just runtime
+# `environment`. Server-side vars (NEXTAUTH_*, GOOGLE_*) are read at runtime by
+# the standalone server and only need placeholders here.
 ARG NEXTAUTH_URL
 ARG NEXTAUTH_SECRET
 ARG GOOGLE_CLIENT_ID
 ARG GOOGLE_CLIENT_SECRET
 ARG NEXT_PUBLIC_API_URL
+ARG NEXT_PUBLIC_APP_URL
+ARG NEXT_PUBLIC_DEV_AUTH
+ARG NEXT_PUBLIC_RDF_RESOURCE_BASE_URI
+ARG NEXT_PUBLIC_CESIUM_ION_ACCESS_TOKEN
+ARG NEXT_PUBLIC_ATLAS_SHOW_ERROR_DETAIL
+ARG NEXT_PUBLIC_SHOW_FORM_GRAPH
 
-# Set build-time environment variables (placeholders so build doesn't fail;
-# real values are injected at runtime via docker-compose environment)
+# Server-side placeholders (real values injected at runtime via compose environment).
 ENV NEXTAUTH_URL=${NEXTAUTH_URL:-http://localhost:3000}
 ENV NEXTAUTH_SECRET=${NEXTAUTH_SECRET:-build-placeholder}
 ENV GOOGLE_CLIENT_ID=${GOOGLE_CLIENT_ID:-build-placeholder}
 ENV GOOGLE_CLIENT_SECRET=${GOOGLE_CLIENT_SECRET:-build-placeholder}
+# Client (NEXT_PUBLIC_*) values — baked into the bundle now.
 ENV NEXT_PUBLIC_API_URL=${NEXT_PUBLIC_API_URL:-http://localhost:8000}
+ENV NEXT_PUBLIC_APP_URL=${NEXT_PUBLIC_APP_URL:-http://localhost:3000}
+ENV NEXT_PUBLIC_DEV_AUTH=${NEXT_PUBLIC_DEV_AUTH:-false}
+ENV NEXT_PUBLIC_RDF_RESOURCE_BASE_URI=${NEXT_PUBLIC_RDF_RESOURCE_BASE_URI:-https://cair-nepal.org/heritagegraph/resource/}
+ENV NEXT_PUBLIC_CESIUM_ION_ACCESS_TOKEN=${NEXT_PUBLIC_CESIUM_ION_ACCESS_TOKEN:-}
+ENV NEXT_PUBLIC_ATLAS_SHOW_ERROR_DETAIL=${NEXT_PUBLIC_ATLAS_SHOW_ERROR_DETAIL:-false}
+ENV NEXT_PUBLIC_SHOW_FORM_GRAPH=${NEXT_PUBLIC_SHOW_FORM_GRAPH:-false}
 
-# Build Next.js app
+# `npm run build` runs prebuild (copy-cesium-assets + viz config). Do not use plain `next build`
+# without copying Cesium into public/cesium — Heritage Atlas would fail at runtime.
 RUN npm run build
 
 # ================================================================
@@ -61,22 +84,16 @@ WORKDIR /app
 ENV NODE_ENV=production \
     NEXT_TELEMETRY_DISABLED=1
 
-# Runtime environment variables (overridable at container start)
-ENV NEXTAUTH_URL=$NEXTAUTH_URL
-ENV NEXTAUTH_SECRET=$NEXTAUTH_SECRET
-ENV GOOGLE_CLIENT_ID=$GOOGLE_CLIENT_ID
-ENV GOOGLE_CLIENT_SECRET=$GOOGLE_CLIENT_SECRET
-# Internal backend URL for server-side calls (NextAuth callbacks)
-# Uses Docker service name so SSR doesn't go through public DNS
+# NextAuth / Google: set at container runtime (e.g. compose `environment:`), not baked here.
+# Internal backend URL for server-side calls (NextAuth server-side)
 ENV INTERNAL_BACKEND_URL=http://backend:8000
 
-# Copy package.json
-COPY package.json ./
+COPY --from=builder /repo/heritage_graph_ui/package.json ./
 
 # Copy production dependencies from standalone output
-COPY --from=builder --chown=nextjs:nodejs /app/.next/standalone ./
-COPY --from=builder --chown=nextjs:nodejs /app/.next/static ./.next/static
-COPY --from=builder --chown=nextjs:nodejs /app/public ./public
+COPY --from=builder --chown=nextjs:nodejs /repo/heritage_graph_ui/.next/standalone ./
+COPY --from=builder --chown=nextjs:nodejs /repo/heritage_graph_ui/.next/static ./.next/static
+COPY --from=builder --chown=nextjs:nodejs /repo/heritage_graph_ui/public ./public
 
 # Switch to non-root user
 USER nextjs

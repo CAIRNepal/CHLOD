@@ -6,43 +6,30 @@ import Link from 'next/link';
 import { motion } from 'framer-motion';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Badge } from '@/components/ui/badge';
 import { Progress } from '@/components/ui/progress';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 import { RankAvatar, getTierFromName, tierConfig, type TierType } from '@/components/rank-avatar';
 import { cn } from '@/lib/utils';
 import {
   IconTrophy,
-  IconMedal,
   IconFlame,
   IconArrowRight,
   IconSparkles,
-  IconStar,
-  IconArchive,
-  IconPencil,
-  IconSearch,
-  IconPhoto,
   IconChevronRight,
-  IconTarget,
 } from '@tabler/icons-react';
 
-const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000';
+import { apiFetchJson } from '@/lib/api-client';
+import { getPublicApiUrl } from '@/lib/api-base';
 
-/* ── Track data (matches progression page) ── */
-const trackInfo = {
-  curation: { name: 'Curation', icon: IconArchive, gradient: 'from-amber-500 to-orange-600', color: 'text-amber-600' },
-  annotation: { name: 'Annotation', icon: IconPencil, gradient: 'from-emerald-500 to-teal-600', color: 'text-emerald-600' },
-  verification: { name: 'Verification', icon: IconSearch, gradient: 'from-orange-600 to-red-600', color: 'text-orange-600' },
-  exhibition: { name: 'Exhibition', icon: IconPhoto, gradient: 'from-violet-500 to-purple-600', color: 'text-violet-600' },
-};
+const API_BASE_URL = getPublicApiUrl();
 
 /* ── Tier display info ── */
-const tierDisplay: Record<string, { name: string; icon: string; next: string | null; gradient: string }> = {
-  apprentice: { name: 'Apprentice', icon: '🕯️', next: 'Scholar', gradient: 'from-gray-400 to-gray-500' },
-  scholar: { name: 'Scholar', icon: '📚', next: 'Curator', gradient: 'from-emerald-500 to-green-600' },
-  curator: { name: 'Curator', icon: '🏛️', next: 'Archivist', gradient: 'from-amber-500 to-yellow-600' },
-  archivist: { name: 'Archivist', icon: '📦', next: 'Grand Keeper', gradient: 'from-violet-500 to-purple-600' },
-  grandkeeper: { name: 'Grand Keeper', icon: '👑', next: null, gradient: 'from-yellow-400 to-amber-500' },
+const tierDisplay: Record<string, { name: string; icon: string; next: string | null; accent: string }> = {
+  apprentice: { name: 'Apprentice', icon: '🕯️', next: 'Scholar', accent: 'bg-chart-1' },
+  scholar: { name: 'Scholar', icon: '📚', next: 'Curator', accent: 'bg-chart-3' },
+  curator: { name: 'Curator', icon: '🏛️', next: 'Archivist', accent: 'bg-chart-2' },
+  archivist: { name: 'Archivist', icon: '📦', next: 'Grand Keeper', accent: 'bg-chart-4' },
+  grandkeeper: { name: 'Grand Keeper', icon: '👑', next: null, accent: 'bg-chart-5' },
 };
 
 interface UserProgressData {
@@ -80,13 +67,19 @@ function useUserProgress(): { progress: UserProgressData | null; leaderboard: Le
           headers['Authorization'] = `Bearer ${session.accessToken}`;
         }
 
-        const res = await fetch(`${API_BASE_URL}/data/api/progression/`, { headers });
-        if (!res.ok) {
-          setLoading(false);
-          return;
-        }
-
-        const data = await res.json();
+        const data = await apiFetchJson<{
+          leaderboard?: LeaderboardUser[];
+          user_progress?: {
+            tierId?: string;
+            rank: number;
+            totalPoints: number;
+            pointsToNextTier: number;
+            progressPercent: number;
+            medals: { gold: number; silver: number; bronze: number };
+            recentActivity?: { type: string; points: number; label: string }[];
+            streak?: number;
+          };
+        }>(`${API_BASE_URL}/data/api/progression/`, { headers });
         setLeaderboard(data.leaderboard || []);
 
         if (data.user_progress) {
@@ -103,7 +96,9 @@ function useUserProgress(): { progress: UserProgressData | null; leaderboard: Le
           });
         }
       } catch (err) {
-        console.error('Failed to fetch progression data for widget:', err);
+        // Widgets degrade to their empty state, but a failure here means the
+        // contributor's progress is missing -- it must not vanish silently.
+        console.error('Failed to load progression data', err);
       } finally {
         setLoading(false);
       }
@@ -129,29 +124,33 @@ export function UserProgressBadge({ className }: { className?: string }) {
     <TooltipProvider>
       <Tooltip>
         <TooltipTrigger asChild>
-          <Link href="/dashboard/progression">
-            <div className={cn(
-              'flex items-center gap-2 px-3 py-1.5 rounded-full border transition-all hover:scale-105',
-              'bg-gradient-to-r bg-opacity-10 cursor-pointer',
-              config.ringClass.replace('ring-', 'border-'),
-              className
-            )}>
+          <Link href="/progression">
+            <div
+              className={cn(
+                'flex cursor-pointer items-center gap-2 rounded-full border px-3 py-1.5 transition-all hover:scale-105',
+                'bg-muted/60 dark:bg-muted/50',
+                config.ringClass.replace('ring-', 'border-'),
+                className,
+              )}
+            >
               <span className="text-lg">{tierInfo.icon}</span>
               <div className="hidden sm:block">
-                <span className={cn('font-semibold text-sm', config.ringClass.replace('ring-', 'text-').replace('dark:ring-', 'dark:text-'))}>
+                <span className="text-sm font-semibold text-foreground">
                   {progress.totalPoints.toLocaleString()}
                 </span>
-                <span className="text-xs text-muted-foreground ml-1">pts</span>
+                <span className="ml-1 text-xs text-muted-foreground">pts</span>
               </div>
-              <IconChevronRight className="w-3 h-3 text-muted-foreground" />
+              <IconChevronRight className="h-3 w-3 text-muted-foreground" />
             </div>
           </Link>
         </TooltipTrigger>
-        <TooltipContent side="bottom" className="p-3">
+        <TooltipContent side="bottom" className="p-3 text-popover-foreground">
           <div className="text-center">
             <div className="font-semibold">{tierInfo.name}</div>
             <div className="text-xs text-muted-foreground">Rank #{progress.rank} • {progress.totalPoints} pts</div>
-            <div className="text-xs text-emerald-600 mt-1">{progress.pointsToNextTier} pts to {tierInfo.next || 'max'}</div>
+            <div className="mt-1 text-xs text-muted-foreground">
+              {progress.pointsToNextTier} pts to {tierInfo.next || 'max'}
+            </div>
           </div>
         </TooltipContent>
       </Tooltip>
@@ -169,7 +168,7 @@ export function ProgressionWidgetMini({ className }: { className?: string }) {
   const tierInfo = tierDisplay[progress.tier] || tierDisplay.apprentice;
 
   return (
-    <Link href="/dashboard/progression">
+    <Link href="/progression">
       <Card className={cn('hover:shadow-md transition-shadow cursor-pointer', className)}>
         <CardContent className="p-4">
           <div className="flex items-center gap-3">
@@ -204,15 +203,15 @@ export function ProgressionWidgetFull({ className }: { className?: string }) {
   if (!session || (!progress && !loading)) {
     return (
       <Card className={cn('overflow-hidden', className)}>
-        <div className="bg-gradient-to-br from-amber-100 to-yellow-50 dark:from-amber-950/30 dark:to-yellow-950/20 p-6">
+        <div className="bg-secondary p-6">
           <div className="flex items-center gap-3 mb-4">
-            <IconTrophy className="w-8 h-8 text-amber-500" />
+            <IconTrophy className="h-8 w-8 text-medal-gold" />
             <div>
               <h3 className="font-bold text-lg">Start Your Journey</h3>
               <p className="text-sm text-muted-foreground">Sign in to track your contributions</p>
             </div>
           </div>
-          <Button asChild className="bg-gradient-to-r from-amber-500 to-yellow-500 hover:from-amber-600 hover:to-yellow-600">
+          <Button asChild className="">
             <Link href="/api/auth/signin">Sign In to Begin</Link>
           </Button>
         </div>
@@ -236,8 +235,16 @@ export function ProgressionWidgetFull({ className }: { className?: string }) {
 
   return (
     <Card className={cn('overflow-hidden', className)}>
-      {/* Header with gradient */}
-      <div className={cn('bg-gradient-to-r p-5', tierInfo.gradient)}>
+      {/*
+        Tier header. The tier colour is a 3px rule, not the header background.
+        Filling the header with the tier hue forced white text onto it, and the
+        tier hues come from the chart ramp — which is light in dark mode, where
+        white measured under 2:1. The rule carries identity as a second channel
+        behind the tier's own name and icon; the text sits on a token surface
+        that is legible in both themes.
+      */}
+      <div className="relative bg-secondary p-5">
+        <div className={cn('absolute inset-x-0 top-0 h-[3px]', tierInfo.accent)} aria-hidden="true" />
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-4">
             <RankAvatar
@@ -247,17 +254,17 @@ export function ProgressionWidgetFull({ className }: { className?: string }) {
               size="lg"
               showGlow={false}
             />
-            <div className="text-white">
-              <h3 className="font-bold text-lg">{session.user?.name?.split(' ')[0]}</h3>
+            <div className="text-secondary-foreground">
+              <h3 className="text-lg font-bold">{session.user?.name?.split(' ')[0]}</h3>
               <div className="flex items-center gap-2">
                 <span className="text-xl">{tierInfo.icon}</span>
-                <span className="font-medium opacity-90">{tierInfo.name}</span>
+                <span className="font-medium">{tierInfo.name}</span>
               </div>
             </div>
           </div>
-          <div className="text-right text-white">
-            <div className="text-2xl font-bold">{progress.totalPoints.toLocaleString()}</div>
-            <div className="text-sm opacity-80">Total Points</div>
+          <div className="text-right text-secondary-foreground">
+            <div className="text-2xl font-bold tabular-nums">{progress.totalPoints.toLocaleString()}</div>
+            <div className="text-sm text-muted-foreground">Total Points</div>
           </div>
         </div>
       </div>
@@ -277,7 +284,7 @@ export function ProgressionWidgetFull({ className }: { className?: string }) {
               </div>
             </div>
             <p className="text-xs text-muted-foreground mt-1.5">
-              <span className="font-semibold text-emerald-600">{progress.pointsToNextTier}</span> more points needed
+              <span className="font-semibold text-success">{progress.pointsToNextTier}</span> more points needed
             </p>
           </div>
         )}
@@ -296,16 +303,16 @@ export function ProgressionWidgetFull({ className }: { className?: string }) {
                   <TooltipTrigger>
                     <div className={cn(
                       'flex items-center gap-1 px-2 py-1 rounded-full text-xs font-semibold',
-                      type === 'gold' && 'bg-yellow-100 text-yellow-700 dark:bg-yellow-900/30 dark:text-yellow-300',
-                      type === 'silver' && 'bg-gray-100 text-gray-600 dark:bg-gray-800 dark:text-gray-300',
-                      type === 'bronze' && 'bg-orange-100 text-orange-700 dark:bg-orange-900/30 dark:text-orange-300',
+                      type === 'gold' && 'bg-medal-gold-soft text-medal-gold-on-soft',
+                      type === 'silver' && 'bg-medal-silver-soft text-medal-silver-on-soft',
+                      type === 'bronze' && 'bg-medal-bronze-soft text-medal-bronze-on-soft',
                       count === 0 && 'opacity-40'
                     )}>
                       <span className={cn(
                         'w-2 h-2 rounded-full',
-                        type === 'gold' && 'bg-gradient-to-br from-yellow-400 to-amber-500',
-                        type === 'silver' && 'bg-gradient-to-br from-gray-300 to-gray-400',
-                        type === 'bronze' && 'bg-gradient-to-br from-orange-400 to-amber-600',
+                        type === 'gold' && 'bg-medal-gold',
+                        type === 'silver' && 'bg-medal-silver',
+                        type === 'bronze' && 'bg-medal-bronze',
                       )} />
                       {count}
                     </div>
@@ -319,12 +326,12 @@ export function ProgressionWidgetFull({ className }: { className?: string }) {
 
         {/* Streak */}
         {progress.streak && progress.streak > 0 && (
-          <div className="flex items-center gap-3 p-3 bg-gradient-to-r from-orange-50 to-amber-50 dark:from-orange-950/20 dark:to-amber-950/20 rounded-lg border border-orange-200 dark:border-orange-800">
-            <div className="p-2 bg-gradient-to-br from-orange-500 to-amber-500 rounded-full">
-              <IconFlame className="w-4 h-4 text-white" />
+          <div className="flex items-center gap-3 rounded-lg border border-border bg-secondary p-3">
+            <div className="rounded-full bg-primary p-2">
+              <IconFlame className="h-4 w-4 text-primary-foreground" />
             </div>
             <div className="flex-1">
-              <span className="font-semibold text-orange-700 dark:text-orange-300">{progress.streak} day streak!</span>
+              <span className="font-semibold text-foreground">{progress.streak} day streak!</span>
               <p className="text-xs text-muted-foreground">Keep contributing to maintain it</p>
             </div>
           </div>
@@ -338,7 +345,7 @@ export function ProgressionWidgetFull({ className }: { className?: string }) {
               {progress.recentActivity.slice(0, 3).map((activity, i) => (
                 <div key={i} className="flex items-center justify-between text-sm p-2 rounded-lg hover:bg-muted/30">
                   <span className="text-muted-foreground">{activity.label}</span>
-                  <span className="font-semibold text-emerald-600">+{activity.points} pts</span>
+                  <span className="font-semibold text-success">+{activity.points} pts</span>
                 </div>
               ))}
             </div>
@@ -348,13 +355,13 @@ export function ProgressionWidgetFull({ className }: { className?: string }) {
         {/* CTA */}
         <div className="flex gap-2 pt-2">
           <Button asChild variant="outline" className="flex-1">
-            <Link href="/dashboard/progression">
+            <Link href="/progression">
               View Details
               <IconArrowRight className="w-4 h-4 ml-1" />
             </Link>
           </Button>
-          <Button asChild className="flex-1 bg-gradient-to-r from-amber-500 to-yellow-500 hover:from-amber-600 hover:to-yellow-600">
-            <Link href="/dashboard/contribute">
+          <Button asChild className="flex-1">
+            <Link href="/contribute">
               <IconSparkles className="w-4 h-4 mr-1" />
               Earn Points
             </Link>
@@ -377,10 +384,10 @@ export function LeaderboardPreview({ className }: { className?: string }) {
       <CardHeader className="pb-3">
         <div className="flex items-center justify-between">
           <CardTitle className="text-base flex items-center gap-2">
-            <IconTrophy className="w-5 h-5 text-yellow-500" />
+            <IconTrophy className="h-5 w-5 text-medal-gold" />
             Hall of Record
           </CardTitle>
-          <Link href="/dashboard/progression" className="text-sm text-blue-600 hover:underline flex items-center gap-1">
+          <Link href="/progression" className="flex items-center gap-1 text-sm text-primary hover:underline">
             See all <IconChevronRight className="w-3 h-3" />
           </Link>
         </div>
@@ -402,15 +409,15 @@ export function LeaderboardPreview({ className }: { className?: string }) {
             <div key={user.user_id} className="flex items-center gap-3">
               <span className={cn(
                 'w-6 h-6 flex items-center justify-center rounded-full text-xs font-bold',
-                i === 0 && 'bg-yellow-100 text-yellow-700',
-                i === 1 && 'bg-gray-100 text-gray-600',
-                i === 2 && 'bg-orange-100 text-orange-700',
+                i === 0 && 'bg-medal-gold-soft text-medal-gold-on-soft',
+                i === 1 && 'bg-medal-silver-soft text-medal-silver-on-soft',
+                i === 2 && 'bg-medal-bronze-soft text-medal-bronze-on-soft',
               )}>
                 {i + 1}
               </span>
               <span className="text-lg">{tierInfo.icon}</span>
               <span className="flex-1 font-medium truncate text-sm">{user.full_name || user.username}</span>
-              <span className="text-sm text-amber-600 font-semibold">{user.score.toLocaleString()}</span>
+              <span className="text-sm font-semibold text-primary">{user.score.toLocaleString()}</span>
             </div>
           );
         })}
@@ -418,13 +425,13 @@ export function LeaderboardPreview({ className }: { className?: string }) {
         {session && progress && (
           <>
             <div className="border-t pt-3 mt-3">
-              <div className="flex items-center gap-3 bg-amber-50/50 dark:bg-amber-950/20 p-2 rounded-lg">
-                <span className="w-6 h-6 flex items-center justify-center rounded-full bg-blue-100 text-blue-700 text-xs font-bold">
+              <div className="flex items-center gap-3 rounded-lg bg-secondary p-2">
+                <span className="flex h-6 w-6 items-center justify-center rounded-full bg-muted text-xs font-bold text-foreground">
                   {progress.rank}
                 </span>
                 <span className="text-lg">{(tierDisplay[progress.tier] || tierDisplay.apprentice).icon}</span>
                 <span className="flex-1 font-medium truncate text-sm">You</span>
-                <span className="text-sm text-amber-600 font-semibold">{progress.totalPoints.toLocaleString()}</span>
+                <span className="text-sm font-semibold text-primary">{progress.totalPoints.toLocaleString()}</span>
               </div>
             </div>
           </>
@@ -450,16 +457,16 @@ export function AchievementToast({
     <motion.div
       initial={{ scale: 0.8, opacity: 0 }}
       animate={{ scale: 1, opacity: 1 }}
-      className="flex items-center gap-4 p-4 bg-gradient-to-r from-amber-50 to-yellow-50 dark:from-amber-950/50 dark:to-yellow-950/50 border border-amber-200 dark:border-amber-800 rounded-xl shadow-lg"
+      className="flex items-center gap-4 rounded-xl border border-border bg-card p-4 shadow-lg"
     >
       <div className="text-3xl">{icon}</div>
       <div className="flex-1">
-        <h4 className="font-bold text-amber-900 dark:text-amber-100">{title}</h4>
-        <p className="text-sm text-amber-700 dark:text-amber-300">{description}</p>
+        <h4 className="font-bold text-foreground">{title}</h4>
+        <p className="text-sm text-muted-foreground">{description}</p>
       </div>
       {points && (
         <div className="text-right">
-          <span className="text-lg font-bold text-emerald-600">+{points}</span>
+          <span className="text-lg font-bold text-success">+{points}</span>
           <span className="text-xs block text-muted-foreground">points</span>
         </div>
       )}
@@ -467,31 +474,3 @@ export function AchievementToast({
   );
 }
 
-/* ── Motivation Quote Card ── */
-export function MotivationCard({ className }: { className?: string }) {
-  const quotes = [
-    { text: "Every artifact tells a story. Every story you preserve connects the past to the future.", icon: "📜" },
-    { text: "Heritage is not owned—it is borrowed from future generations. Thank you for being a steward.", icon: "🌱" },
-    { text: "One entry may seem small, but together we're building an infinite library of human memory.", icon: "📚" },
-    { text: "The best time to preserve heritage was 100 years ago. The second best time is now.", icon: "⏳" },
-  ];
-
-  // Use first quote for SSR, then randomize on client mount to prevent hydration mismatch
-  const [quote, setQuote] = useState(quotes[0]);
-
-  useEffect(() => {
-    setQuote(quotes[Math.floor(Math.random() * quotes.length)]);
-  }, []);
-
-  return (
-    <Card className={cn('bg-gradient-to-br from-blue-50 to-sky-50 dark:from-blue-950/30 dark:to-sky-950/30 border-blue-200 dark:border-blue-800', className)}>
-      <CardContent className="p-5 flex items-start gap-4">
-        <span className="text-3xl">{quote.icon}</span>
-        <div>
-          <p className="text-blue-800 dark:text-blue-200 italic leading-relaxed">&ldquo;{quote.text}&rdquo;</p>
-          <p className="text-xs text-blue-600 dark:text-blue-400 mt-2 font-medium">— HeritageGraph Community</p>
-        </div>
-      </CardContent>
-    </Card>
-  );
-}

@@ -1,6 +1,16 @@
 import { ColumnDef } from '@tanstack/react-table';
 
 /**
+ * One tab in a filterable tab strip (e.g. All / Pending / Approved).
+ * Omit `filter` for an "All" tab that shows every row.
+ */
+export interface DataTableTab<TData> {
+  id: string;
+  label: string;
+  filter?: (row: TData) => boolean;
+}
+
+/**
  * Configuration for a data table instance.
  * This interface allows the GenericDataTable to be fully customizable
  * for different data types (persons, locations, events, etc.)
@@ -12,9 +22,14 @@ export interface DataTableConfig<TData> {
   columns: ColumnDef<TData>[];
   /** Key to extract data array from API response (e.g., "persons", "results") */
   dataKey?: string;
-  /** Base path for viewing individual items (e.g., "/dashboard/knowledge/person") */
+  /** Base path for viewing individual items (e.g., "/knowledge/person") */
   viewBasePath?: string;
-  /** Field to use as the unique row ID (default: "id") */
+  /**
+   * Unique row id for selection, pagination, and drag-drop (TanStack `getRowId`).
+   * Defaults to numeric/string `id`. Use `entity_id` for cultural entities.
+   */
+  rowIdField?: keyof TData;
+  /** @deprecated Use `rowIdField` */
   idField?: keyof TData;
   /** Title to display in the table header */
   title?: string;
@@ -22,10 +37,19 @@ export interface DataTableConfig<TData> {
   description?: string;
   /** Whether to show the header section (title, description, add button) */
   showHeader?: boolean;
-  /** Whether to show tabs (All, Pending, Approved, etc.) */
+  /**
+   * Tab definitions. Set to `false` to hide tabs.
+   * If omitted and `showTabs` is not false, default status workflow tabs are used.
+   */
+  tabs?: false | DataTableTab<TData>[];
+  /** Initial tab id when using tabs (default: first tab, usually `all`) */
+  defaultTabId?: string;
+  /** Whether to show tabs (legacy). Prefer `tabs: false` to disable. */
   showTabs?: boolean;
   /** Custom empty state message */
   emptyMessage?: string;
+  /** Filename stem for CSV/JSON exports, e.g. "cultural_entities". */
+  exportName?: string;
   /** Whether to enable drag-and-drop reordering */
   enableDragDrop?: boolean;
   /** Whether to enable row selection */
@@ -37,6 +61,13 @@ export interface DataTableConfig<TData> {
     label: string;
     href: string;
   };
+  /**
+   * Use DRF limit/offset + status query params (recommended for `/cidoc/*` lists).
+   * Default: true when `endpoint` starts with `/cidoc/`.
+   */
+  serverPagination?: boolean;
+  /** Debounced server search field (maps to DRF `?search=`). */
+  enableServerSearch?: boolean;
 }
 
 /**
@@ -100,24 +131,32 @@ export interface TraditionRecord extends BaseRecord {
  */
 export interface CulturalEntityRecord {
   entity_id: string;
+  name: string;
   category: string;
-  label: string;
   status: string;
   created_at: string;
-  updated_at: string;
-  created_by?: string;
-  current_data?: Record<string, unknown>;
+  updated_at?: string;
+  contributor?: { username?: string; id?: number };
+  /** Present on list/detail from API; `data` may contain `_cidoc_model` / `_cidoc_id` for CIDOC-backed rows. */
+  current_revision?: {
+    revision_id?: string;
+    revision_number?: number;
+    data?: Record<string, unknown>;
+    created_at?: string;
+  } | null;
 }
 
 /**
- * Source record type
+ * Source record type — aligns with `cidoc_data.Source` + CulturalEntityLinkMixin
  */
 export interface SourceRecord extends BaseRecord {
-  source_type?: string;
-  author?: string;
-  publication_date?: string;
-  url?: string;
-  cultural_entity_id?: string;
+  authors?: string;
+  publication_year?: string;
+  /** Material type: book, journal, archive, thesis, web, field_note */
+  type?: string;
+  digital_link?: string;
+  archive_location?: string;
+  cultural_entity_id?: string | null;
 }
 
 /**

@@ -1,11 +1,10 @@
 'use client';
 
-import { useEffect } from 'react';
+
 import Link from 'next/link';
 import { IconDotsVertical, IconLogout, IconUserCircle } from '@tabler/icons-react';
 import { useTranslations } from 'next-intl';
 
-import { Button } from '@/components/ui/button';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import {
   DropdownMenu,
@@ -24,6 +23,15 @@ import {
 } from '@/components/ui/sidebar';
 
 import { signOut, useSession } from 'next-auth/react';
+import { useEffect, useState } from 'react';
+
+import { ConfirmActionDialog } from '@/components/confirm-action-dialog';
+import { apiFetchJson, getApiErrorMessage } from '@/lib/api-client';
+import { dataApiPath } from '@/lib/api-paths';
+import { getPublicApiUrl } from '@/lib/api-base';
+import { toast } from 'sonner';
+
+const API_BASE = getPublicApiUrl();
 
 export function NavUser({
   user,
@@ -48,40 +56,50 @@ export function NavUser({
   }
   const { data: session, status } = useSession();
   const t = useTranslations('user');
-  console.log("HRRRRRE")
-  console.log(session?.accessToken)
+  const [userSlug, setUserSlug] = useState<string | null>(null);
+  const [signOutConfirmOpen, setSignOutConfirmOpen] = useState(false);
 
-  // 🔥 Initialize user in backend when logged in
+  // Eagerly fetch slug if it's not in the session (e.g., first login before JWT refresh)
   useEffect(() => {
-    if (status === 'authenticated' && session?.accessToken) {
-      const initUser = async () => {
+    if (status === 'authenticated' && session?.accessToken && !session?.user?.slug) {
+      const fetchSlug = async () => {
         try {
-          const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000'}/data/testthelogin`, {
-            method: 'POST',
-            headers: {
-              'Content-Type': 'application/json',
-              Authorization: `Bearer ${session.accessToken}`,
-            },
-            body: JSON.stringify({
-              name: user.name,
-              email: user.email,
-            }),
-          });
-
-          if (!res.ok) {
-            // const err = await res.json();
-          } else {
-            // const data = await res.json();
+          if (!API_BASE) {
+            toast.error('API is not configured. Set NEXT_PUBLIC_API_URL and reload.');
+            return;
           }
+          const data = await apiFetchJson<{ slug?: string }>(dataApiPath('user', 'me'), {
+            headers: {
+              Authorization: `Bearer ${session.accessToken}`,
+              Accept: 'application/json',
+            },
+          });
+          if (data.slug) setUserSlug(data.slug);
         } catch (err) {
-          console.error('Error initializing user:', err);
+          const msg = getApiErrorMessage(err);
+          toast.error('Could not load your profile link.', { description: msg });
         }
       };
-
-      initUser();
+      fetchSlug();
+    } else if (session?.user?.slug) {
+      setUserSlug(session.user.slug);
     }
-  }, [status, session, user]);
+  }, [status, session]);
+
   return (
+    <>
+      <ConfirmActionDialog
+        open={signOutConfirmOpen}
+        onOpenChange={setSignOutConfirmOpen}
+        title={t('signOut')}
+        description="You will be signed out of HeritageGraph on this device and need to sign in again to access your dashboard."
+        confirmLabel={t('signOut')}
+        confirmVariant="destructive"
+        onConfirm={async () => {
+          setSignOutConfirmOpen(false);
+          await signOut({ callbackUrl: '/' });
+        }}
+      />
     <SidebarMenu>
       <SidebarMenuItem>
         <DropdownMenu>
@@ -138,7 +156,7 @@ export function NavUser({
             <DropdownMenuSeparator />
             <DropdownMenuGroup>
               <DropdownMenuItem asChild>
-                <Link href="/dashboard" className="flex items-center gap-2">
+                <Link href="/" className="flex items-center gap-2">
                   <IconUserCircle />
                   {t('home')}
                 </Link>
@@ -146,7 +164,7 @@ export function NavUser({
 
               <DropdownMenuItem asChild>
                 <Link
-                  href={`/dashboard/users/${session?.user?.username}`}
+                  href={userSlug ? `/users/${userSlug}` : '#'}
                   className="flex items-center gap-2"
                 >
                   <IconUserCircle />
@@ -155,7 +173,7 @@ export function NavUser({
               </DropdownMenuItem>
 
               <DropdownMenuItem asChild>
-                <Link href="/dashboard/account" 
+                <Link href="/account" 
                 className="flex items-center gap-2">
                   <IconUserCircle />
                   {t('accountSettings')}
@@ -163,21 +181,20 @@ export function NavUser({
               </DropdownMenuItem>
             </DropdownMenuGroup>
             <DropdownMenuSeparator />
-            <DropdownMenuItem asChild>
-            <Button
-              variant="ghost"
-              className="w-full"
-              onClick={() => {
-                signOut({ callbackUrl: '/' });
+            <DropdownMenuItem
+              className="flex cursor-pointer items-center gap-2"
+              onSelect={(e) => {
+                e.preventDefault();
+                setSignOutConfirmOpen(true);
               }}
             >
               <IconLogout />
               {t('signOut')}
-            </Button>
             </DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>
       </SidebarMenuItem>
     </SidebarMenu>
+    </>
   );
 }

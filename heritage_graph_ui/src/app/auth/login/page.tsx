@@ -1,27 +1,27 @@
-"use client";
+import { Suspense } from 'react';
+import { isDevAuthEnabled, isGoogleOAuthConfigured } from '@/lib/auth';
+import LoginRedirectPageClient from './page-client';
 
-import { signIn } from "next-auth/react";
-import { useEffect } from "react";
-
-/**
- * Legacy dev login page — now redirects to OAuth sign-in.
- * Google Auth is the primary authentication method.
- * This page exists only to catch old bookmarks / redirects.
- */
-export default function LoginRedirectPage() {
-  useEffect(() => {
-    // Redirect to the NextAuth sign-in page (Google OAuth)
-    signIn("google", { callbackUrl: "/dashboard" });
-  }, []);
-
+function LoginFallback() {
   return (
     <div className="flex min-h-screen items-center justify-center bg-background">
       <div className="space-y-4 text-center">
-        <div className="inline-block h-8 w-8 animate-spin rounded-full border-4 border-primary border-r-transparent" />
-        <p className="text-sm text-muted-foreground">
-          Redirecting to Google sign-in...
-        </p>
+        <div className="mx-auto h-8 w-8 animate-spin rounded-full border-4 border-primary border-r-transparent" />
+        <p className="text-sm text-muted-foreground">Loading…</p>
       </div>
     </div>
+  );
+}
+
+export default function LoginRedirectPage() {
+  const googleOAuthConfigured = isGoogleOAuthConfigured();
+  const devAuthEnabled = isDevAuthEnabled();
+  return (
+    <Suspense fallback={<LoginFallback />}>
+      <LoginRedirectPageClient
+        googleOAuthConfigured={googleOAuthConfigured}
+        devAuthEnabled={devAuthEnabled}
+      />
+    </Suspense>
   );
 }

@@ -4,15 +4,23 @@ declare module 'next-auth' {
   interface Session extends DefaultSession {
     /** OAuth access token sent as Bearer token to Django backend */
     accessToken?: string;
-    /** Set to 'RefreshAccessTokenError' if token refresh failed */
+    /** Machine-readable code, e.g. `RefreshAccessTokenError` */
     error?: string;
+    /** Human-readable explanation for `error` (safe to show in UI) */
+    errorDescription?: string;
     user?: {
+      id?: string;
       username?: string | null;
+      slug?: string | null;
+      groups?: string[];
+      isStaff?: boolean;
     } & DefaultSession['user'];
   }
 
   interface User {
+    id?: string;
     username?: string | null;
+    slug?: string | null;
   }
 }
 
@@ -24,10 +32,14 @@ declare module 'next-auth/jwt' {
     refreshToken?: string;
     /** Timestamp (ms) when the access token expires */
     accessTokenExpires?: number;
-    /** Which OAuth provider was used: 'google' | 'github' */
+    /** Always `google` for this app */
     authProvider?: string;
+    id?: string;
     username?: string | null;
-    /** Set to 'RefreshAccessTokenError' if token refresh failed */
+    slug?: string | null;
+    groups?: string[];
+    isStaff?: boolean;
     error?: string;
+    errorDescription?: string;
   }
 }

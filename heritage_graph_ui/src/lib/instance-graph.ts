@@ -1,3 +1,5 @@
+import { apiFetch } from '@/lib/api-client';
+
 /**
  * HeritageGraph — Live Instance Data Graph
  *
@@ -46,7 +48,7 @@ export interface InstanceEdge {
   source: string;
   target: string;
   label: string;
-  edgeType: 'relation' | 'location' | 'type_hierarchy';
+  edgeType: 'relation' | 'location' | 'type_hierarchy' | 'fork';
 }
 
 export interface InstanceGraphData {
@@ -90,25 +92,32 @@ interface EntityConfig {
   descriptionField: string;
   /** Fields that can create relation edges (name-matched to other entities) */
   relationFields: { field: string; label: string; targetCategory?: InstanceCategory }[];
-  /** Field holding a location name (creates edge to location nodes) */
+  /** Free-text location field (legacy / name-matched) */
   locationField?: string;
+  /**
+   * Resolved location FK field returned by DRF serializers as either a numeric ID
+   * or {id, name} dict (e.g. has_current_location). Far more reliable than name
+   * matching for live data.
+   */
+  locationFkField?: string;
 }
 
 const ENTITY_CONFIGS: EntityConfig[] = [
   {
-    endpoint: '/cidoc/structures/',
+    endpoint: '/api/v1/cidoc/structures/',
     category: 'structure',
     entityType: 'ArchitecturalStructure',
     nameField: 'name',
     descriptionField: 'note',
     relationFields: [
-      { field: 'structure_type', label: 'type' },
+      { field: 'structure_type', label: 'structure_type' },
       { field: 'architectural_style', label: 'style' },
     ],
     locationField: 'location_name',
+    locationFkField: 'has_current_location',
   },
   {
-    endpoint: '/cidoc/deities/',
+    endpoint: '/api/v1/cidoc/deities/',
     category: 'deity',
     entityType: 'Deity',
     nameField: 'name',
@@ -118,7 +127,7 @@ const ENTITY_CONFIGS: EntityConfig[] = [
     ],
   },
   {
-    endpoint: '/cidoc/persons/',
+    endpoint: '/api/v1/cidoc/persons/',
     category: 'person',
     entityType: 'Person',
     nameField: 'name',
@@ -128,7 +137,7 @@ const ENTITY_CONFIGS: EntityConfig[] = [
     ],
   },
   {
-    endpoint: '/cidoc/locations/',
+    endpoint: '/api/v1/cidoc/locations/',
     category: 'location',
     entityType: 'Location',
     nameField: 'name',
@@ -138,7 +147,7 @@ const ENTITY_CONFIGS: EntityConfig[] = [
     ],
   },
   {
-    endpoint: '/cidoc/events/',
+    endpoint: '/api/v1/cidoc/events/',
     category: 'event',
     entityType: 'Event',
     nameField: 'name',
@@ -148,7 +157,7 @@ const ENTITY_CONFIGS: EntityConfig[] = [
     ],
   },
   {
-    endpoint: '/cidoc/rituals/',
+    endpoint: '/api/v1/cidoc/rituals/',
     category: 'ritual',
     entityType: 'RitualEvent',
     nameField: 'name',
@@ -160,7 +169,7 @@ const ENTITY_CONFIGS: EntityConfig[] = [
     locationField: 'location_name',
   },
   {
-    endpoint: '/cidoc/festivals/',
+    endpoint: '/api/v1/cidoc/festivals/',
     category: 'festival',
     entityType: 'Festival',
     nameField: 'name',
@@ -171,7 +180,7 @@ const ENTITY_CONFIGS: EntityConfig[] = [
     locationField: 'location_name',
   },
   {
-    endpoint: '/cidoc/guthis/',
+    endpoint: '/api/v1/cidoc/guthis/',
     category: 'guthi',
     entityType: 'Guthi',
     nameField: 'name',
@@ -182,7 +191,7 @@ const ENTITY_CONFIGS: EntityConfig[] = [
     locationField: 'location',
   },
   {
-    endpoint: '/cidoc/monuments/',
+    endpoint: '/api/v1/cidoc/monuments/',
     category: 'monument',
     entityType: 'Monument',
     nameField: 'name',
@@ -193,7 +202,7 @@ const ENTITY_CONFIGS: EntityConfig[] = [
     locationField: 'location_name',
   },
   {
-    endpoint: '/cidoc/iconographic_objects/',
+    endpoint: '/api/v1/cidoc/iconographic_objects/',
     category: 'iconography',
     entityType: 'IconographicObject',
     nameField: 'name',
@@ -206,7 +215,7 @@ const ENTITY_CONFIGS: EntityConfig[] = [
     locationField: 'location_name',
   },
   {
-    endpoint: '/cidoc/historical_periods/',
+    endpoint: '/api/v1/cidoc/historical_periods/',
     category: 'period',
     entityType: 'HistoricalPeriod',
     nameField: 'name',
@@ -214,7 +223,7 @@ const ENTITY_CONFIGS: EntityConfig[] = [
     relationFields: [],
   },
   {
-    endpoint: '/cidoc/traditions/',
+    endpoint: '/api/v1/cidoc/traditions/',
     category: 'tradition',
     entityType: 'Tradition',
     nameField: 'name',
@@ -224,7 +233,7 @@ const ENTITY_CONFIGS: EntityConfig[] = [
     ],
   },
   {
-    endpoint: '/cidoc/sources/',
+    endpoint: '/api/v1/cidoc/sources/',
     category: 'source',
     entityType: 'Source',
     nameField: 'title',
@@ -234,6 +243,65 @@ const ENTITY_CONFIGS: EntityConfig[] = [
     ],
   },
 ];
+
+/**
+ * Django ContentType `model` field → frontend InstanceCategory.
+ * Used to translate HeritageAssertion subject/object pointers into node IDs.
+ */
+const DJANGO_MODEL_TO_CATEGORY: Record<string, InstanceCategory> = {
+  person: 'person',
+  location: 'location',
+  event: 'event',
+  historicalperiod: 'period',
+  tradition: 'tradition',
+  source: 'source',
+  deity: 'deity',
+  guthi: 'guthi',
+  architecturalstructure: 'structure',
+  ritualevent: 'ritual',
+  festival: 'festival',
+  iconographicobject: 'iconography',
+  monument: 'monument',
+};
+
+interface AcceptedAssertionRow {
+  content_type_name?: string;
+  object_id?: number | string | null;
+  object_entity_type?: string;
+  object_entity_id?: number | string | null;
+  object_object_id?: number | string | null;
+  asserted_property?: string;
+  reconciliation_status?: string;
+}
+
+/**
+ * Convert a HeritageAssertion row into (sourceNodeId, targetNodeId, label).
+ * Returns null when either side maps to a class not visible in the graph
+ * (e.g. CasteGroup, KumariTenure) — `addEdge` would drop them anyway.
+ */
+function assertionToEdge(
+  a: AcceptedAssertionRow,
+): { source: string; target: string; label: string } | null {
+  const subjModel = (a.content_type_name || '').toLowerCase();
+  const objModel = (a.object_entity_type || '').toLowerCase();
+  const subjCat = DJANGO_MODEL_TO_CATEGORY[subjModel];
+  const objCat = DJANGO_MODEL_TO_CATEGORY[objModel];
+  if (!subjCat || !objCat) return null;
+
+  const subjPk = a.object_id ?? null;          // model PK of the subject row
+  const objPk = a.object_entity_id ?? a.object_object_id ?? null;
+  if (subjPk == null || objPk == null) return null;
+
+  const prop = a.asserted_property || '';
+  // 'relationship.member_of' → 'member_of'; bare property names pass through.
+  const label = prop.startsWith('relationship.') ? prop.slice('relationship.'.length) : prop;
+
+  return {
+    source: `${subjCat}_${subjPk}`,
+    target: `${objCat}_${objPk}`,
+    label: label || 'related_to',
+  };
+}
 
 /* ══════════════════════════════════════════════════════
  *  Paginated fetch helper
@@ -251,8 +319,7 @@ async function fetchAllPages(
   let nextUrl: string | null = url + (url.includes('?') ? '&' : '?') + 'limit=' + PAGE_LIMIT;
 
   while (nextUrl) {
-    const res = await fetch(nextUrl, { headers, signal });
-    if (!res.ok) break;
+    const res = await apiFetch(nextUrl, { headers, signal });
     const json = await res.json();
 
     // Handle both paginated {count, next, results} and flat array responses
@@ -275,18 +342,27 @@ async function fetchAllPages(
 export async function fetchInstanceGraphData(
   apiBaseUrl: string,
   token?: string,
+  options?: { signal?: AbortSignal },
 ): Promise<InstanceGraphData> {
   const headers: Record<string, string> = { 'Content-Type': 'application/json' };
   if (token) headers['Authorization'] = 'Bearer ' + token;
 
-  // AbortController with a 30s timeout
   const controller = new AbortController();
   const timeout = setTimeout(() => controller.abort(), 30_000);
+  const external = options?.signal;
+  if (external) {
+    if (external.aborted) {
+      clearTimeout(timeout);
+      return { nodes: [], edges: [], isDemo: false };
+    }
+    external.addEventListener('abort', () => controller.abort(), { once: true });
+  }
 
   let results: PromiseSettledResult<{ config: EntityConfig; data: Record<string, unknown>[] }>[];
+  let assertionRows: AcceptedAssertionRow[] = [];
 
   try {
-    results = await Promise.allSettled(
+    const entityResults = Promise.allSettled(
       ENTITY_CONFIGS.map(async (config) => {
         const data = await fetchAllPages(
           apiBaseUrl + config.endpoint,
@@ -296,7 +372,19 @@ export async function fetchInstanceGraphData(
         return { config, data };
       }),
     );
-  } catch {
+    // HeritageAssertion edges live in their own endpoint, separate from per-resource fields.
+    const assertionsPromise = fetchAllPages(
+      `${apiBaseUrl}/api/v1/cidoc/assertions/?reconciliation_status=accepted`,
+      headers,
+      controller.signal,
+    )
+      .then((rows) => rows as AcceptedAssertionRow[])
+      .catch(() => [] as AcceptedAssertionRow[]);
+    [results, assertionRows] = await Promise.all([entityResults, assertionsPromise]);
+  } catch (err) {
+    if (controller.signal.aborted || (err as Error).name === 'AbortError') {
+      return { nodes: [], edges: [], isDemo: false };
+    }
     return { nodes: [], edges: [], isDemo: false };
   } finally {
     clearTimeout(timeout);
@@ -391,7 +479,29 @@ export async function fetchInstanceGraphData(
     for (const item of data) {
       const sourceId = config.category + '_' + item.id;
 
-      // Location edges
+      // Strong location edge: serializer-resolved FK (numeric id or {id,name} dict)
+      if (config.locationFkField) {
+        const fk = item[config.locationFkField];
+        let targetLocationId: string | undefined;
+        if (typeof fk === 'number' || typeof fk === 'string') {
+          const id = 'location_' + fk;
+          if (nodeIdSet.has(id)) targetLocationId = id;
+        } else if (fk && typeof fk === 'object') {
+          const inner = (fk as { id?: number | string; name?: string }).id;
+          if (inner !== undefined) {
+            const id = 'location_' + inner;
+            if (nodeIdSet.has(id)) targetLocationId = id;
+          }
+          if (!targetLocationId && (fk as { name?: string }).name) {
+            targetLocationId = resolveNameToNode(String((fk as { name?: string }).name), 'location');
+          }
+        }
+        if (targetLocationId) {
+          addEdge(sourceId, targetLocationId, 'has_current_location', 'location');
+        }
+      }
+
+      // Weaker location edge: free-text name match (legacy fallback)
       if (config.locationField) {
         const loc = item[config.locationField];
         if (loc && typeof loc === 'string' && loc.trim()) {
@@ -424,6 +534,15 @@ export async function fetchInstanceGraphData(
     }
   }
 
+  // HeritageAssertion edges (the actual KG cross-entity relationships).
+  // Each accepted assertion projects to an RDF triple in Oxigraph; mirror that
+  // structure in the UI graph so users see the same connectivity.
+  for (const row of assertionRows) {
+    const edge = assertionToEdge(row);
+    if (!edge) continue;
+    addEdge(edge.source, edge.target, edge.label, 'relation');
+  }
+
   // ── Co-location edges ──
   const locGroups = new Map<string, string[]>();
   for (const result of results) {
@@ -444,42 +563,126 @@ export async function fetchInstanceGraphData(
     if (group.length < 2 || group.length > 6) continue;
     for (let i = 0; i < group.length; i++) {
       for (let j = i + 1; j < group.length; j++) {
-        addEdge(group[i], group[j], 'co-located', 'location');
+        addEdge(group[i], group[j], 'co_located', 'location');
       }
     }
   }
 
   // ── Semantic description-based edges (lightweight NLP) ──
-  const importantNames = new Map<string, { id: string; cat: InstanceCategory }>();
+  //
+  // Conservative inference: only emit a `mentions` edge when:
+  //  - description is rich (>= 30 chars after trim)
+  //  - target name is reasonably specific (>= 8 chars)
+  //  - target name appears as a whole-word match (no substring noise)
+  //  - source and target are not already connected
+  // This avoids the previous behavior where short common prefixes (e.g. "Patan")
+  // produced false-positive edges to every entity sharing the prefix.
+  const importantNames: { needle: string; id: string; cat: InstanceCategory }[] = [];
   for (const n of nodes) {
     const name = n.label.toLowerCase().trim();
-    if (name.length >= 4) {
-      importantNames.set(name, { id: n.id, cat: n.category });
-    }
+    if (name.length < 8) continue;
+    importantNames.push({ needle: name, id: n.id, cat: n.category });
   }
 
   const edgeKeySet = new Set(edges.map((e) => e.source + '→' + e.target));
 
+  // Pre-compile word-boundary regexes once (escape special chars)
+  function escapeRegex(s: string): string {
+    return s.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+  }
+  const nameRegexes = importantNames.map((n) => ({
+    ...n,
+    re: new RegExp('\\b' + escapeRegex(n.needle) + '\\b', 'i'),
+  }));
+
   for (const node of nodes) {
-    const desc = (node.description || '').toLowerCase();
-    if (desc.length < 10) continue;
+    const desc = (node.description || '').trim();
+    if (desc.length < 30) continue;
 
-    for (const [name, target] of importantNames) {
-      if (target.id === node.id) continue;
+    for (const candidate of nameRegexes) {
+      if (candidate.id === node.id) continue;
       // Skip same-category unless location (avoids noisy same-type edges)
-      if (target.cat === node.category && target.cat !== 'location') continue;
-      if (name.length < 5) continue;
-      if (!desc.includes(name)) continue;
+      if (candidate.cat === node.category && candidate.cat !== 'location') continue;
+      if (!candidate.re.test(desc)) continue;
 
-      const key = node.id + '→' + target.id;
-      const rev = target.id + '→' + node.id;
+      const key = node.id + '→' + candidate.id;
+      const rev = candidate.id + '→' + node.id;
       if (edgeKeySet.has(key) || edgeKeySet.has(rev)) continue;
       edgeKeySet.add(key);
-      addEdge(node.id, target.id, 'mentions', 'relation');
+      addEdge(node.id, candidate.id, 'mentions', 'relation');
     }
   }
 
   return { nodes, edges, isDemo: false };
+}
+
+/* ══════════════════════════════════════════════════════
+ *  Fork edges: fetch CulturalEntity fork relationships
+ * ══════════════════════════════════════════════════════ */
+
+export async function fetchForkEdges(
+  apiBaseUrl: string,
+  token?: string,
+): Promise<{ nodes: InstanceNode[]; edges: InstanceEdge[] }> {
+  const headers: Record<string, string> = { 'Content-Type': 'application/json' };
+  if (token) headers['Authorization'] = 'Bearer ' + token;
+
+  const nodes: InstanceNode[] = [];
+  const edges: InstanceEdge[] = [];
+  const nodeIdSet = new Set<string>();
+
+  try {
+    const res = await apiFetch(
+      `${apiBaseUrl}/api/v1/data/cultural-entities/?limit=200&offset=0`,
+      { headers }
+    );
+    const data = await res.json();
+    const entities = data.results || data || [];
+
+    let eid = 0;
+    for (const entity of entities) {
+      const nodeId = `ce_${entity.entity_id}`;
+      if (!nodeIdSet.has(nodeId)) {
+        nodeIdSet.add(nodeId);
+        nodes.push({
+          id: nodeId,
+          label: entity.name,
+          category: 'tradition' as InstanceCategory,
+          entityType: 'cultural_entity',
+          description: entity.description || '',
+          apiEndpoint: `/data/api/cultural-entities/${entity.entity_id}/`,
+          rawData: entity,
+        });
+      }
+      if (entity.parent_entity) {
+        const parentId = `ce_${entity.parent_entity}`;
+        edges.push({
+          id: `fork_e_${eid++}`,
+          source: parentId,
+          target: nodeId,
+          label: 'fork',
+          edgeType: 'fork',
+        });
+      }
+    }
+  } catch {
+    // silently fail
+  }
+
+  return { nodes, edges };
+}
+
+export function mergeForkData(
+  base: InstanceGraphData,
+  forkData: { nodes: InstanceNode[]; edges: InstanceEdge[] },
+): InstanceGraphData {
+  const existingNodeIds = new Set(base.nodes.map((n) => n.id));
+  const newNodes = forkData.nodes.filter((n) => !existingNodeIds.has(n.id));
+  return {
+    ...base,
+    nodes: [...base.nodes, ...newNodes],
+    edges: [...base.edges, ...forkData.edges],
+  };
 }
 
 /* ══════════════════════════════════════════════════════
