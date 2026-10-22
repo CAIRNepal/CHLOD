@@ -2502,7 +2502,7 @@ SHACL enforcement, external-authority reconciliation, LOD publishing, evaluation
 <li><strong>Heritage Museum</strong> (<code>/heritage-museum</code>): <code>src/lib/museum-graph.ts</code> + <code>kg-graph.ts</code> fetch
   <code>/api/v1/cidoc/kg/graph/</code>; cluster dedup + canonical member preference; live corpus default.</li>
 <li><strong>Graphview</strong> (<code>/graphview</code>): Cytoscape instance graph via <code>src/lib/instance-graph.ts</code>.</li>
-<li><strong>Atlas</strong> (<code>/atlas</code>): Cesium globe + live CIDOC hydration (<code>src/lib/atlas-api-hydrate.ts</code>).</li>
+<li><strong>Atlas</strong> (<code>/atlas</code>): Leaflet map of Nepal, reading the same live graph as the museum (<code>src/lib/heritage-museum/use-heritage-collection.ts</code>).</li>
 <li>Nodes typed via <code>RDF_CLASS_URI_TO_NODE_TYPE</code>; edges are <strong>real triples</strong> (not name-matching heuristics).</li>
 </ul>
 <hr />

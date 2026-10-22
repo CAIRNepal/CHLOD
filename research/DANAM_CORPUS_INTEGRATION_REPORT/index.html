@@ -2233,7 +2233,7 @@
 <p>This dual-layer design is the same pattern used, in different vocabularies, by Wikidata (item + sitelinks + references), Europeana (EDM aggregation + provider graphs), Linked Art / Getty (CIDOC-CRM A-Box + controlled vocabularies), and ResearchSpace / British Museum (CRM + named-graph provenance).</p>
 <hr />
 <h2 id="2-corpus-characterization-what-you-are-finalizing">2. Corpus characterization (what you are finalizing)</h2>
-<p>Measured on <code>data/reconciled/danam-heritagegraph.nq</code> (post–vocabulary crosswalk to <code>https://w3id.org/heritagegraph/</code>):</p>
+<p>Measured on <code>data/reconciled/danam-heritagegraph.nq</code> (post–vocabulary crosswalk to <code>https://cair-nepal.org/heritagegraph/</code>):</p>
 <table>
 <thead>
 <tr>
@@ -2264,7 +2264,7 @@
 </tr>
 <tr>
 <td>Ontology IRIs</td>
-<td style="text-align: right;">Current released TBox (<code>w3id.org/heritagegraph/</code> + CIDOC-CRM / CRMinf)</td>
+<td style="text-align: right;">Current released TBox (<code>cair-nepal.org/heritagegraph/</code> + CIDOC-CRM / CRMinf)</td>
 </tr>
 </tbody>
 </table>
@@ -2368,7 +2368,7 @@
 <h3 id="51-identity-policy">5.1 Identity policy</h3>
 <ul>
 <li><strong>Stable external IRI:</strong> keep <code>https://data.cair-nepal.org/heritagegraph/id/...</code> as <code>dcterms:identifier</code> / <code>owl:sameAs</code>.  </li>
-<li><strong>Platform IRI:</strong> mint <code>https://w3id.org/heritagegraph/resource/{type}/{pk}</code> via normal projection.  </li>
+<li><strong>Platform IRI:</strong> mint <code>https://cair-nepal.org/heritagegraph/resource/{type}/{pk}</code> via normal projection.  </li>
 <li><strong>Dedup:</strong> idempotent ETL key = external IRI (or DANAM <code>rid</code> when present). Re-runs update, never duplicate.  </li>
 <li><strong>Identity layer (spec 005):</strong> after load, run cluster hints for label collisions (e.g. temples already contributed manually vs DANAM).</li>
 </ul>

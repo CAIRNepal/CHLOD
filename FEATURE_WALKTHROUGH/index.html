@@ -1006,15 +1006,15 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#5-atlas-heritage-in-space-and-time-3d-globe" class="md-nav__link">
+  <a href="#5-atlas-where-the-collection-is" class="md-nav__link">
     <span class="md-ellipsis">
       
-        5. Atlas — heritage in space and time (3D globe)
+        5. Atlas — where the collection is
       
     </span>
   </a>
   
-    <nav class="md-nav" aria-label="5. Atlas — heritage in space and time (3D globe)">
+    <nav class="md-nav" aria-label="5. Atlas — where the collection is">
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
@@ -1033,50 +1033,6 @@
     <span class="md-ellipsis">
       
         What the audience sees
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#how-it-works_1" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        How it works
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#data-flow_1" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Data flow
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#why-this-stack_2" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Why this stack
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#talking-points_4" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Talking points
       
     </span>
   </a>
@@ -2728,15 +2684,15 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#5-atlas-heritage-in-space-and-time-3d-globe" class="md-nav__link">
+  <a href="#5-atlas-where-the-collection-is" class="md-nav__link">
     <span class="md-ellipsis">
       
-        5. Atlas — heritage in space and time (3D globe)
+        5. Atlas — where the collection is
       
     </span>
   </a>
   
-    <nav class="md-nav" aria-label="5. Atlas — heritage in space and time (3D globe)">
+    <nav class="md-nav" aria-label="5. Atlas — where the collection is">
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
@@ -2755,50 +2711,6 @@
     <span class="md-ellipsis">
       
         What the audience sees
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#how-it-works_1" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        How it works
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#data-flow_1" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Data flow
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#why-this-stack_2" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Why this stack
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#talking-points_4" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Talking points
       
     </span>
   </a>
@@ -2942,10 +2854,10 @@ doc to drive a live demo or a slide deck.</p>
 <td>Two tools for two jobs — see §2 and §4.</td>
 </tr>
 <tr>
-<td>3D</td>
-<td><strong>Three.js</strong> &amp; <strong>Cesium + Resium</strong></td>
-<td>0.184 / 1.123</td>
-<td>360° panoramas vs. a 3D globe — see §4 and §5.</td>
+<td>3D / maps</td>
+<td><strong>Three.js</strong> &amp; <strong>Leaflet</strong></td>
+<td>0.184 / 1.9</td>
+<td>360° panoramas (§4) and the map of Nepal (§5).</td>
 </tr>
 </tbody>
 </table>
@@ -2956,7 +2868,7 @@ doc to drive a live demo or a slide deck.</p>
   <a href="../heritage_graph_ui/src/lib/ontology/OntologyProvider.tsx">OntologyProvider</a>) and into a
   visualization config (<code>tools/gen_heritage_viz_config.py</code> → <code>heritage-viz-config</code>) that
   drives node colors, icons, and relation labels. <strong>One schema → forms <em>and</em> visualizations.</strong></li>
-<li><strong>Heavy/visual surfaces are <code>dynamic(..., { ssr: false })</code>.</strong> Cytoscape, Cesium, and the
+<li><strong>Heavy/visual surfaces are <code>dynamic(..., { ssr: false })</code>.</strong> Cytoscape, Leaflet, and the
   Three.js panorama never run on the server and never block first paint — they load as a lazy
   client island with a loading fallback.</li>
 <li><strong>API calls carry the Bearer token.</strong> <code>process.env.NEXT_PUBLIC_API_URL</code> + <code>Authorization:
@@ -3016,9 +2928,9 @@ doc to drive a live demo or a slide deck.</p>
 <td>5</td>
 <td><strong>Atlas</strong></td>
 <td><code>/atlas</code></td>
-<td>Cesium + Resium</td>
+<td>Leaflet + baked relief</td>
 <td>Demo corpus / live toggle</td>
-<td>Heritage placed in space <em>and</em> time on a 3D Earth</td>
+<td>Where the collection is, with distances, altitude and periods</td>
 </tr>
 </tbody>
 </table>
@@ -3240,74 +3152,22 @@ fetchInstanceGraphData(API_BASE, token) ──► same REST-built graph as /grap
 <li>"Same graph, two audiences: researchers use Graph View; the public gets the Museum."</li>
 </ul>
 <hr />
-<h2 id="5-atlas-heritage-in-space-and-time-3d-globe">5. Atlas — heritage in space <em>and</em> time (3D globe)</h2>
-<p><strong>Code:</strong> <a href="../heritage_graph_ui/src/app/(dashboard)/atlas/">atlas/</a> ·
-globe <a href="../heritage_graph_ui/src/app/(dashboard)/atlas/components/globe.tsx">components/globe.tsx</a> ·
-store <a href="../heritage_graph_ui/src/app/(dashboard)/atlas/hooks/use-atlas-store.ts">hooks/use-atlas-store.ts</a></p>
+<h2 id="5-atlas-where-the-collection-is">5. Atlas — where the collection is</h2>
+<p><strong>Code:</strong> <a href="../heritage_graph_ui/src/app/(site)/atlas/">atlas/</a> ·
+map <a href="../heritage_graph_ui/src/app/(site)/atlas/components/AtlasMap.tsx">components/AtlasMap.tsx</a> ·
+model <a href="../heritage_graph_ui/src/lib/heritage-atlas/atlas-model.ts">lib/heritage-atlas/atlas-model.ts</a></p>
 <h3 id="stack_4">Stack</h3>
-<p><strong>CesiumJS</strong> 1.123 (open-source 3D-geospatial engine) via <strong>Resium</strong> 1.18 (React bindings) ·
-<strong>Zustand</strong> store for camera/filters/timeline/FX · generated ontology colors. Data: <strong>demo
-corpus by default</strong>, <strong>live KG projection on demand</strong> (<code>use-atlas-data-source</code> →
-<code>fetchKgGraph(/api/v1/cidoc/kg/graph/)</code> → <code>hydrateAtlasFromKgGraph</code> — the same authoritative
-endpoint as the Heritage Museum).</p>
+<p><strong>Leaflet</strong> over two baked shaded-relief images of Nepal and the Kathmandu Valley (SRTM-derived,
+<code>tools/bake_atlas_relief.py</code>), with an optional OpenStreetMap Streets layer. Data comes from the
+same loader as the museum (<code>useHeritageCollection</code>): the illustrated demo corpus by default, the
+live graph from <code>/api/v1/cidoc/kg/graph/</code> on request.</p>
 <h3 id="what-the-audience-sees">What the audience sees</h3>
-<p>A photorealistic, spinnable <strong>3D Earth</strong> with heritage entities pinned at their real
-coordinates; a <strong>timeline</strong> filters by era, a <strong>city-jump bar</strong> flies the camera to a place, a
-<strong>spotlight</strong> highlights selected entities, and clicking a pin opens an <strong>entity panel</strong> with
-provenance.</p>
-<h3 id="how-it-works_1">How it works</h3>
-<ul>
-<li><strong>Cesium assets</strong> (workers, widgets, terrain) are copied into <code>public/</code> at build time
-  (<code>copy-cesium-assets.mjs</code>, wired into <code>predev</code>/<code>prebuild</code>/<code>postinstall</code>); a
-  <code>cesium-assets-gate</code> confirms they're present before the globe renders. The
-  <code>cesium-base-url</code> side-effect import runs <strong>before</strong> Cesium resolves its worker URLs.</li>
-<li><strong>Rendering</strong> — Resium's <code>&lt;Viewer&gt;</code> + <code>&lt;Entity&gt;</code> + camera controllers; pins are colored by
-  <strong>ontology class</strong> (<code>colorForOntologyClass</code>), with distance-based label scaling so the globe
-  stays readable.</li>
-<li><strong>Temporal dimension</strong> — <code>atlas-time-extents.ts</code> + <code>temporalGlobeAlpha</code> /
-  <code>entityExistedAtYear</code> fade entities in and out as you <strong>scrub the timeline</strong> — heritage
-  appears and disappears across history.</li>
-<li><strong>State</strong> — a single <strong>Zustand</strong> store holds camera handles, active filters, the timeline
-  year, FX presets, and the demo/live load token; selectors use <code>useShallow</code> to avoid
-  re-renders.</li>
-<li><strong>Polish</strong> — reduced-motion support (<code>atlasPrefersReducedMotion</code>), keyboard shortcuts
-  (<code>use-atlas-shortcuts</code>), fullscreen, an error boundary, optional sound + telemetry.</li>
-</ul>
-<h3 id="data-flow_1">Data flow</h3>
-<pre><code>demo corpus (ATLAS_DUMMY_ENTITIES) ──► default globe
-                  │  user requests &quot;live&quot; (or ?source=live)
-                  ▼
-fetchKgGraph(/api/v1/cidoc/kg/graph/?scope=reviewed&amp;include_lux=linked)
-                  │   one call — Oxigraph projection + enrich_museum_graph_nodes
-                  ▼   (server-side WKT coords, narrative, media, edge provenance)
-hydrateAtlasFromKgGraph ──► entities (IRI ids, coord tiers verified/inherited/
-                  │          gazetteer/unmapped) + assertion-backed edges +
-                  │          sources/agents derived from PROV-O edge provenance
-                  ▼
-Zustand store ──► Cesium &lt;Entity&gt; pins (colored by class, faded by year)
-</code></pre>
-<p>Live mode shares <code>lib/kg-geo.ts</code> (location-edge coordinate propagation) with the Museum,
-caches the projection in <code>sessionStorage</code> for 5 minutes, syncs <code>source</code>/<code>selected</code>/<code>panel</code>/
-<code>year</code> to the URL for shareable views, and offers signed-in curators a <strong>Reviewed/All</strong>
-scope toggle. No synthetic assertions: the provenance and sources tabs show real citations,
-confidence scores, asserters, and temporal scope from the knowledge graph.</p>
-<h3 id="why-this-stack_2">Why this stack</h3>
-<ul>
-<li><strong>Cesium over a 2D map (Mapbox/Leaflet)</strong> — heritage is global and <em>temporal</em>; a true 3D
-  globe with a <strong>time dimension</strong> shows <em>where</em> <strong>and</strong> <em>when</em>, which a flat map can't.</li>
-<li><strong>Cesium is open-source and self-hostable</strong> — assets ship in our own <code>public/</code>, no
-  proprietary map dependency or per-tile billing.</li>
-<li><strong>Resium</strong> keeps the imperative Cesium API declarative and React-friendly.</li>
-<li><strong>Zustand</strong> — the globe has lots of fast-changing UI state (camera, year, filters); a tiny
-  store keeps that fluid without Redux ceremony.</li>
-</ul>
-<h3 id="talking-points_4">Talking points</h3>
-<ul>
-<li>"Two dimensions the network graph can't show: <strong>geography and time</strong>."</li>
-<li>"Scrub the timeline and watch sites appear across centuries — the demo's 'wow' moment."</li>
-<li>"Fully open-source 3D; assets are self-hosted, nothing proprietary."</li>
-</ul>
-<hr />
+<p>A map of Nepal with every located record, clustered where they crowd together. Picking a place
+draws dashed lines to the places it connects to, labelled with distances, and shows its altitude,
+period, what is at it and what is within 15 km. Colour switches between kind and period; a
+period bar filters by era; a guided tour steps through places in date order; a short list of
+facts (valley share, oldest, highest, lowest, where nothing is recorded yet) opens the place it
+names.</p>
 <h2 id="suggested-demo-flow-6-minutes">Suggested demo flow (≈ 6 minutes)</h2>
 <ol>
 <li><strong>Contribute</strong> (1.5 min) — open <code>/contribute/festival</code>, fill two steps, show the
@@ -3318,11 +3178,11 @@ confidence scores, asserters, and temporal scope from the knowledge graph.</p>
 <li><strong>Entity Neighborhood</strong> (0.5 min) — from one entity's page, open its <code>/graph</code> to show the
    live SPARQL-backed drill-down.</li>
 <li><strong>Heritage Museum</strong> (1.5 min) — open <code>/heritage-museum</code>, let a <strong>story beat</strong> play, let the
-   <strong>narration</strong> speak, then follow <strong>View on globe</strong> into the Atlas. "Same data, public
+   <strong>narration</strong> speak, then follow <strong>View in the Atlas</strong>. "Same data, public
    storytelling — all in the browser." (Skip the 360° panorama unless the entity on screen has
    a genuine equirectangular image; the button is hidden otherwise.)</li>
-<li><strong>Atlas</strong> (1.5 min) — open <code>/atlas</code>, fly to a city, <strong>scrub the timeline</strong> across eras.
-   Close on the 3D globe.</li>
+<li><strong>Atlas</strong> (1.5 min) — open <code>/atlas</code>, pick a place to see its connections drawn across Nepal,
+   then filter by period.</li>
 </ol>
 <blockquote>
 <p>Tip: both Atlas and the Museum default to the <strong>demo corpus</strong>, so the demo always looks
@@ -3378,15 +3238,15 @@ great. Flip the <strong>live toggle</strong> only if you want to show real contr
 </tr>
 <tr>
 <td>Atlas</td>
-<td><strong>Cesium</strong> + <strong>Resium</strong></td>
-<td><strong>Zustand</strong></td>
+<td><strong>Leaflet</strong> + baked relief</td>
+<td>React state</td>
 <td>demo / live toggle</td>
-<td>Open-source 3D globe with a real time dimension</td>
+<td>Light map of Nepal that states distances, altitude and periods</td>
 </tr>
 </tbody>
 </table>
 <p><strong>Recurring engineering decisions, in one line each:</strong>
-- <strong>SSR-off dynamic imports</strong> for Cytoscape / Cesium / Three.js → heavy code never blocks first
+- <strong>SSR-off dynamic imports</strong> for Cytoscape / Leaflet / Three.js → heavy code never blocks first
   paint.
 - <strong>Ontology-registry codegen</strong> → forms <em>and</em> visualization colors/labels come from one source.
 - <strong>Demo-first, live-on-demand</strong> → reliable demos, real data one click away.

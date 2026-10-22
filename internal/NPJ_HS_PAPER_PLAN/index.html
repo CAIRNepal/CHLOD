@@ -2410,7 +2410,7 @@
 <td><strong>B2</strong></td>
 <td>No data availability statement with persistent identifier</td>
 <td><em>npj HS</em> requires a Zenodo/Dryad/Figshare DOI for data and code. Personal GitHub URLs are not acceptable as the only deposit.</td>
-<td>Cut a <code>paper-v1.0</code> tag; archive on Zenodo; cite the DOI. Mint a <strong>w3id.org/heritagegraph/</strong> prefix for the ontology — vendor-neutral, community-resolvable.</td>
+<td>Cut a <code>paper-v1.0</code> tag; archive on Zenodo; cite the DOI. Mint a <strong>cair-nepal.org/heritagegraph/</strong> prefix for the ontology — vendor-neutral, community-resolvable.</td>
 </tr>
 <tr>
 <td><strong>B3</strong></td>
@@ -2620,7 +2620,7 @@
 <h3 id="query-design">Query design</h3>
 <p>The query must traverse three endpoints and return a single resolved entity with cross-cluster context. Sketch (replace placeholders with real IRIs from your deployment):</p>
 <pre><code class="language-sparql">PREFIX crm:     &lt;http://www.cidoc-crm.org/cidoc-crm/&gt;
-PREFIX hg:      &lt;https://w3id.org/heritagegraph/entity/&gt;
+PREFIX hg:      &lt;https://cair-nepal.org/heritagegraph/entity/&gt;
 PREFIX aat:     &lt;http://vocab.getty.edu/aat/&gt;
 PREFIX wd:      &lt;http://www.wikidata.org/entity/&gt;
 PREFIX wdt:     &lt;http://www.wikidata.org/prop/direct/&gt;
@@ -2635,7 +2635,7 @@ WHERE {
             rdfs:label ?label ;
             crm:P2_has_type ?aatType ;
             owl:sameAs ?wdItem .
-    FILTER(STRSTARTS(STR(?entity), &quot;https://w3id.org/heritagegraph/&quot;))
+    FILTER(STRSTARTS(STR(?entity), &quot;https://cair-nepal.org/heritagegraph/&quot;))
   }
 
   # Federated: Getty AAT
@@ -2655,7 +2655,7 @@ WHERE {
 </code></pre>
 <p><strong>Pre-flight checks before you commit this query to the paper:</strong>
 1. Your Fuseki endpoint must be publicly resolvable at a <strong>stable URL</strong> (not <code>localhost</code>, not an IP). Mint a subdomain.
-2. The HG entity IRI must be a <code>w3id.org/heritagegraph/...</code> PURL that 303-redirects to your Fuseki content-negotiable endpoint. <em>Do not use bare backend.localhost URIs in the paper.</em>
+2. The HG entity IRI must be a <code>cair-nepal.org/heritagegraph/...</code> PURL that 303-redirects to your Fuseki content-negotiable endpoint. <em>Do not use bare backend.localhost URIs in the paper.</em>
 3. The <code>owl:sameAs</code> link to Wikidata must be asserted in your graph and serialized.
 4. The Getty AAT type IRI must actually exist (verify against vocab.getty.edu).
 5. The query must execute end-to-end in under 30s against live endpoints. Test it from a fresh machine.</p>

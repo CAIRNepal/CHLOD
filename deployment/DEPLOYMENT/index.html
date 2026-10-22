@@ -3819,7 +3819,6 @@ TRAEFIK_DASHBOARD_USER=admin
 TRAEFIK_DASHBOARD_PASSWORD=&lt;generate-with: htpasswd -nb admin yourpassword&gt;
 </code></pre>
 <blockquote>
-<p><strong>Heritage Atlas (Cesium):</strong> Production frontend builds must run <strong><code>npm run build</code></strong> inside <code>heritage_graph_ui</code> (or the repo Docker frontend target), so the <code>prebuild</code> step copies static Cesium workers into <code>public/cesium</code>. Using <strong><code>next build</code> alone</strong> or <strong><code>npm ci --ignore-scripts</code></strong> without also running <strong><code>npm run copy-cesium</code></strong> in <code>heritage_graph_ui</code> breaks <strong><code>/atlas</code></strong> when the browser cannot load <strong><code>/cesium/Workers/</code></strong>.</p>
 <p><strong>Generate secrets</strong> (run these one by one and paste into <code>.env</code>):
 <code>bash
 openssl rand -base64 50   # DJANGO_SECRET_KEY

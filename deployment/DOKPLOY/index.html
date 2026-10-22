@@ -1486,10 +1486,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#heritage-atlas-cesium-3d-globe" class="md-nav__link">
+  <a href="#heritage-atlas" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Heritage Atlas (Cesium 3D globe)
+        Heritage Atlas
       
     </span>
   </a>
@@ -2225,10 +2225,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#heritage-atlas-cesium-3d-globe" class="md-nav__link">
+  <a href="#heritage-atlas" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Heritage Atlas (Cesium 3D globe)
+        Heritage Atlas
       
     </span>
   </a>
@@ -2440,21 +2440,10 @@ printf '%s' &quot;$WEBHOOK_URL&quot; | gh secret set DOKPLOY_WEBHOOK_URL --repo 
 <h2 id="migrations">Migrations</h2>
 <p><code>MIGRATION_AUTO_REPAIR=1</code> is set for the <strong>backend</strong> service in this compose file. On startup, the entrypoint runs <code>repair_migration_history</code> before <code>migrate</code>, which fixes the common <code>InconsistentMigrationHistory</code> case (<code>admin</code> recorded before <code>users</code> with a custom user model).</p>
 <p>To disable after the database is healthy, set <code>MIGRATION_AUTO_REPAIR=0</code> (or remove it) in Dokploy and redeploy.</p>
-<h2 id="heritage-atlas-cesium-3d-globe">Heritage Atlas (Cesium 3D globe)</h2>
-<p>The <strong><code>frontend</code></strong> Dockerfile runs <strong><code>npm run build</code></strong>, which runs <strong><code>prebuild</code></strong> and copies <strong><code>node_modules/cesium/…</code></strong> into <strong><code>public/cesium/</code></strong> (workers, WASM, Assets). Never replace that with bare <strong><code>next build</code></strong> without <strong><code>copy-cesium-assets</code></strong> or the atlas will fail at runtime.</p>
-<p><strong>Verify after deploy:</strong></p>
-<ul>
-<li>From a browser or shell: <strong><code>GET https://&lt;your-app-host&gt;/cesium/Assets/approximateTerrainHeights.json</code></strong> should return <strong>HTTP 200</strong> (JSON). <strong><code>404</code>/HTML from the SPA</strong> usually means <strong><code>public/cesium</code></strong> never made it into the image or the path is not routed to the frontend.</li>
-<li>In <strong><code>heritage_graph_ui</code></strong>, you can smoke-check locally: <strong><code>npm run verify:cesium-public</code></strong> (checks <code>public/cesium</code> layout after copy).</li>
-</ul>
-<p>If <strong><code>approximateTerrainHeights.json</code></strong> is <strong>200</strong> but the globe still errors, open <strong>DevTools → Console</strong> on <strong><code>/atlas</code></strong> and watch for Content Security Policy (CSP) reports: Cesium expects workers (often <strong><code>blob:</code></strong>) and WASM. If your Dokploy ingress, CDN, or a security middleware injects CSP, widen it responsibly. Typical ingredients (adapt to your security model; tighten <code>default-src</code>/hosts as needed):</p>
-<pre><code>script-src 'self' 'wasm-unsafe-eval' 'unsafe-eval' blob: https:
-worker-src 'self' blob:
-connect-src 'self' https://server.arcgisonline.com ...
-img-src 'self' data: blob: https:
-</code></pre>
-<p>Imagery tiles use <strong><code>https://server.arcgisonline.com/...</code></strong>; include that host in <strong><code>connect-src</code></strong>/<strong><code>img-src</code></strong> if you constrain those directives.</p>
-<p><strong>Operator-only UI:</strong> Set <strong><code>NEXT_PUBLIC_ATLAS_SHOW_ERROR_DETAIL=true</code></strong> on the <strong><code>frontend</code></strong> service to show <strong><code>AtlasErrorBoundary</code></strong> exception text after a hard failure (helps distinguish WebGL vs. script errors vs. CSP). Leave unset for normal deployments.</p>
+<h2 id="heritage-atlas">Heritage Atlas</h2>
+<p>The atlas is a Leaflet map of Nepal over two baked shaded-relief images and an elevation grid in <strong><code>heritage_graph_ui/public/atlas/</code></strong> (regenerate with <strong><code>python tools/bake_atlas_relief.py</code></strong>). Nothing is copied at build time and no tile server is needed for the default view.</p>
+<p>The optional <strong>Streets</strong> layer (and the museum map) use OpenStreetMap tiles by default. For production traffic set <strong><code>NEXT_PUBLIC_MAP_TILE_URL</code></strong> (and <strong><code>NEXT_PUBLIC_MAP_TILE_ATTRIBUTION</code></strong>) to a keyed provider; its host is added to the CSP automatically.</p>
+<p><strong>Operator-only UI:</strong> Set <strong><code>NEXT_PUBLIC_ATLAS_SHOW_ERROR_DETAIL=true</code></strong> on the <strong><code>frontend</code></strong> service to show <strong><code>AtlasErrorBoundary</code></strong> exception text after a hard failure. Leave unset for normal deployments.</p>
 <h2 id="more-help">More help</h2>
 <ul>
 <li><a href="../../TROUBLESHOOTING/">TROUBLESHOOTING.md</a> — migration history, CORS, OAuth.</li>

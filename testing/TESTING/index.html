@@ -2994,7 +2994,7 @@ pip install -r heritage_graph/requirements.txt linkml pyyaml
 </tr>
 <tr>
 <td><code>RDF_RESOURCE_BASE_URI</code></td>
-<td><code>https://w3id.org/heritagegraph/resource/</code></td>
+<td><code>https://cair-nepal.org/heritagegraph/resource/</code></td>
 <td>Instance IRIs</td>
 </tr>
 <tr>
@@ -3175,12 +3175,12 @@ DJANGO_ENV=development python manage.py rdf_rebuild --purge-imports
 </code></pre>
 <h3 id="53-sparql-sanity-docker-oxigraph">5.3 SPARQL sanity (Docker Oxigraph)</h3>
 <p>Instance IRIs use:</p>
-<pre><code class="language-text">https://w3id.org/heritagegraph/resource/{model_name_lower}/{pk}
+<pre><code class="language-text">https://cair-nepal.org/heritagegraph/resource/{model_name_lower}/{pk}
 </code></pre>
 <p>Example (replace <code>65</code> with a real person id):</p>
 <pre><code class="language-sparql">PREFIX rdfs: &lt;http://www.w3.org/2000/01/rdf-schema#&gt;
 SELECT ?p ?o WHERE {
-  &lt;https://w3id.org/heritagegraph/resource/person/65&gt; ?p ?o .
+  &lt;https://cair-nepal.org/heritagegraph/resource/person/65&gt; ?p ?o .
 }
 LIMIT 50
 </code></pre>
@@ -3241,7 +3241,7 @@ LIMIT 50
 <li><strong>Graph panel:</strong> uses filtered entities and ontology edges from the same corpus.</li>
 <li><strong>Search / entity panel:</strong> should list contributed names.</li>
 </ol>
-<p><strong>Important:</strong> Persons without lat/lon appear in graph/search but <strong>not</strong> on the Cesium globe. For globe testing, contribute a <strong>Location</strong> or <strong>Structure</strong> with coordinates:</p>
+<p><strong>Important:</strong> Persons without lat/lon appear in graph/search but <strong>not</strong> on the Atlas map. For map testing, contribute a <strong>Location</strong> or <strong>Structure</strong> with coordinates:</p>
 <pre><code class="language-json">{
   &quot;latitude&quot;: 27.7172,
   &quot;longitude&quot;: 85.324

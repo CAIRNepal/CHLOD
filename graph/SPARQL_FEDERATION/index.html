@@ -1969,11 +1969,11 @@
 </tr>
 <tr>
 <td>Is graph/public queryable over HTTP today?</td>
-<td><strong>Yes, mediated:</strong> <code>POST /api/v1/cidoc/sparql/</code> (<code>SparqlProxyView</code>) proxies to Oxigraph and rejects writes via <code>is_readonly_sparql_query()</code> (rdf_signals.py — regex allowlist of SELECT/ASK/CONSTRUCT/DESCRIBE). The named graph <code>https://w3id.org/heritagegraph/graph/public</code> is addressable with <code>GRAPH</code>/<code>FROM</code>.</td>
+<td><strong>Yes, mediated:</strong> <code>POST /api/v1/cidoc/sparql/</code> (<code>SparqlProxyView</code>) proxies to Oxigraph and rejects writes via <code>is_readonly_sparql_query()</code> (rdf_signals.py — regex allowlist of SELECT/ASK/CONSTRUCT/DESCRIBE). The named graph <code>https://cair-nepal.org/heritagegraph/graph/public</code> is addressable with <code>GRAPH</code>/<code>FROM</code>.</td>
 </tr>
 <tr>
 <td>Resource IRIs</td>
-<td><code>https://w3id.org/heritagegraph/resource/&lt;registry_key&gt;/&lt;pk&gt;</code> (<code>RDF_RESOURCE_BASE_URI</code>).</td>
+<td><code>https://cair-nepal.org/heritagegraph/resource/&lt;registry_key&gt;/&lt;pk&gt;</code> (<code>RDF_RESOURCE_BASE_URI</code>).</td>
 </tr>
 </tbody>
 </table>
@@ -1986,11 +1986,11 @@ the demonstrator entities — dev currently has <strong>zero</strong> populated
 stand on until reconciliation is run.</p>
 <h2 id="2-draft-three-endpoint-federation-query">2. Draft three-endpoint federation query</h2>
 <p>Demonstrator: <strong>Bhimsen Tower (Dharahara)</strong> —
-<code>https://w3id.org/heritagegraph/resource/monument/21</code> (real row in the curated DB).
+<code>https://cair-nepal.org/heritagegraph/resource/monument/21</code> (real row in the curated DB).
 Prefixes are exactly those defined in <code>apps/graph/ontology_config.py</code>; Wikidata
 <em>property</em> IRIs are written in full because <code>wdt:</code>/<code>wd:</code> are deliberately not in
 <code>RDF_PREFIXES</code> (only <code>wikidata:</code> for the entity namespace).</p>
-<pre><code class="language-sparql">PREFIX heritageGraph: &lt;https://w3id.org/heritagegraph/&gt;
+<pre><code class="language-sparql">PREFIX heritageGraph: &lt;https://cair-nepal.org/heritagegraph/&gt;
 PREFIX crm:      &lt;http://www.cidoc-crm.org/cidoc-crm/&gt;
 PREFIX rdfs:     &lt;http://www.w3.org/2000/01/rdf-schema#&gt;
 PREFIX skos:     &lt;http://www.w3.org/2004/02/skos/core#&gt;
@@ -2001,8 +2001,8 @@ PREFIX gvp:      &lt;http://vocab.getty.edu/ontology#&gt;   # used only inside t
 SELECT ?monument ?label ?wd ?wdLabel ?coord ?image ?aatType ?aatPref WHERE {
 
   # ── 1. HeritageGraph (local graph/public) ────────────────────────────────
-  GRAPH &lt;https://w3id.org/heritagegraph/graph/public&gt; {
-    BIND (&lt;https://w3id.org/heritagegraph/resource/monument/21&gt; AS ?monument)
+  GRAPH &lt;https://cair-nepal.org/heritagegraph/graph/public&gt; {
+    BIND (&lt;https://cair-nepal.org/heritagegraph/resource/monument/21&gt; AS ?monument)
     ?monument rdfs:label ?label .
     # Reconciled identity links (written by the identity workspace):
     OPTIONAL { ?monument skos:exactMatch ?wd
